@@ -1,0 +1,64 @@
+.collections-section {
+  padding: 40px 20px;
+  background: #fff;
+}
+
+.collections-title {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.collections-sub {
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* -------- Horizontal scroll container -------- */
+.collections-slider {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;          /* enables horizontal scroll */
+  padding-bottom: 10px;
+  scrollbar-width: none;     /* Firefox */
+}
+.collections-slider::-webkit-scrollbar {
+  display: none;             /* Chrome/Safari */
+}
+
+/* -------- Card styling -------- */
+.collection-card {
+  flex: 0 0 auto;            /* don’t shrink */
+  width: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  background: #f9f9f9;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.collection-card img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  display: block;
+}
+
+.collection-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 12px;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0));
+}
+
+.collection-info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.collection-info p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+}
