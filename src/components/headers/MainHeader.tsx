@@ -122,7 +122,7 @@ const MainHeader: React.FC = () => {
 
       {/* Logo */}
       <Link href="/" className="text-2xl font-bold">
-        NQD
+        SNM
       </Link>
 
       {/* Right icons */}

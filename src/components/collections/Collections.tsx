@@ -79,7 +79,7 @@ const Collections: React.FC = () => {
 
 
       <div style={{ padding: "40px", textAlign: "center" }}>
-        <h1>Welcome to NQD Fashion Store</h1>
+        <h1>Welcome to SNM Fashion Store</h1>
         <p>Explore our categories above.</p>
       </div>
     </section>

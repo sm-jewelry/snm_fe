@@ -30,8 +30,8 @@ const Footer = () => {
             <li><a href="/legal/shipping">Shipping</a></li>
             <li><a href="/legal/terms-conditions">Terms & Conditions</a></li>
             <li><a href="/legal/faqs">FAQ’s</a></li>
-            <li><a href="#">Compare</a></li>
-            <li><a href="#">My Wishlist</a></li>
+            {/* <li><a href="#">Compare</a></li> */}
+            <li><a href="/wishlist">My Wishlist</a></li>
           </ul>
         </div>
 
@@ -39,11 +39,11 @@ const Footer = () => {
         <div className="footer-col">
           <h4>About us</h4>
           <ul>
-            <li><a href="#">Our Story</a></li>
-            <li><a href="#">Visit Our Store</a></li>
+            {/* <li><a href="#">Our Story</a></li>
+            <li><a href="#">Visit Our Store</a></li> */}
             <li><a href="/legal/contact-us">Contact Us</a></li>
             <li><a href="/legal/about-us">About Us</a></li>
-            <li><a href="#">Account</a></li>
+            <li><a href="/profile">Account</a></li>
           </ul>
         </div>
 
