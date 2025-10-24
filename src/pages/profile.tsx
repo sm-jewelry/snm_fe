@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
-const LOGIN_FRONTEND_URL = process.env.NEXT_LOGIN_FRONTEND_URL; // your Hydra-Kratos frontend
+const LOGIN_FRONTEND_URL = process.env.NEXT_PUBLIC_LOGIN_FRONTEND_URL; // your Hydra-Kratos frontend
 
 interface UserInfo {
   email: string;
@@ -45,7 +45,6 @@ async function refreshAccessTokenOnServer(refreshToken: string) {
   if (data.refresh_token) localStorage.setItem("refresh_token", data.refresh_token);
   if (data.id_token) localStorage.setItem("id_token", data.id_token);
 
-  console.log("✅ Token refreshed successfully");
   return data.access_token;
 }
 
