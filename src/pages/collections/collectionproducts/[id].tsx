@@ -1,7 +1,5 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import Seo from "../../../components/common/Seo";
 
 interface Product {
@@ -22,8 +20,7 @@ const MAIN_API = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const ProductDetail: React.FC = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const { id } = router.query;
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -58,7 +55,7 @@ const ProductDetail: React.FC = () => {
   if (loading) return <p className="text-center p-6">Loading...</p>;
   if (!product) return <p className="text-center p-6">Product not found</p>;
 
-  const productUrl = `${process.env.NEXT_LOGIN_FRONTEND_URL}/products/${product._id}`;
+  const productUrl = `${process.env.NEXT_PUBLIC_LOGIN_FRONTEND_URL}/products/${product._id}`;
   const imageList = [product.URL, ...(product.images || [])];
   const mainImage = selectedImage || imageList[0];
 

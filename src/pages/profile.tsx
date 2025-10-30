@@ -1,7 +1,5 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 
 const LOGIN_FRONTEND_URL = process.env.NEXT_PUBLIC_LOGIN_FRONTEND_URL; // your Hydra-Kratos frontend
 
@@ -53,7 +51,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = router.pathname;
 
   useEffect(() => {
     // ---------------- Handle tokens from URL ----------------

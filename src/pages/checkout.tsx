@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 
 interface CheckoutItem {
@@ -79,7 +77,7 @@ const CheckoutPage: React.FC = () => {
             }
             fetchCart(cartId);
         }
-    }, []);
+    }, [token]);
 
     if (loading) return <p>Loading checkout...</p>;
     if (!cart || cart.items.length === 0)

@@ -1,6 +1,5 @@
-"use client";
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useRouter } from "next/router";
 
 interface CatalogProduct {
   _id: string;
@@ -41,8 +40,8 @@ const ORDER_API = process.env.NEXT_PUBLIC_ORDER_API_BASE_URL;
 const CATALOG_API = process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL;
 
 const OrderDetailsPage: React.FC = () => {
-  const params = useParams();
-  const orderId = params?.id as string;
+  const router = useRouter();
+  const { id: orderId } = router.query;
 
   const [order, setOrder] = useState<Order | null>(null);
   const [payment, setPayment] = useState<PaymentDetails | null>(null);

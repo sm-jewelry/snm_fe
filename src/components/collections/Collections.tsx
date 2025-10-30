@@ -1,7 +1,5 @@
-"use client";
-
 import React, { useRef, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 interface Collection {
   _id: string;
