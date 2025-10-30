@@ -1,7 +1,5 @@
-"use client";
-
 import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 const OrderSuccessPage: React.FC = () => {
   const router = useRouter();

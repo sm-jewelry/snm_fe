@@ -1,7 +1,5 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 
 interface Product {
   _id: string;
@@ -13,8 +11,8 @@ interface Product {
 const API_BASE = process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL;
 
 const CategoryPage: React.FC = () => {
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const router = useRouter();
+  const { id } = router.query;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);

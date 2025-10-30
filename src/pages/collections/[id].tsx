@@ -1,8 +1,6 @@
-"use client";
-
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 
 interface Product {
   _id: string;
@@ -22,8 +20,7 @@ const MAIN_API = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const CollectionProductsPage: React.FC = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const { id } = router.query;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [collectionName, setCollectionName] = useState<string>("");
