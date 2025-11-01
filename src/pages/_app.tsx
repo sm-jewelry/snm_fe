@@ -20,6 +20,21 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
       </Head>
+
+      {/* Google Analytics */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-N8CYXX9N9R"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-N8CYXX9N9R');
+        `}
+      </Script>
+
       <Layout>
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
