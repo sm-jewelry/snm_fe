@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Seo from "../../../components/common/Seo";
 
 interface Product {
@@ -22,8 +22,8 @@ const MAIN_API = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const ProductDetail: React.FC = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const params = useParams();
+  const id = params?.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -158,9 +158,8 @@ const ProductDetail: React.FC = () => {
     <>
       <Seo
         title={`${product.title} - Buy Online | NQD Fashion Store`}
-        description={`Buy ${product.title} at just ₹${product.price}. ${
-          product.stock > 0 ? "In stock now!" : "Currently out of stock."
-        }`}
+        description={`Buy ${product.title} at just ₹${product.price}. ${product.stock > 0 ? "In stock now!" : "Currently out of stock."
+          }`}
         ogTitle={product.title}
         ogDescription={`Shop ${product.title} — available at NQD Fashion Store.`}
         ogType="product"

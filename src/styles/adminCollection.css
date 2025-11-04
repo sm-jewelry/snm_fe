@@ -1,0 +1,120 @@
+.admin-collection-container {
+  padding: 30px;
+  font-family: "Inter", sans-serif;
+}
+
+.admin-collection-container h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+/* ---- Form ---- */
+.admin-collection-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 40px;
+  max-width: 400px;
+}
+
+.admin-collection-form input,
+.admin-collection-form textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.admin-collection-form button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.admin-collection-form button:hover {
+  background-color: #0056b3;
+}
+
+.admin-cancel-btn {
+  background-color: #999;
+}
+
+/* ---- Image Preview ---- */
+.admin-image-preview img {
+  max-width: 150px;
+  margin-top: 10px;
+  border-radius: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* ---- Collection Grid ---- */
+.admin-collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.admin-collection-card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.admin-collection-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.admin-collection-card h3 {
+  margin: 10px 0 5px;
+  font-size: 18px;
+}
+
+.admin-collection-card p {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* ---- Actions ---- */
+.admin-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.admin-edit-btn,
+.admin-delete-btn {
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+.admin-edit-btn {
+  background-color: #ffc107;
+}
+
+.admin-delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.admin-edit-btn:hover {
+  background-color: #e0a800;
+}
+
+.admin-delete-btn:hover {
+  background-color: #c82333;
+}

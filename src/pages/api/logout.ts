@@ -4,9 +4,10 @@ import type { NextApiRequest, NextApiResponse } from "next"
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const KRATOS_PUBLIC_URL = process.env.KRATOS_PUBLIC_URL || "http://localhost:4433"
-
+   // 🏠 Where to redirect after successful logout
+    const returnTo = process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000/"
     // Step 1: Ask Kratos for a logout URL (server side)
-    const response = await fetch(`${KRATOS_PUBLIC_URL}/self-service/logout/browser`, {
+    const response = await fetch(`${KRATOS_PUBLIC_URL}/self-service/logout/browser?return_to=${encodeURIComponent(returnTo)}`, {
       credentials: "include",
       headers: { cookie: req.headers.cookie || "" },
     })

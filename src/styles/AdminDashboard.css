@@ -1,0 +1,54 @@
+.dashboard-container {
+  padding: 40px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #f7f9fc;
+  min-height: 100vh;
+}
+
+.dashboard-title {
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.dashboard-list {
+  list-style: none;
+  padding: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.dashboard-item {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-item:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.dashboard-link {
+  text-decoration: none;
+  font-size: 18px;
+  color: #1e40af;
+  font-weight: 500;
+}
+
+.dashboard-link:hover {
+  text-decoration: underline;
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 10px;
+}
+

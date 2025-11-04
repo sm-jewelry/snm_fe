@@ -1,0 +1,135 @@
+.catalog-container {
+  padding: 30px;
+  font-family: Arial, sans-serif;
+}
+
+.catalog-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.catalog-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 30px;
+  justify-content: center;
+}
+
+.catalog-form input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  flex: 1 1 180px;
+}
+
+.catalog-form button {
+  padding: 8px 16px;
+  border: none;
+  background-color: #0078d7;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.catalog-form .cancel-btn {
+  background-color: #999;
+}
+
+.catalog-form button:hover {
+  opacity: 0.9;
+}
+
+.image-preview {
+  width: 120px;
+  height: 120px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.catalog-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.catalog-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.catalog-card h3 {
+  margin: 10px 0 5px;
+}
+
+.catalog-card p {
+  margin: 3px 0;
+}
+
+.catalog-card .sku {
+  font-size: 12px;
+  color: #666;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.edit-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-btn:hover,
+.delete-btn:hover {
+  opacity: 0.85;
+}
+
+.category-path {
+  font-size: 13px;
+  color: #444;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  flex: 1 1 180px;
+}
+

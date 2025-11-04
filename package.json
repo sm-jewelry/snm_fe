@@ -15,10 +15,15 @@
     "@ory/client-fetch": "^1.22.2",
     "@types/node": "^24.5.2",
     "@types/react": "^19.1.13",
+    "multer": "^2.0.2",
     "next": "^15.5.4",
+    "next-connect": "^1.0.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.1",
     "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@types/multer": "^2.0.0"
   }
 }
