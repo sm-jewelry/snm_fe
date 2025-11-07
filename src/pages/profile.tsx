@@ -161,9 +161,10 @@ export default function ProfilePage() {
 
   // ---------------- Logout ----------------
   const handleLogout = async () => {
-  localStorage.clear(); // clear tokens etc
-  window.location.href = "/api/logout"; // hit Next.js API route, which redirects to Kratos
-};
+    localStorage.clear();
+    const returnTo = window.location.origin; // or specific page
+    window.location.href = `${LOGIN_FRONTEND_URL}/logout-sync?return_to=${encodeURIComponent(returnTo)}`;
+  };
 
   if (loading) return <div>Loading user info...</div>;
   if (error) return <div style={{ color: "red" }}>{error}</div>;
@@ -175,11 +176,11 @@ export default function ProfilePage() {
         <ul>
           <li className="active">Dashboard</li>
           <li
-          className={pathname === "/wishlist" ? "active" : ""}
-          onClick={() => router.push("/wishlist")}
-        >
-          Wishlist
-        </li>
+            className={pathname === "/wishlist" ? "active" : ""}
+            onClick={() => router.push("/wishlist")}
+          >
+            Wishlist
+          </li>
           <li onClick={handleLogout}>Log out</li>
         </ul>
       </div>
