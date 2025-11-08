@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { storage } from "../lib/storage";
 
 interface CheckoutItem {
     productId: string;
@@ -33,9 +34,9 @@ const CheckoutPage: React.FC = () => {
     const [city, setCity] = useState("");
     const [state, setState] = useState("");
     const [pinCode, setPinCode] = useState("");
+    const [country, setCountry] = useState("India");
 
-    const token =
-        typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+    const token = storage.getItem("access_token");
 
     useEffect(() => {
         const fetchCart = async (cartId: string) => {
@@ -52,7 +53,7 @@ const CheckoutPage: React.FC = () => {
             }
         };
 
-        const checkoutItem = localStorage.getItem("checkoutItem");
+        const checkoutItem = storage.getItem("checkoutItem");
         if (checkoutItem) {
             const item = JSON.parse(checkoutItem);
             setCart({
@@ -67,7 +68,7 @@ const CheckoutPage: React.FC = () => {
                 ],
                 total: item.total,
             });
-            localStorage.removeItem("checkoutItem");
+            storage.removeItem("checkoutItem");
             setLoading(false);
         } else {
             const params = new URLSearchParams(window.location.search);
@@ -101,6 +102,7 @@ const CheckoutPage: React.FC = () => {
             city,
             state,
             pinCode,
+            country,
         };
 
         try {
@@ -208,10 +210,10 @@ const CheckoutPage: React.FC = () => {
                     </label>
 
                     <h3>Delivery</h3>
-                    <select>
-                        <option>India</option>
-                        <option>United States</option>
-                        <option>United Kingdom</option>
+                    <select value={country} onChange={(e) => setCountry(e.target.value)}>
+                        <option value="India">India</option>
+                        <option value="United States">United States</option>
+                        <option value="United Kingdom">United Kingdom</option>
                     </select>
 
                     <div className="name-fields">

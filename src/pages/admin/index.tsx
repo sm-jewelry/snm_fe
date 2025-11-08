@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { storage } from "../../lib/storage";
+import ErrorBoundary from "../../components/ui/ErrorBoundary";
 
 interface UserInfo {
   sub: string;
@@ -17,7 +19,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const checkAdminAccess = async () => {
       try {
-        const token = localStorage.getItem("access_token");
+        const token = storage.getItem("access_token");
         if (!token) {
           router.push("/login");
           return;
@@ -66,20 +68,22 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="dashboard-container">
-      <h1 className="dashboard-title">🛠 Admin Dashboard</h1>
-      <p>Welcome, {user?.email || "Admin"} 👋</p>
+    <ErrorBoundary>
+      <div className="dashboard-container">
+        <h1 className="dashboard-title">🛠 Admin Dashboard</h1>
+        <p>Welcome, {user?.email || "Admin"} 👋</p>
 
-      <ul className="dashboard-list">
-        {sections.map((sec) => (
-          <li key={sec.name} className="dashboard-item">
-            <Link href={sec.path} className="dashboard-link">
-              <span>{sec.name}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+        <ul className="dashboard-list">
+          {sections.map((sec) => (
+            <li key={sec.name} className="dashboard-item">
+              <Link href={sec.path} className="dashboard-link">
+                <span>{sec.name}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </ErrorBoundary>
   );
 };
 

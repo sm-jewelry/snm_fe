@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { storage } from "../lib/storage";
 
 const LOGIN_FRONTEND_URL = process.env.NEXT_PUBLIC_LOGIN_FRONTEND_URL; // your Hydra-Kratos frontend
 
@@ -41,9 +42,9 @@ async function refreshAccessTokenOnServer(refreshToken: string) {
   }
 
   // Save tokens if present
-  if (data.access_token) localStorage.setItem("access_token", data.access_token);
-  if (data.refresh_token) localStorage.setItem("refresh_token", data.refresh_token);
-  if (data.id_token) localStorage.setItem("id_token", data.id_token);
+  if (data.access_token) storage.setItem("access_token", data.access_token);
+  if (data.refresh_token) storage.setItem("refresh_token", data.refresh_token);
+  if (data.id_token) storage.setItem("id_token", data.id_token);
 
   return data.access_token;
 }
@@ -63,9 +64,9 @@ export default function ProfilePage() {
       const refreshTokenFromURL = params.get("refresh_token");
       const idTokenFromURL = params.get("id_token");
 
-      if (accessTokenFromURL) localStorage.setItem("access_token", accessTokenFromURL);
-      if (refreshTokenFromURL) localStorage.setItem("refresh_token", refreshTokenFromURL);
-      if (idTokenFromURL) localStorage.setItem("id_token", idTokenFromURL);
+      if (accessTokenFromURL) storage.setItem("access_token", accessTokenFromURL);
+      if (refreshTokenFromURL) storage.setItem("refresh_token", refreshTokenFromURL);
+      if (idTokenFromURL) storage.setItem("id_token", idTokenFromURL);
 
       // Clean sensitive data from URL
       const url = new URL(window.location.href);
@@ -79,8 +80,8 @@ export default function ProfilePage() {
 
     // ---------------- Fetch user info ----------------
     const fetchUserInfo = async () => {
-      let accessToken = localStorage.getItem("access_token");
-      let refreshToken = localStorage.getItem("refresh_token");
+      let accessToken = storage.getItem("access_token");
+      let refreshToken = storage.getItem("refresh_token");
 
       // 🔸 If access token missing → try refresh or redirect
       if (!accessToken) {
@@ -94,7 +95,7 @@ export default function ProfilePage() {
           accessToken = await refreshAccessTokenOnServer(refreshToken);
         } catch (err) {
           console.warn("⚠️ Failed to refresh token, redirecting to login", err);
-          localStorage.clear();
+          storage.clear();
           const returnTo = encodeURIComponent(window.location.href);
           window.location.href = `${LOGIN_FRONTEND_URL}?return_to=${returnTo}`;
           return;
@@ -121,14 +122,14 @@ export default function ProfilePage() {
                 return attemptFetch(); // retry once
               } catch (err) {
                 console.error("❌ Token refresh failed, redirecting to login");
-                localStorage.clear();
+                storage.clear();
                 const returnTo = encodeURIComponent(window.location.href);
                 window.location.href = `${LOGIN_FRONTEND_URL}?return_to=${returnTo}`;
                 return;
               }
             } else {
               console.warn("⚠️ Unauthorized and no refresh left, redirecting to login");
-              localStorage.clear();
+              storage.clear();
               const returnTo = encodeURIComponent(window.location.href);
               window.location.href = `${LOGIN_FRONTEND_URL}?return_to=${returnTo}`;
               return;
@@ -137,7 +138,7 @@ export default function ProfilePage() {
 
           if (!resp.ok) {
             console.error("❌ Failed to fetch user info:", resp.statusText);
-            localStorage.clear();
+            storage.clear();
             const returnTo = encodeURIComponent(window.location.href);
             window.location.href = `${LOGIN_FRONTEND_URL}?return_to=${returnTo}`;
             return;
@@ -161,7 +162,7 @@ export default function ProfilePage() {
 
   // ---------------- Logout ----------------
   const handleLogout = async () => {
-    localStorage.clear();
+    storage.clear();
     const returnTo = window.location.origin; // or specific page
     window.location.href = `${LOGIN_FRONTEND_URL}/logout-sync?return_to=${encodeURIComponent(returnTo)}`;
   };

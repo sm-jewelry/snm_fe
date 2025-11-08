@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { storage } from "../lib/storage";
 
 export default function SessionWatcher() {
   const [showPopup, setShowPopup] = useState(false);
@@ -19,7 +20,7 @@ export default function SessionWatcher() {
 
   // Refresh token
   async function refreshToken() {
-    const refresh = localStorage.getItem("refresh_token");
+    const refresh = storage.getItem("refresh_token");
     if (!refresh) return (window.location.href = "/api/logout");
     const resp = await fetch("/api/refresh-token", {
       method: "POST",
@@ -28,20 +29,20 @@ export default function SessionWatcher() {
     });
     const data = await resp.json();
     if (resp.ok) {
-      localStorage.setItem("access_token", data.access_token);
+      storage.setItem("access_token", data.access_token);
       if (data.refresh_token)
-        localStorage.setItem("refresh_token", data.refresh_token);
+        storage.setItem("refresh_token", data.refresh_token);
       setShowPopup(false);
       startWatcher(); // restart countdown
     } else {
-      localStorage.clear();
+      storage.clear();
       window.location.href = "/api/logout";
     }
   }
 
   // Start timer based on token exp
   function startWatcher() {
-    const token = localStorage.getItem("access_token");
+    const token = storage.getItem("access_token");
     if (!token) return;
     const expTime = decodeExp(token);
 
@@ -60,7 +61,7 @@ export default function SessionWatcher() {
         setTimeLeft(counter);
         if (counter <= 0) {
           clearInterval(id);
-          localStorage.clear();
+          storage.clear();
           window.location.href = "/api/logout";
         }
       }, 1000);
@@ -73,7 +74,7 @@ export default function SessionWatcher() {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, []);
+  }, [intervalId]);
 
   if (!showPopup) return null;
 

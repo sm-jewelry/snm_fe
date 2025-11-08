@@ -1,9 +1,10 @@
+import { storage } from "./storage";
+
 const API_BASE =
   process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL || "http://localhost:4455";
 
 export const fetcher = async (url: string, options: RequestInit = {}) => {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const token = storage.getItem("access_token");
 
   const isFormData = options.body instanceof FormData;
 

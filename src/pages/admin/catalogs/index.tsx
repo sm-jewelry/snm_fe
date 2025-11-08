@@ -60,15 +60,15 @@ export default function CatalogsPage() {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetcher("/api/catalogs/upload", {
+  const response = await fetcher("/api/catalogs/upload", {
     method: "POST",
     body: formData,
   });
 
-  const data = await res.json();
+  const data = await response.json();
   if (data.url) {
     setPreview(data.url);
-    setForm((prev) => ({ ...prev, URL: data.url })); // ✅ callback form
+    setForm((prev) => ({ ...prev, URL: data.url }));
   }
 
   console.log("Uploaded URL:", data.url);
