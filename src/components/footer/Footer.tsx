@@ -7,9 +7,9 @@ const Footer = () => {
       <div className="footer-top">
         {/* ----- Column 1 ----- */}
         <div className="footer-col">
-          <h2 className="footer-logo">ecomus</h2>
+          <h2 className="footer-logo">SNM®</h2>
           <p>Address: 1234 Fashion Street, Suite 567,<br />New York, NY</p>
-          <p>Email: <a href="mailto:info@fashionshop.com">info@fashionshop.com</a></p>
+          <p>Email: <a href="mailto:info@stonemetaljewelry.com">info@stonemetaljewelry.com</a></p>
           <p>Phone: <a href="tel:(212)555-1234">(212)555-1234</a></p>
           <a href="#" className="footer-link direction">Get direction →</a>
           <div className="footer-socials">
@@ -66,7 +66,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>© 2025 Ecomus. All rights reserved.</p>
+        <p>© 2025 SNM®. All rights reserved.</p>
         <div className="payment-icons">
           <img src="/Visa.png" alt="Visa" />
           <img src="/PayPal.svg" alt="PayPal" />

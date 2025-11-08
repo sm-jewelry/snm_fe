@@ -1963,33 +1963,42 @@ pre {
 }
 
 .footer-bottom {
-  border-top: 1px solid #ddd;
-  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 16px;
+  margin-top: 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-bottom p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  font-weight: 400;
 }
 
 .payment-icons {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-top: 10px;
+  gap: 8px;
 }
 
 .payment-icons img {
-  height: 28px;
+  height: 20px;
   width: auto;
   object-fit: contain;
-  opacity: 0.9;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  filter: grayscale(20%);
 }
 
 .payment-icons img:hover {
-  transform: scale(1.1);
   opacity: 1;
+  filter: grayscale(0%);
 }
 
 
@@ -2005,6 +2014,20 @@ pre {
   }
   .footer {
     padding: 40px 20px;
+  }
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  .footer-bottom p {
+    font-size: 12px;
+  }
+  .payment-icons {
+    margin-top: 0;
+  }
+  .payment-icons img {
+    height: 18px;
   }
 }
 @media (max-width: 400px) {
