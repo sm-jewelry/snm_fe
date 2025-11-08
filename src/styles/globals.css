@@ -1,7 +1,39 @@
 /* Base styles for body and links */
+html,
 body {
   margin: 0;
+  padding: 0;
+  height: 100%;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Ensure #__next takes full height for Pages Router */
+#__next {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Layout wrapper for sticky footer */
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Content area should grow to push footer down */
+.layout-content {
+  flex: 1 0 auto;
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+}
+
+/* Footer should stick to bottom */
+.footer {
+  flex-shrink: 0;
 }
 
 a {

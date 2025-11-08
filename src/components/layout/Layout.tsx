@@ -7,11 +7,15 @@ import Footer from '../footer/Footer'
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ErrorBoundary>
-    <AnnouncementBar />
-    <MainHeader />
-    <NavHeader />
-    <main>{children}</main>
-    <Footer />
+    <div className="layout-wrapper">
+      <div className="layout-content">
+        <AnnouncementBar />
+        <MainHeader />
+        <NavHeader />
+        <main className="main-content">{children}</main>
+      </div>
+      <Footer />
+    </div>
   </ErrorBoundary>
 )
 

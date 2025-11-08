@@ -34,14 +34,14 @@ export function generateHreflangAlternates(
   pathname: string,
   currentLocale: Locale = 'en'
 ): { hrefLang: string; href: string }[] {
-  const alternates = locales.map((locale) => ({
-    hrefLang: locale,
+  const alternates: { hrefLang: string; href: string }[] = locales.map((locale) => ({
+    hrefLang: locale as string,
     href: `${SITE_URL}/${locale}${pathname}`,
   }));
 
   // Add x-default for English
   alternates.push({
-    hrefLang: 'x-default',
+    hrefLang: 'x-default' as string,
     href: `${SITE_URL}/en${pathname}`,
   });
 
