@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="footer-col">
           <h2 className="footer-logo">SNM®</h2>
           <p>Address: 1234 Fashion Street, Suite 567,<br />New York, NY</p>
-          <p>Email: <a href="mailto:info@stonemetaljewelry.com">info@stonemetaljewelry.com</a></p>
+          <p>Email: <a href="mailto:contact@snm.jewelry">contact@snm.jewelry</a></p>
           <p>Phone: <a href="tel:(212)555-1234">(212)555-1234</a></p>
           <a href="#" className="footer-link direction">Get direction →</a>
           <div className="footer-socials">
