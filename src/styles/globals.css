@@ -1,10 +1,27 @@
+/* Font variables */
+:root {
+  --font-poppins: var(--font-poppins);
+  --font-playfair: var(--font-playfair);
+}
+
 /* Base styles for body and links */
 html,
 body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
+}
+
+/* Headings with elegant serif font */
+h1, h2, h3 {
+  font-family: var(--font-playfair), "Playfair Display", serif;
+  font-weight: 700;
+}
+
+h4, h5, h6 {
+  font-family: var(--font-poppins), "Poppins", sans-serif;
+  font-weight: 600;
 }
 
 /* Ensure #__next takes full height for Pages Router */
@@ -285,7 +302,7 @@ nav {
   padding: 40px;
   max-width: 1200px;
   margin: 0 auto;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
 }
 
 .wishlist-hero h1 {
@@ -403,7 +420,7 @@ nav {
   padding: 24px;
   max-width: 800px;
   margin: 0 auto;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
   color: #333;
 }
 
@@ -463,7 +480,7 @@ nav {
   padding: 12px 0;
   border-bottom: 1px solid #ddd;
   font-weight: bold;
-  font-family: sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
   position: relative;
   align-items: center;
   /* Align all children vertically */
@@ -607,7 +624,7 @@ nav {
 /* Base styles for body and links */
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
 }
 
 /* product Details Page */
@@ -1329,7 +1346,7 @@ body {
   background: #fafafa;
   min-height: 100vh;
   padding: 40px 0;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
   display: flex;
   justify-content: center;
 }
@@ -1559,7 +1576,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
 }
 
 .order-success-container {
@@ -1609,7 +1626,7 @@ body {
   padding: 40px 20px;
   background: #fafafa;
   min-height: 100vh;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
 }
 
 .my-orders-page h1 {
@@ -1718,7 +1735,7 @@ body {
   max-width: 1100px;
   margin: 60px auto;
   padding: 20px;
-  font-family: "Poppins", sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
   color: #222;
 }
 
@@ -1847,7 +1864,7 @@ pre {
 .footer {
   background: #f9f9f9;
   padding: 60px 100px 30px;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
   color: #333;
   border-top: 1px solid #e5e5e5;
 }
@@ -2065,7 +2082,7 @@ pre {
   max-width: 1200px;
   margin: 0 auto;
   padding: 50px 20px;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
   color: #333;
 }
 
@@ -2126,7 +2143,7 @@ pre {
   max-width: 1200px;
   margin: 0 auto;
   padding: 50px 20px;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
   color: #333;
 }
 
@@ -2218,7 +2235,7 @@ pre {
   max-width: 1200px;
   margin: 0 auto;
   padding: 50px 20px;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-poppins), "Poppins", sans-serif;
   color: #333;
 }
 
