@@ -33,3 +33,5 @@ Thumbs.db
 .npm/
 # Next.js export folder
 out/
+
+local/
