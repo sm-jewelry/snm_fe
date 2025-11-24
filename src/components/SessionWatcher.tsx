@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 
+const LOGIN_FRONTEND_URL = process.env.NEXT_PUBLIC_LOGIN_FRONTEND_URL;
+
 export default function SessionWatcher() {
   const [showPopup, setShowPopup] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -35,7 +37,8 @@ export default function SessionWatcher() {
       startWatcher(); // restart countdown
     } else {
       localStorage.clear();
-      window.location.href = "/api/logout";
+      const returnTo = window.location.origin;
+      window.location.href = `${LOGIN_FRONTEND_URL}/logout-sync?return_to=${encodeURIComponent(returnTo)}`;
     }
   }
 
@@ -61,7 +64,8 @@ export default function SessionWatcher() {
         if (counter <= 0) {
           clearInterval(id);
           localStorage.clear();
-          window.location.href = "/api/logout";
+          const returnTo = window.location.origin;
+          window.location.href = `${LOGIN_FRONTEND_URL}/logout-sync?return_to=${encodeURIComponent(returnTo)}`;
         }
       }, 1000);
       setIntervalId(id);
