@@ -22,7 +22,8 @@ export default function SessionWatcher() {
   // Refresh token
   async function refreshToken() {
     const refresh = localStorage.getItem("refresh_token");
-    if (!refresh) return (window.location.href = "/api/logout");
+     const returnTo = window.location.origin;
+    if (!refresh) return (window.location.href = `${LOGIN_FRONTEND_URL}/logout-sync?return_to=${encodeURIComponent(returnTo)}`);
     const resp = await fetch("/api/refresh-token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -19,7 +19,7 @@ const AdminDashboard = () => {
       try {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          router.push("/login");
+          router.push("/profile");
           return;
         }
 
@@ -31,7 +31,7 @@ const AdminDashboard = () => {
 
         // If token invalid or no role found
         if (!res.ok || !data.role) {
-          router.push("/login");
+          router.push("/profile");
           return;
         }
 
@@ -45,7 +45,7 @@ const AdminDashboard = () => {
         setUser(data);
       } catch (err) {
         console.error("Error checking admin access:", err);
-        router.push("/login");
+        router.push("/profile");
       } finally {
         setLoading(false);
       }

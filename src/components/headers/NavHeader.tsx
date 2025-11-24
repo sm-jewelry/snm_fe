@@ -182,7 +182,7 @@ const NavHeader: React.FC = () => {
             🛒<br />
             Cart
           </button>
-          <Link href="/login">
+          <Link href="/profile">
             👤<br />
             Account
           </Link>

@@ -58,7 +58,7 @@ const CollectionProductsPage: React.FC = () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
       alert("Please login to continue");
-      router.push("/login");
+      router.push("/profile");
       return;
     }
 
@@ -95,7 +95,7 @@ const CollectionProductsPage: React.FC = () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
       alert("Please login to continue");
-      router.push("/login");
+      router.push("/profile");
       return;
     }
 

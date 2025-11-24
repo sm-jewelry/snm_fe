@@ -31,7 +31,7 @@ const WishlistPage: React.FC = () => {
   const fetchWishlist = async () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      router.push("/login");
+      router.push("/profile");
       return;
     }
 
