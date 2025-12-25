@@ -10,7 +10,8 @@ interface Product {
   URL: string;
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL;
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
 const CategoryPage: React.FC = () => {
   const searchParams = useSearchParams();
@@ -28,7 +29,9 @@ const CategoryPage: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const res = await fetch(`${API_BASE}/api/categories/${id}/products`);
+        const res = await fetch(`${API_GATEWAY_URL}/api/categories/${id}/products`, {
+          credentials: 'include', // Important for API Gateway
+        });
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message || "Failed to fetch products");

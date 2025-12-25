@@ -18,8 +18,8 @@ interface Order {
   items: OrderItem[];
 }
 
-// ✅ Use environment variable for API base URL
-const API_BASE = `${process.env.NEXT_PUBLIC_ORDER_API_BASE_URL}/api/orders`;
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
 const MyOrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -36,8 +36,9 @@ const MyOrdersPage: React.FC = () => {
           return;
         }
 
-        const res = await fetch(`${API_BASE}/my-orders`, {
+        const res = await fetch(`${API_GATEWAY_URL}/api/orders/my-orders`, {
           headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include', // Important for API Gateway
         });
 
         const data = await res.json();
@@ -60,7 +61,7 @@ const MyOrdersPage: React.FC = () => {
     return (
       <div className="my-orders-page">
         <h1>My Orders</h1>
-        <p>You haven’t placed any orders yet.</p>
+        <p>You haven't placed any orders yet.</p>
       </div>
     );
   }

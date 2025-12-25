@@ -18,16 +18,18 @@ interface Product {
   sizes?: string[];
 }
 
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+
 const NewArrivals: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const CATEGORY_API = process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL;
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-
   useEffect(() => {
-    fetch(`${CATEGORY_API}/api/new-arrivals`)
+    fetch(`${API_GATEWAY_URL}/api/new-arrivals`, {
+      credentials: 'include', // Important for API Gateway
+    })
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
@@ -37,7 +39,7 @@ const NewArrivals: React.FC = () => {
         console.error("Failed to fetch products:", err);
         setLoading(false);
       });
-  }, [CATEGORY_API]);
+  }, []);
 
   // ✅ Add to Cart
   const handleAddToCart = async (product: Product) => {
@@ -49,12 +51,13 @@ const NewArrivals: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/cart/add`, {
+      const res = await fetch(`${API_GATEWAY_URL}/api/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Important for API Gateway
         body: JSON.stringify({
           productId: product._id,
           url: product.URL,
@@ -87,12 +90,13 @@ const NewArrivals: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/wishlist/add`, {
+      const res = await fetch(`${API_GATEWAY_URL}/api/wishlist/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Important for API Gateway
         body: JSON.stringify({ productId: product._id }),
       });
 

@@ -37,8 +37,8 @@ interface Order {
   items: OrderItem[];
 }
 
-const ORDER_API = process.env.NEXT_PUBLIC_ORDER_API_BASE_URL;
-const CATALOG_API = process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL;
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
 const OrderDetailsPage: React.FC = () => {
   const params = useParams();
@@ -58,8 +58,9 @@ const OrderDetailsPage: React.FC = () => {
         if (!token) throw new Error("Please log in to view order details.");
 
         // 1️⃣ Fetch order
-        const orderRes = await fetch(`${ORDER_API}/api/orders/${orderId}`, {
+        const orderRes = await fetch(`${API_GATEWAY_URL}/api/orders/${orderId}`, {
           headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include', // Important for API Gateway
         });
         const orderData = await orderRes.json();
         if (!orderRes.ok) throw new Error(orderData.message || "Failed to fetch order");
@@ -70,7 +71,9 @@ const OrderDetailsPage: React.FC = () => {
         const itemsWithDetails: OrderItem[] = await Promise.all(
           orderObj.items.map(async (item) => {
             try {
-              const productRes = await fetch(`${CATALOG_API}/api/catalogs/${item.productId}`);
+              const productRes = await fetch(`${API_GATEWAY_URL}/api/catalogs/${item.productId}`, {
+                credentials: 'include', // Important for API Gateway
+              });
               const productData: CatalogProduct = await productRes.json();
               return {
                 ...item,
@@ -89,8 +92,9 @@ const OrderDetailsPage: React.FC = () => {
 
         // 3️⃣ Fetch payment details (optional)
         if (orderObj.razorpayOrderId) {
-          const paymentRes = await fetch(`${ORDER_API}/api/payments/${orderObj.razorpayOrderId}`, {
+          const paymentRes = await fetch(`${API_GATEWAY_URL}/api/payments/${orderObj.razorpayOrderId}`, {
             headers: { Authorization: `Bearer ${token}` },
+            credentials: 'include', // Important for API Gateway
           });
           const paymentData = await paymentRes.json();
           if (paymentRes.ok) setPayment(paymentData.data);

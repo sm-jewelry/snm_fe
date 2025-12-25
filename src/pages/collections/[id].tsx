@@ -17,13 +17,13 @@ interface Product {
   sizes?: string[];
 }
 
-const CATEGORY_API = process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL;
-const MAIN_API = process.env.NEXT_PUBLIC_API_BASE_URL;
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
 const CollectionProductsPage: React.FC = () => {
   const router = useRouter();
   const params = useParams();
-  const id =  params?.id as string;
+  const id = params?.id as string;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [collectionName, setCollectionName] = useState<string>("");
@@ -36,11 +36,16 @@ const CollectionProductsPage: React.FC = () => {
       setLoading(true);
       try {
         // Fetch collection details
-        const colRes = await fetch(`${CATEGORY_API}/api/collections/${id}`);
+        const colRes = await fetch(`${API_GATEWAY_URL}/api/collections/${id}`, {
+          credentials: 'include', // Important for API Gateway
+        });
         const colData = await colRes.json();
         setCollectionName(colData.name || "Collection");
+        
         // Fetch products in collection
-        const res = await fetch(`${CATEGORY_API}/api/products/collection/${id}`);
+        const res = await fetch(`${API_GATEWAY_URL}/api/products/collection/${id}`, {
+          credentials: 'include', // Important for API Gateway
+        });
         const data = await res.json();
         setProducts(data || []);
       } catch (err) {
@@ -63,12 +68,13 @@ const CollectionProductsPage: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`${MAIN_API}/api/cart/add`, {
+      const res = await fetch(`${API_GATEWAY_URL}/api/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Important for API Gateway
         body: JSON.stringify({
           productId: product._id,
           url: product.URL,
@@ -100,12 +106,13 @@ const CollectionProductsPage: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`${MAIN_API}/api/wishlist/add`, {
+      const res = await fetch(`${API_GATEWAY_URL}/api/wishlist/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Important for API Gateway
         body: JSON.stringify({ productId: product._id }),
       });
 
@@ -132,7 +139,7 @@ const CollectionProductsPage: React.FC = () => {
       </p>
     );
 
-    return (
+  return (
     <section style={{ padding: "40px" }}>
       <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
         {collectionName || "Collection"} Products

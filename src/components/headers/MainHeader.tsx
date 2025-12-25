@@ -9,13 +9,12 @@ interface Category {
   name: string;
 }
 
-// ✅ Use environment variables
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-const CATEGORY_API_BASE = process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL;
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
-const WISHLIST_API = `${API_BASE}/api/wishlist`;
-const CART_API = `${API_BASE}/api/cart`;
-const CATEGORY_API = `${CATEGORY_API_BASE}/api/categories/level`;
+const WISHLIST_API = `${API_GATEWAY_URL}/api/wishlist`;
+const CART_API = `${API_GATEWAY_URL}/api/cart`;
+const CATEGORY_API = `${API_GATEWAY_URL}/api/categories/level`;
 
 const MainHeader: React.FC = () => {
   const [c1, setC1] = useState<Category[]>([]);
@@ -31,6 +30,7 @@ const MainHeader: React.FC = () => {
 
     fetch(WISHLIST_API, {
       headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include', // Important for API Gateway
     })
       .then((res) => res.json())
       .then((data) => {
@@ -59,6 +59,7 @@ const MainHeader: React.FC = () => {
 
     fetch(CART_API, {
       headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include', // Important for API Gateway
     })
       .then((res) => res.json())
       .then((data) => {
@@ -79,7 +80,9 @@ const MainHeader: React.FC = () => {
     setIsClient(true);
 
     // Fetch categories (C1)
-    fetch(`${CATEGORY_API}/C1`)
+    fetch(`${CATEGORY_API}/C1`, {
+      credentials: 'include', // Important for API Gateway
+    })
       .then((res) => res.json())
       .then((data) => setC1(data))
       .catch((err) => console.error("Failed to fetch C1 categories:", err));

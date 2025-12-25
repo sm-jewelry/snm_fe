@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
 const CartPage = () => {
   const [cart, setCart] = useState<any>(null);
@@ -13,11 +14,11 @@ const CartPage = () => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
 
-    // ✅ Use environment variable for API URL
-    fetch(`${API_BASE}/api/cart`, {
+    fetch(`${API_GATEWAY_URL}/api/cart`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      credentials: 'include', // Important for API Gateway
     })
       .then((res) => res.json())
       .then((data) => setCart(data.data))

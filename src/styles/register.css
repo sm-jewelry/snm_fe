@@ -1,0 +1,605 @@
+/**
+ * Registration Page Styles - Luxury Jewelry Theme
+ * Inspired by diamonds, gold, and precious stones
+ */
+
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0f3460 0%, #16213e 50%, #1a1a2e 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 3rem 1rem;
+}
+
+/* Animated gemstone particles background */
+.register-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    radial-gradient(3px 3px at 15% 25%, rgba(192, 192, 192, 0.4), transparent),
+    radial-gradient(2px 2px at 75% 80%, rgba(255, 215, 0, 0.35), transparent),
+    radial-gradient(2px 2px at 40% 60%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 90% 15%, rgba(255, 215, 0, 0.45), transparent),
+    radial-gradient(1px 1px at 25% 85%, rgba(192, 192, 192, 0.35), transparent);
+  background-size: 250px 250px, 350px 350px, 180px 180px, 220px 220px, 280px 280px;
+  animation: gemFloat 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes gemFloat {
+  0% {
+    background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 250px 250px, -350px 350px, 180px -180px, -220px 220px, 280px -280px;
+  }
+}
+
+/* Registration card */
+.register-card {
+  max-width: 520px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(25px);
+  border-radius: 28px;
+  box-shadow:
+    0 35px 70px rgba(0, 0, 0, 0.35),
+    0 0 120px rgba(255, 215, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  padding: 3rem 2.75rem;
+  position: relative;
+  overflow: hidden;
+  animation: slideIn 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 215, 0, 0.25);
+}
+
+.register-card::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, #ffd700, #c0c0c0, #ffd700, #c0c0c0);
+  background-size: 300% 300%;
+  border-radius: 28px;
+  z-index: -1;
+  opacity: 0.6;
+  filter: blur(12px);
+  animation: gradientShift 6s ease infinite;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Header section */
+.register-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.register-title {
+  font-size: 2.75rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 50%, #0f3460 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  position: relative;
+  display: inline-block;
+  letter-spacing: -1.5px;
+}
+
+.register-title::before {
+  content: '✨';
+  position: absolute;
+  left: -40px;
+  top: -5px;
+  font-size: 1.5rem;
+  animation: sparkleLeft 2s ease-in-out infinite;
+}
+
+.register-title::after {
+  content: '💍';
+  position: absolute;
+  right: -40px;
+  top: -5px;
+  font-size: 1.5rem;
+  animation: sparkleRight 2s ease-in-out infinite;
+}
+
+@keyframes sparkleLeft {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-5px) rotate(-15deg) scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes sparkleRight {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(5px) rotate(15deg) scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.register-subtitle {
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+/* Form elements */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.register-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.register-form-group {
+  position: relative;
+}
+
+.register-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.3px;
+}
+
+.register-label-optional {
+  color: #a0aec0;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.register-input {
+  width: 100%;
+  padding: 0.95rem 1.2rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #f8fafc;
+  color: #1a202c;
+  font-weight: 500;
+}
+
+.register-input:focus {
+  outline: none;
+  border-color: #ffd700;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 4px rgba(255, 215, 0, 0.12),
+    0 10px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.register-input::placeholder {
+  color: #cbd5e0;
+  font-weight: 400;
+}
+
+.register-input.register-input-error {
+  border-color: #fc8181;
+  background: #fff5f5;
+}
+
+.register-input.register-input-error:focus {
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.1);
+}
+
+/* Input helper text */
+.register-input-helper {
+  margin-top: 0.4rem;
+  font-size: 0.825rem;
+  color: #718096;
+  line-height: 1.4;
+}
+
+/* Submit button */
+.register-button {
+  width: 100%;
+  padding: 1.1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0f3460 0%, #16213e 50%, #0f3460 100%);
+  background-size: 200% 100%;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 12px 30px rgba(15, 52, 96, 0.35),
+    0 0 50px rgba(255, 215, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.register-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 215, 0, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.register-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.register-button:hover {
+  background-position: 100% 0;
+  transform: translateY(-3px);
+  box-shadow:
+    0 18px 40px rgba(15, 52, 96, 0.45),
+    0 0 70px rgba(255, 215, 0, 0.35);
+}
+
+.register-button:active {
+  transform: translateY(-1px);
+}
+
+.register-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.register-button-text {
+  position: relative;
+  z-index: 1;
+}
+
+.register-button-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error message */
+.register-error {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border: 1px solid #fca5a5;
+  border-left: 4px solid #dc2626;
+  color: #991b1b;
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  animation: errorPulse 0.6s ease-in-out;
+}
+
+@keyframes errorPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.register-error-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+/* Divider */
+.register-divider {
+  margin: 1.75rem 0;
+  position: relative;
+}
+
+.register-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #cbd5e0 20%, #cbd5e0 80%, transparent);
+}
+
+.register-divider-text {
+  position: relative;
+  display: inline-block;
+  padding: 0 1.2rem;
+  background: #ffffff;
+  color: #718096;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Login link */
+.register-login {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.register-login-link {
+  color: #0f3460;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.register-login-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ffd700, #c0c0c0);
+  transform: translateX(-50%);
+  transition: width 0.3s ease;
+}
+
+.register-login-link:hover::before {
+  width: 100%;
+}
+
+.register-login-link:hover {
+  color: #ffd700;
+}
+
+/* Back to home link */
+.register-back {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.register-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.register-back-link:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffd700;
+  transform: translateX(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.register-back-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease;
+}
+
+.register-back-link:hover .register-back-icon {
+  transform: translateX(-3px);
+}
+
+/* Password strength indicator */
+.password-strength {
+  margin-top: 0.5rem;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.password-strength-bar {
+  height: 100%;
+  transition: all 0.3s ease;
+  background: linear-gradient(90deg, #fc8181, #f6ad55, #68d391);
+}
+
+.password-strength-weak {
+  width: 33%;
+  background: #fc8181;
+}
+
+.password-strength-medium {
+  width: 66%;
+  background: #f6ad55;
+}
+
+.password-strength-strong {
+  width: 100%;
+  background: linear-gradient(90deg, #68d391, #48bb78);
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .register-container {
+    padding: 2rem 1rem;
+  }
+
+  .register-card {
+    padding: 2.5rem 1.75rem;
+  }
+
+  .register-title {
+    font-size: 2.25rem;
+  }
+
+  .register-title::before,
+  .register-title::after {
+    font-size: 1.2rem;
+  }
+
+  .register-title::before {
+    left: -30px;
+  }
+
+  .register-title::after {
+    right: -30px;
+  }
+
+  .register-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .register-button {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-title::before,
+  .register-title::after {
+    display: none;
+  }
+}
+
+/* Accessibility improvements */
+.register-input:focus-visible,
+.register-button:focus-visible {
+  outline: 3px solid #ffd700;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .register-card {
+    border: 2px solid #000;
+  }
+
+  .register-input {
+    border-width: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .register-container::before,
+  .register-card::before,
+  .register-title::before,
+  .register-title::after,
+  .register-button::before {
+    animation: none;
+  }
+
+  .register-card {
+    animation: none;
+  }
+}
+
+/* Google Sign In Button */
+.register-google-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.register-google-button:hover {
+  background: #f8f9fa;
+  border-color: #d0d0d0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.register-google-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.register-google-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Print styles */
+@media print {
+  .register-container::before,
+  .register-card::before,
+  .register-back {
+    display: none;
+  }
+}

@@ -7,12 +7,17 @@ import "../styles/catalog.css";
 import "../styles/SessionWatcher.css";
 import "../styles/adminCollection.css";
 import "../styles/adminCollectionProduct.css";
+import "../styles/login.css";
+import "../styles/register.css";
+import "../styles/profile.css";
+import "../styles/checkout.css";
 import Layout from "../components/layout/Layout";
 import Script from "next/script";
-import SessionWatcher from "../components/SessionWatcher";
+import { AuthProvider } from "../contexts/AuthContext";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
+    <AuthProvider>
       <Layout>
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
@@ -22,9 +27,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
-        {/* 👇 Popup watcher mounted globally */}
-      <SessionWatcher />
         <Component {...pageProps} />
       </Layout>
+    </AuthProvider>
   );
 }

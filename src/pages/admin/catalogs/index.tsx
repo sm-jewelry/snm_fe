@@ -70,8 +70,6 @@ export default function CatalogsPage() {
     setPreview(data.url);
     setForm((prev) => ({ ...prev, URL: data.url })); // ✅ callback form
   }
-
-  console.log("Uploaded URL:", data.url);
 };
 
   // Submit form

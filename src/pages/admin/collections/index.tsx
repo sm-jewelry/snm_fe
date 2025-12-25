@@ -21,7 +21,6 @@ export default function AdminCollectionsPage() {
   // Load all collections
   const loadCollections = async () => {
     const data = await fetcher("/api/collections");
-    console.log("Loaded collections:", data);
     setCollections(data);
   };
 
@@ -47,8 +46,6 @@ export default function AdminCollectionsPage() {
       setPreview(data.url);
       setForm((prev) => ({ ...prev, imageUrl: data.url }));
     }
-
-    console.log("Uploaded URL:", data.url);
   };
 
   // Submit form

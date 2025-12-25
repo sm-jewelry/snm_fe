@@ -10,9 +10,9 @@ interface Category {
   level?: string;
 }
 
-// ✅ Use env variable instead of hardcoded URL
-const CATEGORY_API_BASE = process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL;
-const CATEGORY_API = `${CATEGORY_API_BASE}/api/categories/level`;
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+const CATEGORY_API = `${API_GATEWAY_URL}/api/categories/level`;
 
 const NavHeader: React.FC = () => {
   const [c1, setC1] = useState<Category[]>([]);
@@ -26,9 +26,15 @@ const NavHeader: React.FC = () => {
 
     // Fetch all 3 category levels in parallel
     Promise.all([
-      fetch(`${CATEGORY_API}/C1`).then((res) => res.json()),
-      fetch(`${CATEGORY_API}/C2`).then((res) => res.json()),
-      fetch(`${CATEGORY_API}/C3`).then((res) => res.json()),
+      fetch(`${CATEGORY_API}/C1`, {
+        credentials: 'include', // Important for API Gateway
+      }).then((res) => res.json()),
+      fetch(`${CATEGORY_API}/C2`, {
+        credentials: 'include', // Important for API Gateway
+      }).then((res) => res.json()),
+      fetch(`${CATEGORY_API}/C3`, {
+        credentials: 'include', // Important for API Gateway
+      }).then((res) => res.json()),
     ])
       .then(([c1Data, c2Data, c3Data]) => {
         setC1(c1Data);

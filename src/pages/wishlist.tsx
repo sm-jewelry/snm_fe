@@ -18,10 +18,11 @@ interface WishlistItem {
   addedAt: string;
 }
 
-// ✅ Use environment variables instead of hardcoded URLs
-const WISHLIST_API = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/wishlist`;
-const PRODUCT_API = `${process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL}/api/catalogs`;
-const FALLBACK_PRODUCT_API = `${process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL}/api/products`;
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+const WISHLIST_API = `${API_GATEWAY_URL}/api/wishlist`;
+const PRODUCT_API = `${API_GATEWAY_URL}/api/catalogs`;
+const FALLBACK_PRODUCT_API = `${API_GATEWAY_URL}/api/products`;
 
 const WishlistPage: React.FC = () => {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
@@ -38,6 +39,7 @@ const WishlistPage: React.FC = () => {
     try {
       const res = await fetch(WISHLIST_API, {
         headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Important for API Gateway
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to fetch wishlist");
@@ -48,12 +50,16 @@ const WishlistPage: React.FC = () => {
           let prodData = null;
           try {
             // Try first endpoint
-            const prodRes = await fetch(`${PRODUCT_API}/${item.productId}`);
+            const prodRes = await fetch(`${PRODUCT_API}/${item.productId}`, {
+              credentials: 'include', // Important for API Gateway
+            });
             prodData = await prodRes.json();
             if (!prodRes.ok || !prodData._id) throw new Error("Not found");
           } catch {
             // Try fallback endpoint
-            const prodRes2 = await fetch(`${FALLBACK_PRODUCT_API}/${item.productId}`);
+            const prodRes2 = await fetch(`${FALLBACK_PRODUCT_API}/${item.productId}`, {
+              credentials: 'include', // Important for API Gateway
+            });
             prodData = await prodRes2.json();
           }
 
@@ -81,6 +87,7 @@ const WishlistPage: React.FC = () => {
       const res = await fetch(`${WISHLIST_API}/${productId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Important for API Gateway
       });
       const data = await res.json();
 

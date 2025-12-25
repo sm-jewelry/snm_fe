@@ -9,8 +9,8 @@ interface CartDrawerProps {
   onClose: () => void;
 }
 
-// ✅ Use environment variable instead of hardcoded URL
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const [cart, setCart] = useState<any>(null);
@@ -21,8 +21,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   // ✅ Fetch cart items
   const fetchCart = () => {
     if (!token) return;
-    fetch(`${API_BASE}/api/cart`, {
+    fetch(`${API_GATEWAY_URL}/api/cart`, {
       headers: { Authorization: `Bearer ${token}` },
+      credentials: 'include', // Important for API Gateway
     })
       .then((res) => res.json())
       .then((data) => setCart(data.data))
@@ -37,12 +38,13 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const updateQuantity = async (productId: string, quantity: number) => {
     if (!token) return;
     try {
-      await fetch(`${API_BASE}/api/cart/item/${productId}`, {
+      await fetch(`${API_GATEWAY_URL}/api/cart/item/${productId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Important for API Gateway
         body: JSON.stringify({ quantity }),
       });
       fetchCart();
@@ -56,9 +58,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const removeItem = async (productId: string) => {
     if (!token) return;
     try {
-      await fetch(`${API_BASE}/api/cart/item/${productId}`, {
+      await fetch(`${API_GATEWAY_URL}/api/cart/item/${productId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
+        credentials: 'include', // Important for API Gateway
       });
       fetchCart();
       window.dispatchEvent(new CustomEvent("cartUpdated"));

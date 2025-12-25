@@ -17,6 +17,9 @@ interface Product {
   sizes?: string[];
 }
 
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+
 const ProductDetail: React.FC = () => {
   const router = useRouter();
   const { id } = router.query as { id?: string };
@@ -27,13 +30,12 @@ const ProductDetail: React.FC = () => {
   const [adding, setAdding] = useState(false);
   const [wishlisting, setWishlisting] = useState(false);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-  const CATEGORY_API = process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL;
-
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    fetch(`${CATEGORY_API}/api/catalogs/${id}`)
+    fetch(`${API_GATEWAY_URL}/api/catalogs/${id}`, {
+      credentials: 'include', // Important for API Gateway
+    })
       .then((res) => res.json())
       .then((data) => {
         setProduct(data);
@@ -45,7 +47,7 @@ const ProductDetail: React.FC = () => {
         console.error("Failed to fetch product:", err);
         setLoading(false);
       });
-  }, [id, CATEGORY_API]);
+  }, [id]);
 
   if (loading) return <p>Loading...</p>;
   if (!product) return <p>Product not found</p>;
@@ -69,12 +71,13 @@ const ProductDetail: React.FC = () => {
 
     setAdding(true);
     try {
-      const res = await fetch(`${API_BASE}/api/cart/add`, {
+      const res = await fetch(`${API_GATEWAY_URL}/api/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Important for API Gateway
         body: JSON.stringify({
           productId: product._id,
           url: product.URL,
@@ -109,12 +112,13 @@ const ProductDetail: React.FC = () => {
 
     setWishlisting(true);
     try {
-      const res = await fetch(`${API_BASE}/api/wishlist/add`, {
+      const res = await fetch(`${API_GATEWAY_URL}/api/wishlist/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Important for API Gateway
         body: JSON.stringify({ productId: product._id }),
       });
 

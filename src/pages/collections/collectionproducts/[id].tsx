@@ -17,8 +17,8 @@ interface Product {
   sizes?: string[];
 }
 
-const CATEGORY_API = process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL;
-const MAIN_API = process.env.NEXT_PUBLIC_API_BASE_URL;
+// ✅ Use API Gateway URL
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
 const ProductDetail: React.FC = () => {
   const router = useRouter();
@@ -37,7 +37,9 @@ const ProductDetail: React.FC = () => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${CATEGORY_API}/api/products/${id}`);
+        const res = await fetch(`${API_GATEWAY_URL}/api/products/${id}`, {
+          credentials: 'include', // Important for API Gateway
+        });
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message || "Failed to fetch product");
@@ -76,12 +78,13 @@ const ProductDetail: React.FC = () => {
 
     setAdding(true);
     try {
-      const res = await fetch(`${MAIN_API}/api/cart/add`, {
+      const res = await fetch(`${API_GATEWAY_URL}/api/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Important for API Gateway
         body: JSON.stringify({
           productId: product._id,
           url: product.URL,
@@ -116,12 +119,13 @@ const ProductDetail: React.FC = () => {
 
     setWishlisting(true);
     try {
-      const res = await fetch(`${MAIN_API}/api/wishlist/add`, {
+      const res = await fetch(`${API_GATEWAY_URL}/api/wishlist/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Important for API Gateway
         body: JSON.stringify({ productId: product._id }),
       });
 
