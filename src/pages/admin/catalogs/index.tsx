@@ -19,6 +19,11 @@ interface Catalog {
   c1?: Category | null;
   c2?: Category | null;
   c3?: Category | null;
+  salesCount?: number;
+  rating?: number;
+  reviewCount?: number;
+  brand?: string;
+  isFeatured?: boolean;
 }
 
 export default function CatalogsPage() {
@@ -31,6 +36,10 @@ export default function CatalogsPage() {
     SKU: "",
     URL: "",
     category: "",
+    rating: 0,
+    reviewCount: 0,
+    brand: "",
+    isFeatured: false,
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [preview, setPreview] = useState<string>("");
@@ -83,10 +92,14 @@ export default function CatalogsPage() {
       body: JSON.stringify({
         ...form,
         URL: preview || form.URL || "", // ensure not empty
+        rating: form.rating || 0,
+        reviewCount: form.reviewCount || 0,
+        brand: form.brand || "",
+        isFeatured: form.isFeatured || false,
       }),
     });
 
-    setForm({ title: "", price: 0, stock: 0, SKU: "", URL: "", category: "" });
+    setForm({ title: "", price: 0, stock: 0, SKU: "", URL: "", category: "", rating: 0, reviewCount: 0, brand: "", isFeatured: false });
     setPreview("");
     setEditingId(null);
     await loadCatalogs();
@@ -101,6 +114,10 @@ export default function CatalogsPage() {
       SKU: catalog.SKU,
       URL: catalog.URL,
       category: catalog.category || "",
+      rating: catalog.rating || 0,
+      reviewCount: catalog.reviewCount || 0,
+      brand: catalog.brand || "",
+      isFeatured: catalog.isFeatured || false,
     });
     setPreview(catalog.URL);
     setEditingId(catalog._id);
@@ -189,6 +206,40 @@ export default function CatalogsPage() {
           ))}
         </select>
 
+        <input
+          placeholder="Brand (optional)"
+          value={form.brand || ""}
+          onChange={(e) => setForm({ ...form, brand: e.target.value })}
+        />
+
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <input
+            type="checkbox"
+            id="catalogFeatured"
+            checked={form.isFeatured || false}
+            onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
+          />
+          <label htmlFor="catalogFeatured">Featured Product (Brands We Love)</label>
+        </div>
+
+        <input
+          type="number"
+          placeholder="Rating (0-5)"
+          min="0"
+          max="5"
+          step="0.1"
+          value={form.rating || ""}
+          onChange={(e) => setForm({ ...form, rating: parseFloat(e.target.value) || 0 })}
+        />
+
+        <input
+          type="number"
+          placeholder="Review Count"
+          min="0"
+          value={form.reviewCount || ""}
+          onChange={(e) => setForm({ ...form, reviewCount: parseInt(e.target.value) || 0 })}
+        />
+
         <input type="file" accept="image/*" onChange={handleImageChange} />
 
         {preview && (
@@ -204,7 +255,7 @@ export default function CatalogsPage() {
             className="cancel-btn"
             onClick={() => {
               setEditingId(null);
-              setForm({ title: "", price: 0, stock: 0, SKU: "", URL: "", category: "" });
+              setForm({ title: "", price: 0, stock: 0, SKU: "", URL: "", category: "", rating: 0, reviewCount: 0, brand: "", isFeatured: false });
               setPreview("");
             }}
           >

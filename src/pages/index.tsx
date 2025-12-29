@@ -12,21 +12,23 @@
 import React from 'react'
 import CircleMenu from '../components/headers/CircleMenu'
 import Collections from '../components/collections/Collections'
+import TrendingProducts from '../components/products/TrendingProducts'
 import Seo from "../components/common/Seo";
 
 const Home: React.FC = () => {
   return (
     <>
       <Seo
-        title="Home - SNM Fashion Store"
-        description="Discover the latest trends in fashion at SNM Fashion Store. Shop our new arrivals and exclusive collections today!"
-        ogTitle="Home - SNM Fashion Store"
-        ogDescription="Discover the latest trends in fashion at SNM Fashion Store. Shop our new arrivals and exclusive collections today!"
+        title="Home - SNM Jewelry"
+        description="Discover exquisite jewelry collections at SNM. Shop our latest trending pieces, premium diamonds, and handcrafted gold ornaments."
+        ogTitle="Home - SNM Jewelry"
+        ogDescription="Discover exquisite jewelry collections at SNM. Shop our latest trending pieces, premium diamonds, and handcrafted gold ornaments."
         ogType="website"
         ogImage='assets/GreeneyeLandscape.png'
       />
       <CircleMenu />
       <Collections />
+      <TrendingProducts />
     </>
   )
 }

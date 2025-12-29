@@ -15,6 +15,17 @@ interface Product {
   oldPrice?: number;
   colors?: string[];
   sizes?: string[];
+  description?: string;
+  brand?: string;
+  rating?: number;
+  reviewCount?: number;
+  salesCount?: number;
+  isFeatured?: boolean;
+  isTrending?: boolean;
+  collectionId?: {
+    _id: string;
+    name: string;
+  };
 }
 
 // ✅ Use API Gateway URL
@@ -192,139 +203,230 @@ const ProductDetail: React.FC = () => {
         }}
       />
 
-      <div className="product-detail">
-        {/* Left: Image gallery */}
-        <div className="images">
-          <div className="thumbnails">
-            {imageList.map((img, i) => (
-              <img
-                key={i}
-                src={img}
-                alt={product.title}
-                className={selectedImage === img ? "active" : ""}
-                onClick={() => setSelectedImage(img)}
-              />
-            ))}
+      <div className="product-detail-page">
+        <div className="product-detail-container">
+          {/* Left: Image gallery */}
+          <div className="product-images-section">
+            <div className="image-thumbnails">
+              {imageList.map((img, i) => (
+                <div
+                  key={i}
+                  className={`thumbnail ${selectedImage === img ? "active" : ""}`}
+                  onClick={() => setSelectedImage(img)}
+                >
+                  <img src={img} alt={`${product.title} view ${i + 1}`} />
+                </div>
+              ))}
+            </div>
+
+            <div className="main-image-container">
+              <img src={mainImage} alt={product.title} className="main-product-image" />
+
+              {/* Badges on image */}
+              <div className="image-badges">
+                {product.isTrending && <span className="badge trending-badge">🔥 TRENDING</span>}
+                {product.isFeatured && <span className="badge featured-badge">⭐ FEATURED</span>}
+              </div>
+            </div>
           </div>
 
-          <div className="main-image">
-            <img src={mainImage} alt={product.title} />
-          </div>
-        </div>
-
-        {/* Right: Product Info */}
-        <div className="info">
-          <h1>{product.title}</h1>
-
-          <div className="price">
-            <span className="current">₹{product.price}</span>
-            {product.oldPrice && <span className="old">₹{product.oldPrice}</span>}
-            {product.oldPrice && (
-              <span className="discount">
-                {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF
-              </span>
+          {/* Right: Product Info */}
+          <div className="product-info-section">
+            {/* Brand & Collection */}
+            {(product.brand || product.collectionId) && (
+              <div className="product-meta">
+                {product.brand && <span className="brand-name">{product.brand}</span>}
+                {product.collectionId && (
+                  <span className="collection-name">{product.collectionId.name}</span>
+                )}
+              </div>
             )}
-          </div>
 
-          <p className="sku">SKU: {product.SKU}</p>
-          <p className="stock">
-            {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
-          </p>
+            {/* Product Title */}
+            <h1 className="product-title">{product.title}</h1>
 
-          {/* Colors */}
-          {product.colors && (
-            <div className="colors">
-              <p>Color:</p>
-              <div className="options">
-                {product.colors.map((c, i) => (
-                  <button key={i} style={{ background: c }} title={c}></button>
-                ))}
+            {/* Rating & Reviews */}
+            {product.rating !== undefined && (
+              <div className="product-rating">
+                <div className="stars">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className={i < Math.floor(product.rating || 0) ? "star filled" : "star"}>
+                      ★
+                    </span>
+                  ))}
+                </div>
+                <span className="rating-value">{product.rating.toFixed(1)}</span>
+                {product.reviewCount !== undefined && (
+                  <span className="review-count">({product.reviewCount} reviews)</span>
+                )}
+                {product.salesCount !== undefined && (
+                  <span className="sales-count">• {product.salesCount} sold</span>
+                )}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Sizes */}
-          {product.sizes && (
-            <div className="sizes">
-              <p>Size:</p>
-              <div className="options">
-                {product.sizes.map((s, i) => (
-                  <button key={i}>{s}</button>
-                ))}
+            {/* Price Section */}
+            <div className="price-section">
+              <div className="price-main">
+                <span className="currency">₹</span>
+                <span className="amount">{product.price.toLocaleString('en-IN')}</span>
               </div>
+              {product.oldPrice && (
+                <div className="price-old-section">
+                  <span className="old-price">₹{product.oldPrice.toLocaleString('en-IN')}</span>
+                  <span className="discount-badge">
+                    {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF
+                  </span>
+                </div>
+              )}
             </div>
-          )}
 
-          {/* Actions: quantity + main buttons */}
-          <div className="actions">
-            <div className="actions-row">
-              <div className="qty-control" role="group" aria-label="Quantity">
+            {/* Description */}
+            {product.description && (
+              <div className="product-description">
+                <p>{product.description}</p>
+              </div>
+            )}
+
+            {/* Product Details Grid */}
+            <div className="product-details-grid">
+              <div className="detail-item">
+                <span className="detail-label">SKU</span>
+                <span className="detail-value">{product.SKU}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Availability</span>
+                <span className={`detail-value ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}`}>
+                  {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+                </span>
+              </div>
+              {product.brand && (
+                <div className="detail-item">
+                  <span className="detail-label">Brand</span>
+                  <span className="detail-value">{product.brand}</span>
+                </div>
+              )}
+              {product.collectionId && (
+                <div className="detail-item">
+                  <span className="detail-label">Collection</span>
+                  <span className="detail-value">{product.collectionId.name}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Colors */}
+            {product.colors && (
+              <div className="product-options">
+                <label className="option-label">Color:</label>
+                <div className="color-options">
+                  {product.colors.map((c, i) => (
+                    <button key={i} className="color-swatch" style={{ background: c }} title={c}></button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sizes */}
+            {product.sizes && (
+              <div className="product-options">
+                <label className="option-label">Size:</label>
+                <div className="size-options">
+                  {product.sizes.map((s, i) => (
+                    <button key={i} className="size-button">{s}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Quantity Selector */}
+            <div className="quantity-section">
+              <label className="option-label">Quantity:</label>
+              <div className="quantity-control">
                 <button
                   type="button"
-                  className="qty-btn"
+                  className="qty-btn qty-minus"
                   onClick={decQty}
                   disabled={qty <= 1}
+                  aria-label="Decrease quantity"
                 >
                   −
                 </button>
-                <div className="qty-value">{qty}</div>
+                <div className="qty-display">{qty}</div>
                 <button
                   type="button"
-                  className="qty-btn"
+                  className="qty-btn qty-plus"
                   onClick={incQty}
                   disabled={product.stock ? qty >= product.stock : false}
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>
               </div>
+              <span className="total-price">Total: ₹{(product.price * qty).toLocaleString('en-IN')}</span>
+            </div>
 
+            {/* Action Buttons */}
+            <div className="action-buttons">
               <button
-                className={`add-to-cart pill-btn ${adding ? "loading" : ""}`}
+                className={`btn-add-cart ${adding ? "loading" : ""}`}
                 onClick={handleAddToCart}
                 disabled={adding || product.stock === 0}
               >
-                {adding ? "Adding..." : `Add to cart – ₹${product.price}`}
+                <span className="btn-icon">🛒</span>
+                <span className="btn-text">{adding ? "Adding..." : "Add to Cart"}</span>
               </button>
 
-              <div className="icons-right">
-                <button
-                  className="icon-circle"
-                  title="Add to Wishlist"
-                  onClick={handleAddToWishlist}
-                  disabled={wishlisting}
-                >
-                  ♥
-                </button>
+              <button
+                className="btn-buy-now"
+                onClick={handleBuyNow}
+                disabled={product.stock === 0}
+              >
+                <span className="btn-icon">⚡</span>
+                <span className="btn-text">Buy Now</span>
+              </button>
 
-                <button
-                  className="icon-circle"
-                  title="More actions"
-                  onClick={() => {
-                    // placeholder for other action (share/compare)
-                    alert("More actions");
-                  }}
-                >
-                  ⤢
-                </button>
-              </div>
+              <button
+                className={`btn-wishlist ${wishlisting ? "loading" : ""}`}
+                title="Add to Wishlist"
+                onClick={handleAddToWishlist}
+                disabled={wishlisting}
+                aria-label="Add to wishlist"
+              >
+                ♥
+              </button>
             </div>
 
-            <button
-              className="buy-now pill-btn buy-now-btn"
-              onClick={handleBuyNow}
-            >
-              BUY IT NOW
-            </button>
-          </div>
-
-          {/* Delivery info */}
-          <div className="delivery">
-            <p>
-              <strong>Delivery:</strong> 3–6 days in India, 12–26 days International
-            </p>
-            <p>
-              <strong>Return:</strong> Within 30 days of purchase
-            </p>
+            {/* Delivery & Return Info */}
+            <div className="delivery-info">
+              <div className="info-card">
+                <div className="info-icon">🚚</div>
+                <div className="info-content">
+                  <h4>Free Delivery</h4>
+                  <p>3-6 days in India • 12-26 days International</p>
+                </div>
+              </div>
+              <div className="info-card">
+                <div className="info-icon">🔄</div>
+                <div className="info-content">
+                  <h4>Easy Returns</h4>
+                  <p>30-day return policy for hassle-free returns</p>
+                </div>
+              </div>
+              <div className="info-card">
+                <div className="info-icon">🔒</div>
+                <div className="info-content">
+                  <h4>Secure Payment</h4>
+                  <p>100% secure payment with trusted gateways</p>
+                </div>
+              </div>
+              <div className="info-card">
+                <div className="info-icon">💎</div>
+                <div className="info-content">
+                  <h4>Authentic Jewelry</h4>
+                  <p>Certified and authenticated premium jewelry</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

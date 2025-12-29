@@ -61,16 +61,20 @@ const NavHeader: React.FC = () => {
               <div className="dropdown-content">
                 {c1.map((parent) => (
                   <div key={parent._id} className="dropdown nested">
-                    <span className="nav-link">{parent.name}</span>
+                    <Link href={`/shop/category/${parent._id}`} className="nav-link">
+                      {parent.name}
+                    </Link>
                     <div className="dropdown-content nested-content">
                       {getChildren(parent._id, c2).map((child) => (
                         <div key={child._id} className="dropdown nested">
-                          <span className="nav-link">{child.name}</span>
+                          <Link href={`/shop/category/${child._id}`} className="nav-link">
+                            {child.name}
+                          </Link>
                           <div className="dropdown-content nested-content">
                             {getChildren(child._id, c3).map((subChild) => (
                               <Link
                                 key={subChild._id}
-                                href={`/category/${subChild._id}`}
+                                href={`/shop/category/${subChild._id}`}
                               >
                                 {subChild.name}
                               </Link>
@@ -125,16 +129,20 @@ const NavHeader: React.FC = () => {
             <div className="dropdown-content mobile-dropdown">
               {c1.map((parent) => (
                 <div key={parent._id} className="dropdown nested">
-                  <span className="nav-link">{parent.name}</span>
+                  <Link href={`/shop/category/${parent._id}`} className="nav-link">
+                    {parent.name}
+                  </Link>
                   <div className="dropdown-content nested-content mobile-dropdown">
                     {getChildren(parent._id, c2).map((child) => (
                       <div key={child._id} className="dropdown nested">
-                        <span className="nav-link">{child.name}</span>
+                        <Link href={`/shop/category/${child._id}`} className="nav-link">
+                          {child.name}
+                        </Link>
                         <div className="dropdown-content nested-content mobile-dropdown">
                           {getChildren(child._id, c3).map((subChild) => (
                             <Link
                               key={subChild._id}
-                              href={`/category/${subChild._id}`}
+                              href={`/shop/category/${subChild._id}`}
                             >
                               {subChild.name}
                             </Link>

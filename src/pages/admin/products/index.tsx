@@ -10,6 +10,11 @@ interface Product {
   description: string;
   stock: number;
   SKU: string;
+  salesCount?: number;
+  rating?: number;
+  reviewCount?: number;
+  brand?: string;
+  isFeatured?: boolean;
 }
 
 interface Collection {
@@ -28,6 +33,10 @@ export default function AdminProductsPage() {
     description: "",
     stock: 0,
     SKU: "",
+    rating: 0,
+    reviewCount: 0,
+    brand: "",
+    isFeatured: false,
   });
   const [preview, setPreview] = useState<string>("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -81,6 +90,10 @@ export default function AdminProductsPage() {
       description: form.description,
       stock: form.stock,
       SKU: form.SKU,
+      rating: form.rating || 0,
+      reviewCount: form.reviewCount || 0,
+      brand: form.brand || "",
+      isFeatured: form.isFeatured || false,
     };
 
     const method = editingId ? "PUT" : "POST";
@@ -100,6 +113,10 @@ export default function AdminProductsPage() {
       description: "",
       stock: 0,
       SKU: "",
+      rating: 0,
+      reviewCount: 0,
+      brand: "",
+      isFeatured: false,
     });
     setPreview("");
     setEditingId(null);
@@ -116,6 +133,10 @@ export default function AdminProductsPage() {
       description: p.description,
       stock: p.stock,
       SKU: p.SKU,
+      rating: p.rating || 0,
+      reviewCount: p.reviewCount || 0,
+      brand: p.brand || "",
+      isFeatured: p.isFeatured || false,
     });
     setPreview(p.URL);
     setEditingId(p._id);
@@ -175,6 +196,40 @@ export default function AdminProductsPage() {
           ))}
         </select>
 
+        <input
+          placeholder="Brand (optional)"
+          value={form.brand || ""}
+          onChange={(e) => setForm({ ...form, brand: e.target.value })}
+        />
+
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <input
+            type="checkbox"
+            id="isFeatured"
+            checked={form.isFeatured || false}
+            onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
+          />
+          <label htmlFor="isFeatured">Featured Product (Brands We Love)</label>
+        </div>
+
+        <input
+          type="number"
+          placeholder="Rating (0-5)"
+          min="0"
+          max="5"
+          step="0.1"
+          value={form.rating || ""}
+          onChange={(e) => setForm({ ...form, rating: parseFloat(e.target.value) || 0 })}
+        />
+
+        <input
+          type="number"
+          placeholder="Review Count"
+          min="0"
+          value={form.reviewCount || ""}
+          onChange={(e) => setForm({ ...form, reviewCount: parseInt(e.target.value) || 0 })}
+        />
+
         <input type="file" accept="image/*" onChange={handleImageChange} />
 
         {preview && (
@@ -200,6 +255,10 @@ export default function AdminProductsPage() {
                 description: "",
                 stock: 0,
                 SKU: "",
+                rating: 0,
+                reviewCount: 0,
+                brand: "",
+                isFeatured: false,
               });
               setPreview("");
             }}
