@@ -56,7 +56,8 @@ export default function AdminProductsPage() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("/api/products/upload", {
+    // Use fetcher which automatically adds API_BASE and auth headers
+    const res = await fetcher("/api/products/upload", {
       method: "POST",
       body: formData,
     });

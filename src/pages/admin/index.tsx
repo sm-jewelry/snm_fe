@@ -23,26 +23,30 @@ const AdminDashboard = () => {
           return;
         }
 
-        const res = await fetch("/api/userinfo", {
+        const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8000";
+
+        const res = await fetch(`${API_GATEWAY_URL}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const data = await res.json();
+        const response = await res.json();
 
-        // If token invalid or no role found
-        if (!res.ok || !data.role) {
+        // If token invalid or request failed
+        if (!res.ok || !response.success) {
           router.push("/profile");
           return;
         }
 
+        const user = response.data;
+
         // ✅ Only allow if role === admin
-        if (data.role !== "admin") {
+        if (user.role !== "admin") {
           alert("Access denied: Admins only");
           router.push("/");
           return;
         }
 
-        setUser(data);
+        setUser(user);
       } catch (err) {
         console.error("Error checking admin access:", err);
         router.push("/profile");

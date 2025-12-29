@@ -36,7 +36,8 @@ export default function AdminCollectionsPage() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("/api/collections/upload", {
+    // Use fetcher which automatically adds API_BASE and auth headers
+    const res = await fetcher("/api/collections/upload", {
       method: "POST",
       body: formData,
     });

@@ -1,5 +1,5 @@
 const API_BASE =
-  process.env.NEXT_PUBLIC_CATEGORY_API_BASE_URL || "http://localhost:4455";
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8000";
 
 export const fetcher = async (url: string, options: RequestInit = {}) => {
   const token =
