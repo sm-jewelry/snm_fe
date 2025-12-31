@@ -47,7 +47,8 @@ export default function CatalogsPage() {
   // Load catalogs
   const loadCatalogs = async () => {
     const data = await fetcher("/api/catalogs");
-    setCatalogs(data);
+    // Handle paginated response structure (products) or fallback to direct array
+    setCatalogs(data.products || data);
   };
 
   // Load categories

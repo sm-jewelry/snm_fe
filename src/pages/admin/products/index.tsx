@@ -44,7 +44,8 @@ export default function AdminProductsPage() {
   // Load products & collections
   const loadProducts = async () => {
     const data = await fetcher("/api/catalogs");
-    setProducts(data);
+    // Handle paginated response structure (products) or fallback to direct array
+    setProducts(data.products || data);
   };
 
   const loadCollections = async () => {
