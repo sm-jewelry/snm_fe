@@ -43,7 +43,7 @@ export default function AdminProductsPage() {
 
   // Load products & collections
   const loadProducts = async () => {
-    const data = await fetcher("/api/products");
+    const data = await fetcher("/api/catalogs");
     setProducts(data);
   };
 
@@ -66,7 +66,7 @@ export default function AdminProductsPage() {
     formData.append("file", file);
 
     // Use fetcher which automatically adds API_BASE and auth headers
-    const res = await fetcher("/api/products/upload", {
+    const res = await fetcher("/api/catalogs/upload", {
       method: "POST",
       body: formData,
     });
@@ -97,7 +97,7 @@ export default function AdminProductsPage() {
     };
 
     const method = editingId ? "PUT" : "POST";
-    const url = editingId ? `/api/products/${editingId}` : "/api/products";
+    const url = editingId ? `/api/catalogs/${editingId}` : "/api/catalogs";
 
     await fetcher(url, {
       method,
@@ -145,7 +145,7 @@ export default function AdminProductsPage() {
   // Delete product
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      await fetcher(`/api/products/${id}`, { method: "DELETE" });
+      await fetcher(`/api/catalogs/${id}`, { method: "DELETE" });
       await loadProducts();
     }
   };

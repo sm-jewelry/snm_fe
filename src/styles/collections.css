@@ -27,7 +27,7 @@
 
 /* -------- Card styling -------- */
 .collection-card {
-  flex: 0 0 auto;            /* don’t shrink */
+  flex: 0 0 auto;            /* don't shrink */
   width: 240px;
   border-radius: 12px;
   overflow: hidden;

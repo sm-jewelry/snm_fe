@@ -1,0 +1,473 @@
+/* Order Failure Page Styles */
+
+.order-failure-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  padding: 2rem 1rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.order-failure-background {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Floating Error Symbols */
+.failure-symbols {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.error-symbol {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.3;
+  animation: floatError 6s ease-in-out infinite;
+}
+
+.error-symbol-1 { top: 10%; left: 10%; animation-delay: 0s; }
+.error-symbol-2 { top: 20%; right: 15%; animation-delay: 1s; }
+.error-symbol-3 { bottom: 15%; left: 20%; animation-delay: 2s; }
+.error-symbol-4 { bottom: 25%; right: 10%; animation-delay: 1.5s; }
+
+@keyframes floatError {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-20px) rotate(5deg); }
+  75% { transform: translateY(20px) rotate(-5deg); }
+}
+
+/* Main Container */
+.order-failure-container {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Failure Icon */
+.failure-icon-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.failure-cross-circle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff4757 0%, #e74c3c 100%);
+  box-shadow:
+    0 10px 30px rgba(231, 76, 60, 0.3),
+    inset 0 2px 10px rgba(255, 255, 255, 0.2);
+  animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.failure-cross-line1,
+.failure-cross-line2 {
+  position: absolute;
+  width: 50px;
+  height: 6px;
+  background: white;
+  border-radius: 3px;
+}
+
+.failure-cross-line1 {
+  transform: rotate(45deg);
+  animation: drawCross1 0.3s ease-out 0.5s both;
+}
+
+.failure-cross-line2 {
+  transform: rotate(-45deg);
+  animation: drawCross2 0.3s ease-out 0.7s both;
+}
+
+@keyframes drawCross1 {
+  from { transform: rotate(45deg) scaleX(0); }
+  to { transform: rotate(45deg) scaleX(1); }
+}
+
+@keyframes drawCross2 {
+  from { transform: rotate(-45deg) scaleX(0); }
+  to { transform: rotate(-45deg) scaleX(1); }
+}
+
+/* Content */
+.failure-content {
+  text-align: center;
+  color: #2c3e50;
+}
+
+.failure-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #e74c3c;
+  margin-bottom: 1rem;
+  animation: slideDown 0.6s ease-out 0.3s both;
+}
+
+.failure-subtitle {
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  animation: slideDown 0.6s ease-out 0.4s both;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Order Info */
+.failure-order-info {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+  border: 2px solid #ffcccc;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem auto;
+  max-width: 500px;
+}
+
+.failure-order-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.failure-order-id {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #e74c3c;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+/* Error Reason Box */
+.failure-reason-box {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem auto;
+  max-width: 500px;
+}
+
+.failure-reason-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #856404;
+  margin-bottom: 0.5rem;
+}
+
+.failure-reason-text {
+  font-size: 1rem;
+  color: #856404;
+  margin: 0;
+}
+
+/* Common Reasons */
+.failure-common-reasons {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.failure-common-reasons h3 {
+  color: #e74c3c;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.failure-common-reasons ul {
+  list-style: none;
+  padding: 0;
+}
+
+.failure-common-reasons li {
+  padding: 0.7rem 0;
+  padding-left: 2rem;
+  position: relative;
+  color: #555;
+  font-size: 1rem;
+}
+
+.failure-common-reasons li::before {
+  content: "❌";
+  position: absolute;
+  left: 0;
+  font-size: 1rem;
+}
+
+/* Action Buttons */
+.failure-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2.5rem 0;
+  animation: slideUp 0.6s ease-out 0.5s both;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.failure-btn-primary,
+.failure-btn-secondary,
+.failure-btn-tertiary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.failure-btn-primary {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.failure-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+.failure-btn-secondary {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.failure-btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.failure-btn-tertiary {
+  background: white;
+  color: #2c3e50;
+  border: 2px solid #ddd;
+}
+
+.failure-btn-tertiary:hover {
+  background: #f8f9fa;
+  border-color: #bbb;
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  font-size: 1.3rem;
+}
+
+/* Help Section */
+.failure-help-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 3rem 0;
+  text-align: left;
+}
+
+.help-card {
+  background: white;
+  border: 2px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.help-card:hover {
+  border-color: #ffd700;
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+  transform: translateY(-3px);
+}
+
+.help-card h4 {
+  color: #2c3e50;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.help-card p {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.help-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.help-card li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.help-card li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.help-link {
+  display: inline-block;
+  color: #e74c3c;
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+.help-link:hover {
+  color: #c0392b;
+  transform: translateX(5px);
+}
+
+/* Footer */
+.failure-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid #eee;
+}
+
+.failure-assurance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #7f8c8d;
+  font-size: 0.95rem;
+}
+
+.shield-icon {
+  font-size: 1.3rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .order-failure-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .failure-title {
+    font-size: 2rem;
+  }
+
+  .failure-subtitle {
+    font-size: 1rem;
+  }
+
+  .failure-cross-circle {
+    width: 100px;
+    height: 100px;
+  }
+
+  .failure-cross-line1,
+  .failure-cross-line2 {
+    width: 40px;
+    height: 5px;
+  }
+
+  .failure-help-section {
+    grid-template-columns: 1fr;
+  }
+
+  .failure-common-reasons {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-failure-page {
+    padding: 1rem 0.5rem;
+  }
+
+  .order-failure-container {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+  }
+
+  .failure-title {
+    font-size: 1.6rem;
+  }
+
+  .failure-btn-primary,
+  .failure-btn-secondary,
+  .failure-btn-tertiary {
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+  }
+}

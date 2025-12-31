@@ -81,9 +81,53 @@ export default function CatalogsPage() {
   }
 };
 
+  // 🔍 Find c1, c2, c3 from selected category
+  const getCategoryHierarchy = (categoryId: string) => {
+    const selectedCat = categories.find((c) => c._id === categoryId);
+    if (!selectedCat) return { c1: null, c2: null, c3: null };
+
+    let c1 = null;
+    let c2 = null;
+    let c3 = null;
+
+    if (selectedCat.level === "C3") {
+      c3 = selectedCat._id;
+      // Find C2 parent
+      if (selectedCat.parents && selectedCat.parents.length > 0) {
+        const c2Parent = typeof selectedCat.parents[0] === 'object'
+          ? selectedCat.parents[0]._id
+          : selectedCat.parents[0];
+        c2 = c2Parent;
+
+        // Find C1 parent
+        const c2Cat = categories.find((c) => c._id === c2Parent);
+        if (c2Cat && c2Cat.parents && c2Cat.parents.length > 0) {
+          c1 = typeof c2Cat.parents[0] === 'object'
+            ? c2Cat.parents[0]._id
+            : c2Cat.parents[0];
+        }
+      }
+    } else if (selectedCat.level === "C2") {
+      c2 = selectedCat._id;
+      if (selectedCat.parents && selectedCat.parents.length > 0) {
+        c1 = typeof selectedCat.parents[0] === 'object'
+          ? selectedCat.parents[0]._id
+          : selectedCat.parents[0];
+      }
+    } else if (selectedCat.level === "C1") {
+      c1 = selectedCat._id;
+    }
+
+    return { c1, c2, c3 };
+  };
+
   // Submit form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Get category hierarchy
+    const hierarchy = getCategoryHierarchy(form.category || "");
+
     const method = editingId ? "PUT" : "POST";
     const url = editingId ? `/api/catalogs/${editingId}` : "/api/catalogs";
     await fetcher(url, {
@@ -96,6 +140,9 @@ export default function CatalogsPage() {
         reviewCount: form.reviewCount || 0,
         brand: form.brand || "",
         isFeatured: form.isFeatured || false,
+        c1: hierarchy.c1,
+        c2: hierarchy.c2,
+        c3: hierarchy.c3,
       }),
     });
 
@@ -144,9 +191,9 @@ export default function CatalogsPage() {
     }
   };
 
-  // 🧩 For dropdown (show only level C3)
+  // 🧩 For dropdown (show all levels: C1, C2, C3)
   const categoryOptions = categories
-    .filter((cat) => cat.level === "C3")
+    .filter((cat) => cat.level === "C1" || cat.level === "C2" || cat.level === "C3")
     .map((cat) => ({
       ...cat,
       path: buildCategoryPath(cat),

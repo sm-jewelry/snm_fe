@@ -92,7 +92,7 @@ const NavHeader: React.FC = () => {
               <span className="nav-link">Products</span>
               <div className="dropdown-content">
                 <Link href="/products/new-arrivals">New Arrivals</Link>
-                <Link href="/products/best-sellers">Best Sellers</Link>
+                <Link href="/best">Best Sellers</Link>
               </div>
             </div>
 
@@ -160,7 +160,7 @@ const NavHeader: React.FC = () => {
             <span className="nav-link">Products</span>
             <div className="dropdown-content mobile-dropdown">
               <Link href="/products/new-arrivals">New Arrivals</Link>
-              <Link href="/products/best-sellers">Best Sellers</Link>
+              <Link href="/best">Best Sellers</Link>
             </div>
           </div>
 

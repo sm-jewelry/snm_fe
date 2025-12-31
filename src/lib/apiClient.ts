@@ -58,6 +58,14 @@ class ApiClient {
   private async request(url: string, options: RequestOptions = {}): Promise<any> {
     const { requiresAuth = false, headers, ...restOptions } = options;
 
+    // Check if auth is required but no token is available
+    if (requiresAuth) {
+      const accessToken = auth.getAccessToken();
+      if (!accessToken) {
+        throw new Error('Please login to continue');
+      }
+    }
+
     const requestHeaders: HeadersInit = requiresAuth
       ? await this.getAuthHeaders()
       : { 'Content-Type': 'application/json', ...headers };
@@ -142,11 +150,11 @@ class ApiClient {
 
   async getProducts(params?: any) {
     const query = params ? `?${new URLSearchParams(params).toString()}` : '';
-    return this.request(`${API_GATEWAY_URL}/api/products${query}`);
+    return this.request(`${API_GATEWAY_URL}/api/catalogs${query}`);
   }
 
   async getProduct(id: string) {
-    return this.request(`${API_GATEWAY_URL}/api/products/${id}`);
+    return this.request(`${API_GATEWAY_URL}/api/catalogs/${id}`);
   }
 
   async getCategories() {
@@ -170,7 +178,7 @@ class ApiClient {
   }
 
   async getCollectionProducts(collectionId: string) {
-    return this.request(`${API_GATEWAY_URL}/api/products/collection/${collectionId}`);
+    return this.request(`${API_GATEWAY_URL}/api/catalogs/collection/${collectionId}`);
   }
 
   async getNewArrivals() {
@@ -179,7 +187,7 @@ class ApiClient {
 
   // Admin only - create product
   async createProduct(data: any) {
-    return this.request(`${API_GATEWAY_URL}/api/products`, {
+    return this.request(`${API_GATEWAY_URL}/api/catalogs`, {
       method: 'POST',
       requiresAuth: true,
       body: JSON.stringify(data),
@@ -188,7 +196,7 @@ class ApiClient {
 
   // Admin only - update product
   async updateProduct(id: string, data: any) {
-    return this.request(`${API_GATEWAY_URL}/api/products/${id}`, {
+    return this.request(`${API_GATEWAY_URL}/api/catalogs/${id}`, {
       method: 'PUT',
       requiresAuth: true,
       body: JSON.stringify(data),
@@ -197,7 +205,7 @@ class ApiClient {
 
   // Admin only - delete product
   async deleteProduct(id: string) {
-    return this.request(`${API_GATEWAY_URL}/api/products/${id}`, {
+    return this.request(`${API_GATEWAY_URL}/api/catalogs/${id}`, {
       method: 'DELETE',
       requiresAuth: true,
     });

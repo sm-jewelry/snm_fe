@@ -22,7 +22,7 @@ interface WishlistItem {
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 const WISHLIST_API = `${API_GATEWAY_URL}/api/wishlist`;
 const PRODUCT_API = `${API_GATEWAY_URL}/api/catalogs`;
-const FALLBACK_PRODUCT_API = `${API_GATEWAY_URL}/api/products`;
+const FALLBACK_PRODUCT_API = `${API_GATEWAY_URL}/api/catalogs`;
 
 const WishlistPage: React.FC = () => {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);

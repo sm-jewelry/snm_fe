@@ -19,6 +19,16 @@ function ProfileContent() {
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses'>('profile');
+
+  // Handle URL query parameter for tab
+  useEffect(() => {
+    if (router.query.tab) {
+      const tab = router.query.tab as 'profile' | 'orders' | 'addresses';
+      if (['profile', 'orders', 'addresses'].includes(tab)) {
+        setActiveTab(tab);
+      }
+    }
+  }, [router.query.tab]);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
@@ -59,10 +69,20 @@ function ProfileContent() {
   }, [user]);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    // Only fetch orders if user is authenticated
+    if (user) {
+      fetchOrders();
+    } else {
+      setLoadingOrders(false);
+    }
+  }, [user]);
 
   const fetchOrders = async () => {
+    if (!user) {
+      setLoadingOrders(false);
+      return;
+    }
+
     try {
       const response = await apiClient.getMyOrders();
       setOrders(response.data || []);

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
 
 interface CheckoutItem {
@@ -41,6 +42,7 @@ interface User {
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
 const CheckoutPage: React.FC = () => {
+  const router = useRouter();
   const { user, addAddress, updateAddress, deleteAddress, setDefaultAddress } =
     useAuth() as {
       user: User | null;
@@ -288,11 +290,15 @@ const CheckoutPage: React.FC = () => {
       if (!res.ok) throw new Error(data.message || "Order creation failed");
 
       if (selectedPayment === "cod") {
+        // For COD, order is directly in data.data (not nested)
+        const orderId = data.data._id || data.data.order?._id;
         alert("Order created successfully (Cash on Delivery)");
-        window.location.href = "/order-success";
+        router.push(`/order-success?orderId=${orderId}`);
       } else if (selectedPayment === "online") {
-        // Trigger Razorpay checkout
+        // For Razorpay, response has { order, rzpOrder }
         const rzpOrder = data.data.rzpOrder;
+        const orderId = data.data.order._id;
+
         const options = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
           amount: rzpOrder.amount,
@@ -302,23 +308,49 @@ const CheckoutPage: React.FC = () => {
           order_id: rzpOrder.id,
           handler: async function (response: any) {
             try {
+              // Get fresh token from localStorage at time of verification
+              const currentToken = typeof window !== "undefined"
+                ? localStorage.getItem("access_token")
+                : null;
+
+              if (!currentToken) {
+                // If no token, redirect to success anyway since webhook will handle verification
+                router.push(`/order-success?orderId=${orderId}`);
+                return;
+              }
+
               const verifyRes = await fetch(`${API_GATEWAY_URL}/api/payments/verify`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${currentToken}`
+                },
                 credentials: 'include',
                 body: JSON.stringify({
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_signature: response.razorpay_signature,
-                  orderId: data.data.order._id,
+                  orderId: orderId,
                 }),
               });
               const verifyData = await verifyRes.json();
-              if (!verifyRes.ok) throw new Error(verifyData.message);
-              alert("Payment successful! Order confirmed.");
-              window.location.href = "/order-success";
+              if (!verifyRes.ok) {
+                // If verification fails, redirect to success anyway since webhook will handle it
+                router.push(`/order-success?orderId=${orderId}`);
+                return;
+              }
+
+              // Payment verified successfully
+              router.push(`/order-success?orderId=${orderId}`);
             } catch (err: any) {
-              alert("Payment verification failed: " + err.message);
+              // Even on error, redirect to success since webhook will handle verification
+              router.push(`/order-success?orderId=${orderId}`);
+            }
+          },
+          modal: {
+            ondismiss: function() {
+              // User closed the payment modal without completing payment
+              router.push(`/order-failure?orderId=${orderId}&reason=${encodeURIComponent("Payment cancelled by user")}`);
             }
           },
           prefill: {
@@ -328,8 +360,14 @@ const CheckoutPage: React.FC = () => {
           theme: { color: "#ffd700" },
         };
 
-        const rzp = new (window as any).Razorpay(options);
-        rzp.open();
+        try {
+          const rzp = new (window as any).Razorpay(options);
+          rzp.open();
+        } catch (err: any) {
+          // Razorpay failed to load
+          const errorMessage = err.message || "Failed to load payment gateway";
+          router.push(`/order-failure?orderId=${orderId}&reason=${encodeURIComponent(errorMessage)}`);
+        }
       }
     } catch (err: any) {
       alert(err.message || "Something went wrong");

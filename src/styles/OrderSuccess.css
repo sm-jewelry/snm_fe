@@ -1,0 +1,525 @@
+/* ============================================
+   ORDER SUCCESS PAGE - Luxury Jewelry Theme
+   ============================================ */
+
+.order-success-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.order-success-background {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  z-index: 1;
+}
+
+/* Animated Sparkles Background */
+.success-sparkles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 24px;
+  animation: sparkleFloat 3s ease-in-out infinite;
+  opacity: 0;
+}
+
+.sparkle-1 {
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.sparkle-2 {
+  top: 20%;
+  right: 15%;
+  animation-delay: 0.5s;
+}
+
+.sparkle-3 {
+  top: 60%;
+  left: 20%;
+  animation-delay: 1s;
+}
+
+.sparkle-4 {
+  top: 70%;
+  right: 20%;
+  animation-delay: 1.5s;
+}
+
+.sparkle-5 {
+  top: 40%;
+  left: 80%;
+  animation-delay: 2s;
+}
+
+.sparkle-6 {
+  top: 80%;
+  left: 50%;
+  animation-delay: 2.5s;
+}
+
+@keyframes sparkleFloat {
+  0%, 100% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-30px) scale(1);
+  }
+}
+
+/* Main Container */
+.order-success-container {
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  border-radius: 24px;
+  padding: 60px 40px;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 215, 0, 0.2);
+}
+
+.order-success-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+/* Animated Success Checkmark */
+.success-icon-wrapper {
+  margin: 0 auto 40px;
+  animation: scaleIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.success-checkmark-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  position: relative;
+  margin: 0 auto;
+  box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 15px 60px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.success-checkmark-stem,
+.success-checkmark-kick {
+  position: absolute;
+  background: #000000;
+  border-radius: 3px;
+}
+
+.success-checkmark-stem {
+  width: 6px;
+  height: 50px;
+  top: 45px;
+  left: 57px;
+  transform: rotate(45deg);
+  animation: drawStem 0.4s ease-out 0.3s forwards;
+  transform-origin: center bottom;
+  opacity: 0;
+}
+
+.success-checkmark-kick {
+  width: 6px;
+  height: 25px;
+  top: 68px;
+  left: 38px;
+  transform: rotate(-45deg);
+  animation: drawKick 0.3s ease-out 0.6s forwards;
+  transform-origin: center bottom;
+  opacity: 0;
+}
+
+@keyframes drawStem {
+  0% {
+    height: 0;
+    opacity: 0;
+  }
+  100% {
+    height: 50px;
+    opacity: 1;
+  }
+}
+
+@keyframes drawKick {
+  0% {
+    height: 0;
+    opacity: 0;
+  }
+  100% {
+    height: 25px;
+    opacity: 1;
+  }
+}
+
+/* Success Content */
+.success-content {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.success-title {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 900;
+  margin: 0 0 16px 0;
+  color: #1a1a1a;
+  font-family: "Playfair Display", Georgia, serif;
+  letter-spacing: -1px;
+}
+
+.success-subtitle {
+  font-size: clamp(16px, 3vw, 20px);
+  color: #666666;
+  margin: 0 0 32px 0;
+  line-height: 1.6;
+}
+
+/* Order ID Badge */
+.order-id-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 165, 0, 0.15) 100%);
+  border: 2px solid #FFD700;
+  border-radius: 50px;
+  padding: 12px 28px;
+  margin-bottom: 40px;
+  animation: fadeIn 0.6s ease-out 0.6s both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.order-id-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.order-id-value {
+  font-size: 18px;
+  font-weight: 900;
+  color: #1a1a1a;
+  font-family: "Courier New", monospace;
+}
+
+/* Success Message Box */
+.success-message-box {
+  background: #f5f5f5;
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 40px;
+  text-align: left;
+  animation: fadeIn 0.6s ease-out 0.8s both;
+}
+
+.success-message-item {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.success-message-item:last-child {
+  margin-bottom: 0;
+}
+
+.message-icon {
+  font-size: 36px;
+  flex-shrink: 0;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.success-message-item h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: #1a1a1a;
+}
+
+.success-message-item p {
+  font-size: 14px;
+  color: #666666;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Action Buttons */
+.success-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  animation: fadeIn 0.6s ease-out 1s both;
+}
+
+.btn-primary,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 40px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: none;
+  text-decoration: none;
+  justify-content: center;
+  min-width: 220px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  color: #000000;
+  box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(255, 215, 0, 0.5);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 2px solid #e5e5e5;
+}
+
+.btn-secondary:hover {
+  background: #fafafa;
+  border-color: #FFD700;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.btn-icon {
+  font-size: 20px;
+}
+
+/* Footer */
+.success-footer {
+  padding-top: 32px;
+  border-top: 2px solid #e5e5e5;
+  animation: fadeIn 0.6s ease-out 1.2s both;
+}
+
+.success-footer p {
+  font-size: 14px;
+  color: #666666;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.success-footer a {
+  color: #FFD700;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.success-footer a:hover {
+  color: #FFA500;
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .order-success-container {
+    padding: 40px 24px;
+    border-radius: 16px;
+  }
+
+  .success-checkmark-circle {
+    width: 100px;
+    height: 100px;
+  }
+
+  .success-checkmark-stem {
+    height: 42px;
+    top: 38px;
+    left: 47px;
+  }
+
+  .success-checkmark-kick {
+    height: 21px;
+    top: 57px;
+    left: 32px;
+  }
+
+  @keyframes drawStem {
+    0% {
+      height: 0;
+      opacity: 0;
+    }
+    100% {
+      height: 42px;
+      opacity: 1;
+    }
+  }
+
+  @keyframes drawKick {
+    0% {
+      height: 0;
+      opacity: 0;
+    }
+    100% {
+      height: 21px;
+      opacity: 1;
+    }
+  }
+
+  .success-message-box {
+    padding: 24px;
+  }
+
+  .success-message-item {
+    gap: 16px;
+  }
+
+  .message-icon {
+    font-size: 28px;
+  }
+
+  .success-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-success-page {
+    padding: 20px 12px;
+  }
+
+  .order-success-container {
+    padding: 32px 20px;
+  }
+
+  .success-title {
+    font-size: 24px;
+  }
+
+  .success-subtitle {
+    font-size: 16px;
+  }
+
+  .order-id-badge {
+    padding: 10px 20px;
+  }
+
+  .order-id-label {
+    font-size: 12px;
+  }
+
+  .order-id-value {
+    font-size: 16px;
+  }
+
+  .success-message-item h3 {
+    font-size: 16px;
+  }
+
+  .success-message-item p {
+    font-size: 13px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 16px 32px;
+    font-size: 14px;
+  }
+}

@@ -63,6 +63,7 @@ const AdminDashboard = () => {
     { name: "Catalogs", path: "/admin/catalogs" },
     { name: "Collections", path: "/admin/collections" },
     { name: "Products", path: "/admin/products" },
+    { name: "Reviews", path: "/admin/reviews" },
   ];
 
   if (loading) {

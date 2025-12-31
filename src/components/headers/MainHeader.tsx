@@ -109,7 +109,7 @@ const MainHeader: React.FC = () => {
         {c1.map((category) => (
           <Link
             key={category._id}
-            href={`/category/${category._id}`}
+            href={`/shop/category/${category._id}`}
             className="nav-link text-gray-700 hover:text-black"
           >
             {category.name}

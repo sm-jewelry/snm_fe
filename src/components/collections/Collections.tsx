@@ -126,11 +126,6 @@ const Collections: React.FC = () => {
           </div>
         ))}
       </div>
-
-      <div style={{ padding: "40px", textAlign: "center" }}>
-        <h1>Welcome to SNM Fashion Store</h1>
-        <p>Explore our collections above.</p>
-      </div>
     </section>
   );
 };

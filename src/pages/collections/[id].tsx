@@ -43,7 +43,7 @@ const CollectionProductsPage: React.FC = () => {
         setCollectionName(colData.name || "Collection");
         
         // Fetch products in collection
-        const res = await fetch(`${API_GATEWAY_URL}/api/products/collection/${id}`, {
+        const res = await fetch(`${API_GATEWAY_URL}/api/catalogs/collection/${id}`, {
           credentials: 'include', // Important for API Gateway
         });
         const data = await res.json();

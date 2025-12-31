@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Seo from "../../components/common/Seo";
+import ProductReviews from "../../components/reviews/ProductReviews";
 
 interface Product {
   _id: string;
@@ -40,13 +41,22 @@ const ProductDetail: React.FC = () => {
   const [qty, setQty] = useState<number>(1);
   const [adding, setAdding] = useState(false);
   const [wishlisting, setWishlisting] = useState(false);
+  const [userHasOrdered, setUserHasOrdered] = useState(false);
 
+  // Check authentication on page load and redirect to login if not authenticated
   useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      alert("Please login to view product details");
+      router.push("/profile");
+    }
+  }, [router]);
+ useEffect(() => {
     if (!id) return;
     setLoading(true);
 
     // Try to fetch from products API first (has more details)
-    fetch(`${API_GATEWAY_URL}/api/products/${id}`, {
+    fetch(`${API_GATEWAY_URL}/api/catalogs/${id}`, {
       credentials: 'include',
     })
       .then((res) => {
@@ -66,6 +76,37 @@ const ProductDetail: React.FC = () => {
         console.error("Failed to fetch product:", err);
         setLoading(false);
       });
+  }, [id]);
+
+  // Check if user has ordered this product
+  useEffect(() => {
+    if (!id) return;
+    const checkUserOrder = async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        setUserHasOrdered(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_GATEWAY_URL}/api/reviews/user/can-review/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: 'include',
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setUserHasOrdered(data.canReview || false);
+        }
+      } catch (err) {
+        console.error("Failed to check user order:", err);
+        setUserHasOrdered(false);
+      }
+    };
+
+    checkUserOrder();
   }, [id]);
 
   if (loading) return <p>Loading...</p>;
@@ -157,6 +198,13 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleBuyNow = () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      alert("Please login to continue");
+      router.push("/profile");
+      return;
+    }
+
     const orderData = {
       productId: product._id,
       title: product.title,
@@ -259,7 +307,18 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <span className="rating-value">{product.rating.toFixed(1)}</span>
                 {product.reviewCount !== undefined && (
-                  <span className="review-count">({product.reviewCount} reviews)</span>
+                  <span
+                    className="review-count"
+                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                    onClick={() => {
+                      const reviewsSection = document.getElementById('product-reviews-section');
+                      if (reviewsSection) {
+                        reviewsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }}
+                  >
+                    ({product.reviewCount} reviews)
+                  </span>
                 )}
                 {product.salesCount !== undefined && (
                   <span className="sales-count">• {product.salesCount} sold</span>
@@ -431,6 +490,13 @@ const ProductDetail: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <ProductReviews
+          productId={product._id}
+          productTitle={product.title}
+          userHasOrdered={userHasOrdered}
+        />
       </div>
     </>
   );
