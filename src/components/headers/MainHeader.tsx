@@ -7,6 +7,8 @@ import CartDrawer from "../CartDrawer";
 interface Category {
   _id: string;
   name: string;
+  parents?: string[];
+  level?: string;
 }
 
 // ✅ Use API Gateway URL
@@ -18,6 +20,7 @@ const CATEGORY_API = `${API_GATEWAY_URL}/api/categories/level`;
 
 const MainHeader: React.FC = () => {
   const [c1, setC1] = useState<Category[]>([]);
+  const [c2, setC2] = useState<Category[]>([]);
   const [cartCount, setCartCount] = useState<number>(0);
   const [isClient, setIsClient] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -79,13 +82,20 @@ const MainHeader: React.FC = () => {
   useEffect(() => {
     setIsClient(true);
 
-    // Fetch categories (C1)
-    fetch(`${CATEGORY_API}/C1`, {
-      credentials: 'include', // Important for API Gateway
-    })
-      .then((res) => res.json())
-      .then((data) => setC1(data))
-      .catch((err) => console.error("Failed to fetch C1 categories:", err));
+    // Fetch categories (C1 and C2) in parallel
+    Promise.all([
+      fetch(`${CATEGORY_API}/C1`, {
+        credentials: 'include',
+      }).then((res) => res.json()),
+      fetch(`${CATEGORY_API}/C2`, {
+        credentials: 'include',
+      }).then((res) => res.json()),
+    ])
+      .then(([c1Data, c2Data]) => {
+        setC1(c1Data);
+        setC2(c2Data);
+      })
+      .catch((err) => console.error("Failed to fetch categories:", err));
 
     // Fetch cart count
     fetchCartCount();
@@ -100,20 +110,38 @@ const MainHeader: React.FC = () => {
     };
   }, []);
 
+  // Helper function to get child categories
+  const getChildren = (parentId: string, categories: Category[]) =>
+    categories.filter((cat) => cat.parents?.includes(parentId));
+
   if (!isClient) return null; // prevents hydration mismatch
 
   return (
     <header className="main-header flex justify-between items-center px-6 py-3 border-b relative">
-      {/* Left nav (C1 categories) */}
-      <nav className="flex gap-4">
+      {/* Left nav (C1 categories with C2 dropdowns) */}
+      <nav className="flex gap-4 main-header-nav">
         {c1.map((category) => (
-          <Link
-            key={category._id}
-            href={`/shop/category/${category._id}`}
-            className="nav-link text-gray-700 hover:text-black"
-          >
-            {category.name}
-          </Link>
+          <div key={category._id} className="dropdown">
+            <Link
+              href={`/shop/category/${category._id}`}
+              className="nav-link text-gray-700 hover:text-black"
+            >
+              {category.name}
+            </Link>
+            {getChildren(category._id, c2).length > 0 && (
+              <div className="dropdown-content">
+                {getChildren(category._id, c2).map((child) => (
+                  <Link
+                    key={child._id}
+                    href={`/shop/category/${child._id}`}
+                    className="dropdown-link"
+                  >
+                    {child.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         ))}
         <Link
           href="/find-store"
