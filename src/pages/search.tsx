@@ -185,10 +185,11 @@ export default function SearchPage() {
     if (selectedCategory !== 'all') {
       filtered = filtered.filter((product) => {
         // Categories are populated objects, need to access _id property
-        const c1Id = typeof product.c1 === 'object' && product.c1?._id ? product.c1._id.toString() : product.c1?.toString() || '';
-        const c2Id = typeof product.c2 === 'object' && product.c2?._id ? product.c2._id.toString() : product.c2?.toString() || '';
-        const c3Id = typeof product.c3 === 'object' && product.c3?._id ? product.c3._id.toString() : product.c3?.toString() || '';
-        const categoryId = typeof product.category === 'object' && product.category?._id ? product.category._id.toString() : product.category?.toString() || '';
+        // Using optional chaining to safely access nested properties
+        const c1Id = (product.c1 as any)?._id?.toString() || product.c1?.toString() || '';
+        const c2Id = (product.c2 as any)?._id?.toString() || product.c2?.toString() || '';
+        const c3Id = (product.c3 as any)?._id?.toString() || product.c3?.toString() || '';
+        const categoryId = (product.category as any)?._id?.toString() || product.category?.toString() || '';
 
         return c1Id === selectedCategory ||
                c2Id === selectedCategory ||
@@ -201,11 +202,9 @@ export default function SearchPage() {
     if (selectedCollection !== 'all') {
       filtered = filtered.filter((product) => {
         // Check the collection field (can be populated object or ObjectId)
-        if (typeof product.collection === 'object' && product.collection?._id) {
-          return product.collection._id.toString() === selectedCollection;
-        }
-        // Handle case where collection is just an ID string
-        return product.collection?.toString() === selectedCollection;
+        // Using optional chaining to safely access nested properties
+        const collectionId = (product.collection as any)?._id?.toString() || product.collection?.toString() || '';
+        return collectionId === selectedCollection;
       });
     }
 
