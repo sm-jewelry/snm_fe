@@ -1,598 +1,409 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import Seo from '../../../components/common/Seo';
+import React, { useEffect, useState } from "react";
+import { Box, Button, Typography, TextField, MenuItem, IconButton, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, Rating, Chip, Drawer } from "@mui/material";
+import { GridColDef } from "@mui/x-data-grid";
+import { CheckCircle as ApproveIcon, Cancel as RejectIcon, Delete as DeleteIcon, FileDownload as ExportIcon, Edit as EditIcon, Close as CloseIcon } from "@mui/icons-material";
+import NextLink from "next/link";
+import { fetcher } from "../../../lib/api";
+import DataTable from "../../../components/admin/common/DataTable";
+import StatusChip from "../../../components/admin/common/StatusChip";
+import ConfirmDialog from "../../../components/admin/common/ConfirmDialog";
+import LoadingState from "../../../components/admin/common/LoadingState";
 
 interface Review {
   _id: string;
+  productId: string;
+  productTitle: string;
   userId: string;
   userName: string;
   userEmail: string;
-  productId: string;
-  productTitle: string;
-  orderId: string;
   rating: number;
   title: string;
   comment: string;
-  images: string[];
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   adminNotes?: string;
-  moderatedBy?: string;
-  moderatedAt?: string;
-  helpfulCount: number;
-  notHelpfulCount: number;
+  isVerifiedPurchase: boolean;
   createdAt: string;
-  updatedAt: string;
 }
 
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
-
 export default function AdminReviewsPage() {
-  const router = useRouter();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalReviews, setTotalReviews] = useState(0);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [ratingFilter, setRatingFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [moderateDialog, setModerateDialog] = useState<{ open: boolean; reviewId: string | null; action: "approve" | "reject" | null }>({ open: false, reviewId: null, action: null });
+  const [adminNotes, setAdminNotes] = useState("");
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({ open: false, message: "", severity: "success" });
 
-  // Filters
-  const [statusFilter, setStatusFilter] = useState('');
-  const [ratingFilter, setRatingFilter] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Moderation
-  const [selectedReviews, setSelectedReviews] = useState<string[]>([]);
-  const [rejectingReview, setRejectingReview] = useState<Review | null>(null);
-  const [rejectReason, setRejectReason] = useState('');
-  const [editingReview, setEditingReview] = useState<Review | null>(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      router.push('/profile?login=true');
-      return;
-    }
-
-    loadReviews();
-  }, [page, statusFilter, ratingFilter]);
+  // NEW: Edit drawer state
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+  const [editForm, setEditForm] = useState<{
+    _id: string;
+    rating: number;
+    title: string;
+    comment: string;
+    status: "pending" | "approved" | "rejected";
+    adminNotes?: string;
+  }>({
+    _id: "",
+    rating: 5,
+    title: "",
+    comment: "",
+    status: "pending",
+    adminNotes: "",
+  });
 
   const loadReviews = async () => {
-    setLoading(true);
-    const token = localStorage.getItem('access_token');
-
     try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '20',
-        sortBy: 'createdAt',
-        sortOrder: 'desc',
-      });
-
-      if (statusFilter) params.append('status', statusFilter);
-      if (ratingFilter) params.append('rating', ratingFilter);
-
-      const response = await fetch(
-        `${API_GATEWAY_URL}/api/reviews/admin/all?${params}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: 'include',
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setReviews(data.reviews || []);
-        setTotalPages(data.pagination?.pages || 1);
-        setTotalReviews(data.pagination?.total || 0);
-      } else {
-        console.error('Failed to load reviews');
-      }
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (statusFilter !== "all") params.append("status", statusFilter);
+      if (ratingFilter !== "all") params.append("rating", ratingFilter);
+      if (searchTerm) params.append("search", searchTerm);
+      const data = await fetcher(`/api/reviews/admin/all?${params.toString()}`);
+      setReviews(data.reviews || data);
     } catch (error) {
-      console.error('Error loading reviews:', error);
+      setSnackbar({ open: true, message: error instanceof Error ? error.message : "Failed to load reviews", severity: "error" });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleApprove = async (reviewId: string) => {
-    const token = localStorage.getItem('access_token');
+  useEffect(() => {
+    loadReviews();
+  }, [statusFilter, ratingFilter]);
 
+  const handleModerate = async () => {
+    if (!moderateDialog.reviewId || !moderateDialog.action) return;
     try {
-      const response = await fetch(
-        `${API_GATEWAY_URL}/api/reviews/admin/${reviewId}/approve`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: 'include',
-        }
-      );
-
-      if (response.ok) {
-        alert('Review approved successfully');
-        loadReviews();
-      } else {
-        const data = await response.json();
-        alert(data.message || 'Failed to approve review');
-      }
+      await fetcher(`/api/reviews/admin/${moderateDialog.reviewId}/${moderateDialog.action}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminNotes }),
+      });
+      setSnackbar({ open: true, message: `Review ${moderateDialog.action}d successfully`, severity: "success" });
+      setModerateDialog({ open: false, reviewId: null, action: null });
+      setAdminNotes("");
+      await loadReviews();
     } catch (error) {
-      console.error('Error approving review:', error);
-      alert('Failed to approve review');
+      setSnackbar({ open: true, message: error instanceof Error ? error.message : "Operation failed", severity: "error" });
     }
   };
 
-  const handleReject = async () => {
-    if (!rejectingReview || !rejectReason.trim()) {
-      alert('Please provide a reason for rejection');
-      return;
-    }
-
-    const token = localStorage.getItem('access_token');
-
+  const handleDelete = async () => {
+    if (!deleteDialog.id) return;
     try {
-      const response = await fetch(
-        `${API_GATEWAY_URL}/api/reviews/admin/${rejectingReview._id}/reject`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: 'include',
-          body: JSON.stringify({ reason: rejectReason }),
-        }
-      );
-
-      if (response.ok) {
-        alert('Review rejected successfully');
-        setRejectingReview(null);
-        setRejectReason('');
-        loadReviews();
-      } else {
-        const data = await response.json();
-        alert(data.message || 'Failed to reject review');
-      }
+      await fetcher(`/api/reviews/admin/${deleteDialog.id}`, { method: "DELETE" });
+      setSnackbar({ open: true, message: "Review deleted successfully", severity: "success" });
+      setDeleteDialog({ open: false, id: null });
+      await loadReviews();
     } catch (error) {
-      console.error('Error rejecting review:', error);
-      alert('Failed to reject review');
-    }
-  };
-
-  const handleDelete = async (reviewId: string) => {
-    if (!confirm('Are you sure you want to delete this review? This action cannot be undone.')) {
-      return;
-    }
-
-    const token = localStorage.getItem('access_token');
-
-    try {
-      const response = await fetch(
-        `${API_GATEWAY_URL}/api/reviews/admin/${reviewId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: 'include',
-        }
-      );
-
-      if (response.ok) {
-        alert('Review deleted successfully');
-        loadReviews();
-      } else {
-        const data = await response.json();
-        alert(data.message || 'Failed to delete review');
-      }
-    } catch (error) {
-      console.error('Error deleting review:', error);
-      alert('Failed to delete review');
+      setSnackbar({ open: true, message: error instanceof Error ? error.message : "Delete failed", severity: "error" });
     }
   };
 
   const handleBulkApprove = async () => {
-    if (selectedReviews.length === 0) {
-      alert('Please select reviews to approve');
-      return;
+    if (selectedRows.length === 0) return;
+    try {
+      await Promise.all(selectedRows.map(id => fetcher(`/api/reviews/admin/${id}/approve`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ adminNotes: "Bulk approved" }) })));
+      setSnackbar({ open: true, message: `${selectedRows.length} reviews approved`, severity: "success" });
+      setSelectedRows([]);
+      await loadReviews();
+    } catch (error) {
+      setSnackbar({ open: true, message: "Bulk approve failed", severity: "error" });
     }
-
-    if (!confirm(`Approve ${selectedReviews.length} selected reviews?`)) {
-      return;
-    }
-
-    const token = localStorage.getItem('access_token');
-    let successCount = 0;
-
-    for (const reviewId of selectedReviews) {
-      try {
-        const response = await fetch(
-          `${API_GATEWAY_URL}/api/reviews/admin/${reviewId}/approve`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            credentials: 'include',
-          }
-        );
-
-        if (response.ok) {
-          successCount++;
-        }
-      } catch (error) {
-        console.error('Error approving review:', error);
-      }
-    }
-
-    alert(`${successCount} out of ${selectedReviews.length} reviews approved successfully`);
-    setSelectedReviews([]);
-    loadReviews();
   };
 
   const handleBulkDelete = async () => {
-    if (selectedReviews.length === 0) {
-      alert('Please select reviews to delete');
-      return;
-    }
-
-    if (!confirm(`Delete ${selectedReviews.length} selected reviews? This action cannot be undone.`)) {
-      return;
-    }
-
-    const token = localStorage.getItem('access_token');
-    let successCount = 0;
-
-    for (const reviewId of selectedReviews) {
-      try {
-        const response = await fetch(
-          `${API_GATEWAY_URL}/api/reviews/admin/${reviewId}`,
-          {
-            method: 'DELETE',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            credentials: 'include',
-          }
-        );
-
-        if (response.ok) {
-          successCount++;
-        }
-      } catch (error) {
-        console.error('Error deleting review:', error);
-      }
-    }
-
-    alert(`${successCount} out of ${selectedReviews.length} reviews deleted successfully`);
-    setSelectedReviews([]);
-    loadReviews();
-  };
-
-  const toggleSelectReview = (reviewId: string) => {
-    if (selectedReviews.includes(reviewId)) {
-      setSelectedReviews(selectedReviews.filter(id => id !== reviewId));
-    } else {
-      setSelectedReviews([...selectedReviews, reviewId]);
+    if (selectedRows.length === 0 || !confirm(`Delete ${selectedRows.length} reviews?`)) return;
+    try {
+      await Promise.all(selectedRows.map(id => fetcher(`/api/reviews/admin/${id}`, { method: "DELETE" })));
+      setSnackbar({ open: true, message: `${selectedRows.length} reviews deleted`, severity: "success" });
+      setSelectedRows([]);
+      await loadReviews();
+    } catch (error) {
+      setSnackbar({ open: true, message: "Bulk delete failed", severity: "error" });
     }
   };
 
-  const toggleSelectAll = () => {
-    if (selectedReviews.length === reviews.length) {
-      setSelectedReviews([]);
-    } else {
-      setSelectedReviews(reviews.map(r => r._id));
-    }
+  // NEW: Edit handlers
+  const handleOpenEditDrawer = (review: Review) => {
+    setEditForm({
+      _id: review._id,
+      rating: review.rating,
+      title: review.title,
+      comment: review.comment,
+      status: review.status,
+      adminNotes: review.adminNotes || "",
+    });
+    setEditDrawerOpen(true);
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+  const handleCloseEditDrawer = () => {
+    setEditDrawerOpen(false);
+    setEditForm({
+      _id: "",
+      rating: 5,
+      title: "",
+      comment: "",
+      status: "pending",
+      adminNotes: "",
     });
   };
 
-  const getStatusBadge = (status: string) => {
-    const badges = {
-      pending: { class: 'badge-pending', text: 'Pending' },
-      approved: { class: 'badge-approved', text: 'Approved' },
-      rejected: { class: 'badge-rejected', text: 'Rejected' },
-    };
-    return badges[status as keyof typeof badges] || badges.pending;
+  const handleUpdateReview = async () => {
+    try {
+      await fetcher(`/api/reviews/admin/${editForm._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rating: editForm.rating,
+          title: editForm.title,
+          comment: editForm.comment,
+          status: editForm.status,
+          adminNotes: editForm.adminNotes,
+        }),
+      });
+      setSnackbar({ open: true, message: "Review updated successfully", severity: "success" });
+      handleCloseEditDrawer();
+      await loadReviews();
+    } catch (error) {
+      setSnackbar({ open: true, message: error instanceof Error ? error.message : "Update failed", severity: "error" });
+    }
   };
 
-  const filteredReviews = reviews.filter(review => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      review.productTitle.toLowerCase().includes(query) ||
-      review.userName.toLowerCase().includes(query) ||
-      review.comment.toLowerCase().includes(query)
-    );
-  });
-
-  return (
-    <>
-      <Seo title="Review Management - Admin | SNM Jewelry" description="Manage customer reviews and ratings for your products" />
-
-      <div className="admin-reviews-page">
-        <div className="admin-container">
-          {/* Header */}
-          <div className="admin-header">
-            <div>
-              <h1 className="admin-title">Review Management</h1>
-              <p className="admin-subtitle">
-                Manage customer reviews and ratings ({totalReviews} total)
-              </p>
-            </div>
-
-            <button
-              className="btn-import-export"
-              onClick={() => router.push('/admin/reviews/import-export')}
-            >
-              📁 Import/Export
-            </button>
-          </div>
-
-          {/* Filters & Search */}
-          <div className="admin-filters">
-            <div className="filters-row">
-              <div className="filter-group">
-                <label>Status:</label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="">All</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                </select>
-              </div>
-
-              <div className="filter-group">
-                <label>Rating:</label>
-                <select
-                  value={ratingFilter}
-                  onChange={(e) => setRatingFilter(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="">All</option>
-                  <option value="5">5 Stars</option>
-                  <option value="4">4 Stars</option>
-                  <option value="3">3 Stars</option>
-                  <option value="2">2 Stars</option>
-                  <option value="1">1 Star</option>
-                </select>
-              </div>
-
-              <div className="filter-group search-group">
-                <label>Search:</label>
-                <input
-                  type="text"
-                  placeholder="Search reviews..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="filter-input"
-                />
-              </div>
-            </div>
-
-            {/* Bulk Actions */}
-            {selectedReviews.length > 0 && (
-              <div className="bulk-actions">
-                <span className="bulk-count">
-                  {selectedReviews.length} selected
-                </span>
-                <button
-                  className="bulk-btn bulk-approve"
-                  onClick={handleBulkApprove}
-                >
-                  ✓ Approve Selected
-                </button>
-                <button
-                  className="bulk-btn bulk-delete"
-                  onClick={handleBulkDelete}
-                >
-                  🗑️ Delete Selected
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Reviews Table */}
-          {loading ? (
-            <div className="loading-state">Loading reviews...</div>
-          ) : filteredReviews.length === 0 ? (
-            <div className="empty-state">
-              <p>No reviews found matching your filters.</p>
-            </div>
-          ) : (
+  const columns: GridColDef[] = [
+    { field: "productTitle", headerName: "Product", flex: 1, minWidth: 180 },
+    { field: "userName", headerName: "User", flex: 1, minWidth: 150 },
+    { field: "rating", headerName: "Rating", width: 130, renderCell: (params) => <Rating value={params.value} readOnly size="small" /> },
+    { 
+      field: "title", 
+      headerName: "Title", 
+      flex: 1, 
+      minWidth: 150,
+      renderCell: (params) => (
+        <Typography variant="body2" fontWeight={600}>
+          {params.value}
+        </Typography>
+      )
+    },
+    { 
+      field: "comment", 
+      headerName: "Comment", 
+      flex: 2, 
+      minWidth: 250,
+      renderCell: (params) => (
+        <Typography variant="body2" sx={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {params.value}
+        </Typography>
+      )
+    },
+    { field: "status", headerName: "Status", width: 120, renderCell: (params) => <StatusChip status={params.value} /> },
+    { field: "createdAt", headerName: "Date", width: 120, renderCell: (params) => new Date(params.value).toLocaleDateString() },
+    { 
+      field: "actions", 
+      headerName: "Actions", 
+      width: 180, 
+      sortable: false, 
+      filterable: false, 
+      renderCell: (params) => (
+        <Box sx={{ display: "flex", gap: 0.5 }}>
+          {params.row.rawStatus === "pending" && (
             <>
-              <div className="reviews-table-container">
-                <table className="reviews-table">
-                  <thead>
-                    <tr>
-                      <th className="checkbox-col">
-                        <input
-                          type="checkbox"
-                          checked={selectedReviews.length === reviews.length}
-                          onChange={toggleSelectAll}
-                        />
-                      </th>
-                      <th>Product</th>
-                      <th>User</th>
-                      <th>Rating</th>
-                      <th>Review</th>
-                      <th>Status</th>
-                      <th>Date</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredReviews.map((review) => (
-                      <tr key={review._id}>
-                        <td className="checkbox-col">
-                          <input
-                            type="checkbox"
-                            checked={selectedReviews.includes(review._id)}
-                            onChange={() => toggleSelectReview(review._id)}
-                          />
-                        </td>
-                        <td>
-                          <div className="product-cell">
-                            <strong>{review.productTitle}</strong>
-                            <small>Order: {review.orderId}</small>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="user-cell">
-                            <strong>{review.userName}</strong>
-                            <small>{review.userEmail}</small>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="rating-cell">
-                            {[...Array(5)].map((_, i) => (
-                              <span
-                                key={i}
-                                className={i < review.rating ? 'star filled' : 'star'}
-                              >
-                                ★
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="review-cell">
-                            <strong>{review.title}</strong>
-                            <p>{review.comment.substring(0, 100)}...</p>
-                            {review.adminNotes && (
-                              <small className="admin-note">
-                                Note: {review.adminNotes}
-                              </small>
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <span
-                            className={`status-badge ${
-                              getStatusBadge(review.status).class
-                            }`}
-                          >
-                            {getStatusBadge(review.status).text}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="date-cell">
-                            {formatDate(review.createdAt)}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="action-buttons">
-                            {review.status === 'pending' && (
-                              <>
-                                <button
-                                  className="action-btn approve-btn"
-                                  onClick={() => handleApprove(review._id)}
-                                  title="Approve"
-                                >
-                                  ✓
-                                </button>
-                                <button
-                                  className="action-btn reject-btn"
-                                  onClick={() => setRejectingReview(review)}
-                                  title="Reject"
-                                >
-                                  ✕
-                                </button>
-                              </>
-                            )}
-                            <button
-                              className="action-btn edit-btn"
-                              onClick={() => setEditingReview(review)}
-                              title="Edit"
-                            >
-                              ✏️
-                            </button>
-                            <button
-                              className="action-btn delete-btn"
-                              onClick={() => handleDelete(review._id)}
-                              title="Delete"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="pagination">
-                  <button
-                    className="pagination-btn"
-                    disabled={page === 1}
-                    onClick={() => setPage(page - 1)}
-                  >
-                    ← Previous
-                  </button>
-
-                  <span className="pagination-info">
-                    Page {page} of {totalPages}
-                  </span>
-
-                  <button
-                    className="pagination-btn"
-                    disabled={page === totalPages}
-                    onClick={() => setPage(page + 1)}
-                  >
-                    Next →
-                  </button>
-                </div>
-              )}
+              <IconButton 
+                size="small" 
+                color="success" 
+                onClick={() => setModerateDialog({ open: true, reviewId: params.row._id, action: "approve" })} 
+                title="Approve"
+              >
+                <ApproveIcon fontSize="small" />
+              </IconButton>
+              <IconButton 
+                size="small" 
+                color="warning" 
+                onClick={() => setModerateDialog({ open: true, reviewId: params.row._id, action: "reject" })} 
+                title="Reject"
+              >
+                <RejectIcon fontSize="small" />
+              </IconButton>
             </>
           )}
-        </div>
-      </div>
+          <IconButton 
+            size="small" 
+            color="primary" 
+            onClick={() => handleOpenEditDrawer(params.row.fullReview)} 
+            title="Edit"
+          >
+            <EditIcon fontSize="small" />
+          </IconButton>
+          <IconButton 
+            size="small" 
+            color="error" 
+            onClick={() => setDeleteDialog({ open: true, id: params.row._id })} 
+            title="Delete"
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      )
+    },
+  ];
 
-      {/* Reject Modal */}
-      {rejectingReview && (
-        <div className="modal-overlay" onClick={() => setRejectingReview(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Reject Review</h2>
-            <p>Provide a reason for rejecting this review:</p>
-            <textarea
-              className="reject-textarea"
-              placeholder="Enter rejection reason..."
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
+  const rows = reviews.map((r) => ({ 
+    id: r._id, 
+    _id: r._id, 
+    productTitle: r.productTitle,
+    userName: r.userName,
+    rating: r.rating, 
+    title: r.title,
+    comment: r.comment, 
+    status: r.status, 
+    rawStatus: r.status, 
+    createdAt: r.createdAt,
+    fullReview: r
+  }));
+
+  if (loading) return <LoadingState message="Loading reviews..." />;
+
+  return (
+    <Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+        <Typography variant="h4" fontWeight={700}>Review Moderation</Typography>
+        <NextLink href="/admin/reviews/import-export" passHref legacyBehavior>
+          <Button component="a" variant="outlined" startIcon={<ExportIcon />}>Import/Export</Button>
+        </NextLink>
+      </Box>
+
+      <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
+        <TextField select label="Status" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} sx={{ minWidth: 150 }}>
+          <MenuItem value="all">All Status</MenuItem><MenuItem value="pending">Pending</MenuItem><MenuItem value="approved">Approved</MenuItem><MenuItem value="rejected">Rejected</MenuItem>
+        </TextField>
+        <TextField select label="Rating" value={ratingFilter} onChange={(e) => setRatingFilter(e.target.value)} sx={{ minWidth: 120 }}>
+          <MenuItem value="all">All Ratings</MenuItem><MenuItem value="5">5 Stars</MenuItem><MenuItem value="4">4 Stars</MenuItem><MenuItem value="3">3 Stars</MenuItem><MenuItem value="2">2 Stars</MenuItem><MenuItem value="1">1 Star</MenuItem>
+        </TextField>
+        <TextField label="Search" placeholder="Product, user, comment..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && loadReviews()} sx={{ minWidth: 250 }} />
+        <Button variant="contained" onClick={loadReviews}>Search</Button>
+      </Box>
+
+      {selectedRows.length > 0 && (
+        <Box sx={{ mb: 2, display: "flex", gap: 1 }}>
+          <Typography variant="body2" sx={{ alignSelf: "center" }}>{selectedRows.length} selected</Typography>
+          <Button size="small" variant="contained" color="success" onClick={handleBulkApprove}>Approve Selected</Button>
+          <Button size="small" variant="outlined" color="error" onClick={handleBulkDelete}>Delete Selected</Button>
+        </Box>
+      )}
+
+      <DataTable columns={columns} rows={rows} pageSize={20} autoHeight checkboxSelection />
+
+      <Dialog open={moderateDialog.open} onClose={() => setModerateDialog({ open: false, reviewId: null, action: null })} maxWidth="sm" fullWidth>
+        <DialogTitle>{moderateDialog.action === "approve" ? "Approve Review" : "Reject Review"}</DialogTitle>
+        <DialogContent>
+          <TextField label="Admin Notes (optional)" value={adminNotes} onChange={(e) => setAdminNotes(e.target.value)} fullWidth multiline rows={3} sx={{ mt: 2 }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModerateDialog({ open: false, reviewId: null, action: null })}>Cancel</Button>
+          <Button variant="contained" color={moderateDialog.action === "approve" ? "success" : "warning"} onClick={handleModerate}>{moderateDialog.action === "approve" ? "Approve" : "Reject"}</Button>
+        </DialogActions>
+      </Dialog>
+
+      <ConfirmDialog open={deleteDialog.open} onClose={() => setDeleteDialog({ open: false, id: null })} onConfirm={handleDelete} title="Delete Review" message="Are you sure you want to delete this review? This action cannot be undone." confirmText="Delete" confirmColor="error" />
+
+      {/* Edit Review Drawer */}
+      <Drawer
+        anchor="right"
+        open={editDrawerOpen}
+        onClose={handleCloseEditDrawer}
+        PaperProps={{ sx: { width: { xs: "100%", sm: 500 } } }}
+      >
+        <Box sx={{ p: 3 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+            <Typography variant="h6" fontWeight={600}>
+              Edit Review
+            </Typography>
+            <IconButton onClick={handleCloseEditDrawer}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {/* Rating */}
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Rating
+              </Typography>
+              <Rating
+                value={editForm.rating}
+                onChange={(e, newValue) => setEditForm({ ...editForm, rating: newValue || 5 })}
+                size="large"
+              />
+            </Box>
+
+            {/* Review Title */}
+            <TextField
+              label="Review Title"
+              value={editForm.title}
+              onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+              required
+              fullWidth
+            />
+
+            {/* Review Comment */}
+            <TextField
+              label="Review Comment"
+              value={editForm.comment}
+              onChange={(e) => setEditForm({ ...editForm, comment: e.target.value })}
+              required
+              fullWidth
+              multiline
               rows={4}
             />
-            <div className="modal-actions">
-              <button
-                className="btn-cancel"
-                onClick={() => {
-                  setRejectingReview(null);
-                  setRejectReason('');
-                }}
-              >
+
+            {/* Status */}
+            <TextField
+              select
+              label="Status"
+              value={editForm.status}
+              onChange={(e) => setEditForm({ ...editForm, status: e.target.value as any })}
+              required
+              fullWidth
+            >
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="approved">Approved</MenuItem>
+              <MenuItem value="rejected">Rejected</MenuItem>
+            </TextField>
+
+            {/* Admin Notes */}
+            <TextField
+              label="Admin Notes (optional)"
+              value={editForm.adminNotes}
+              onChange={(e) => setEditForm({ ...editForm, adminNotes: e.target.value })}
+              fullWidth
+              multiline
+              rows={3}
+            />
+
+            {/* Action Buttons */}
+            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+              <Button onClick={handleCloseEditDrawer} fullWidth>
                 Cancel
-              </button>
-              <button className="btn-reject-confirm" onClick={handleReject}>
-                Reject Review
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+              </Button>
+              <Button 
+                variant="contained" 
+                fullWidth
+                onClick={handleUpdateReview}
+              >
+                Update Review
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Drawer>
+
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })} anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} variant="filled">{snackbar.message}</Alert>
+      </Snackbar>
+    </Box>
   );
 }

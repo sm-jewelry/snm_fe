@@ -243,7 +243,18 @@ function ProfileContent() {
                 {user.firstName} {user.lastName}
               </h1>
               <p>{user.email}</p>
-              <span className={`profile-role-badge ${user.role === 'admin' ? 'admin' : 'user'}`}>
+              <span
+                className={`profile-role-badge ${user.role === 'admin' ? 'admin' : 'user'} ${user.role === 'admin' ? 'clickable' : ''
+                  }`}
+                onClick={() => {
+                  if (user.role === 'admin') {
+                    router.push('/admin');   // your admin dashboard route
+                  }
+                }}
+                style={{
+                  cursor: user.role === 'admin' ? 'pointer' : 'default'
+                }}
+              >
                 {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
               </span>
             </div>
@@ -280,249 +291,248 @@ function ProfileContent() {
 
         {/* Profile Information */}
         {activeTab === 'profile' && (
-        <div className="profile-info-card">
-          <div className="profile-info-header">
-            <h2>Profile Information</h2>
-            {!isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="profile-edit-btn"
-              >
-                Edit Profile
-              </button>
+          <div className="profile-info-card">
+            <div className="profile-info-header">
+              <h2>Profile Information</h2>
+              {!isEditing && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="profile-edit-btn"
+                >
+                  Edit Profile
+                </button>
+              )}
+            </div>
+
+            {error && (
+              <div className="profile-alert error">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="profile-alert success">
+                {success}
+              </div>
+            )}
+
+            {isEditing ? (
+              <form onSubmit={handleSubmit} className="profile-form">
+                <div className="profile-form-row">
+                  <div className="profile-form-group">
+                    <label className="profile-label">
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      required
+                      className="profile-input"
+                    />
+                  </div>
+                  <div className="profile-form-group">
+                    <label className="profile-label">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      required
+                      className="profile-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="profile-form-group">
+                  <label className="profile-label">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    pattern="[0-9]{10}"
+                    className="profile-input"
+                    placeholder="1234567890"
+                  />
+                </div>
+
+                <div className="profile-form-actions">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="profile-save-btn"
+                  >
+                    {loading ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setFormData({
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        phone: user.phone || '',
+                      });
+                    }}
+                    className="profile-cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="profile-info-display">
+                <div className="profile-info-item">
+                  <label>Email</label>
+                  <p>{user.email}</p>
+                </div>
+                <div className="profile-info-item">
+                  <label>Phone</label>
+                  <p>{user.phone || 'Not provided'}</p>
+                </div>
+                <div className="profile-info-item">
+                  <label>Member Since</label>
+                  <p>
+                    {new Date(user.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </div>
+              </div>
             )}
           </div>
-
-          {error && (
-            <div className="profile-alert error">
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="profile-alert success">
-              {success}
-            </div>
-          )}
-
-          {isEditing ? (
-            <form onSubmit={handleSubmit} className="profile-form">
-              <div className="profile-form-row">
-                <div className="profile-form-group">
-                  <label className="profile-label">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    required
-                    className="profile-input"
-                  />
-                </div>
-                <div className="profile-form-group">
-                  <label className="profile-label">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    required
-                    className="profile-input"
-                  />
-                </div>
-              </div>
-
-              <div className="profile-form-group">
-                <label className="profile-label">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  pattern="[0-9]{10}"
-                  className="profile-input"
-                  placeholder="1234567890"
-                />
-              </div>
-
-              <div className="profile-form-actions">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="profile-save-btn"
-                >
-                  {loading ? 'Saving...' : 'Save Changes'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setFormData({
-                      firstName: user.firstName,
-                      lastName: user.lastName,
-                      phone: user.phone || '',
-                    });
-                  }}
-                  className="profile-cancel-btn"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="profile-info-display">
-              <div className="profile-info-item">
-                <label>Email</label>
-                <p>{user.email}</p>
-              </div>
-              <div className="profile-info-item">
-                <label>Phone</label>
-                <p>{user.phone || 'Not provided'}</p>
-              </div>
-              <div className="profile-info-item">
-                <label>Member Since</label>
-                <p>
-                  {new Date(user.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
         )}
 
         {/* Order History */}
         {activeTab === 'orders' && (
-        <div className="profile-orders-card">
-          <h2>Order History</h2>
+          <div className="profile-orders-card">
+            <h2>Order History</h2>
 
-          {loadingOrders ? (
-            <div className="profile-loading">
-              <div className="profile-spinner"></div>
-              <p>Loading orders...</p>
-            </div>
-          ) : orders.length === 0 ? (
-            <div className="profile-empty-state">
-              <svg className="profile-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-              <p>No orders yet</p>
-              <button
-                onClick={() => router.push('/')}
-                className="profile-shop-btn"
-              >
-                Start Shopping
-              </button>
-            </div>
-          ) : (
-            <div className="profile-orders-list">
-              {orders.map((order) => (
-                <div key={order._id} className="profile-order-item">
-                  <div className="profile-order-header">
-                    <div>
-                      <p className="profile-order-id">Order #{order._id.slice(-8)}</p>
-                      <p className="profile-order-date">
-                        {new Date(order.createdAt).toLocaleDateString()}
+            {loadingOrders ? (
+              <div className="profile-loading">
+                <div className="profile-spinner"></div>
+                <p>Loading orders...</p>
+              </div>
+            ) : orders.length === 0 ? (
+              <div className="profile-empty-state">
+                <svg className="profile-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <p>No orders yet</p>
+                <button
+                  onClick={() => router.push('/')}
+                  className="profile-shop-btn"
+                >
+                  Start Shopping
+                </button>
+              </div>
+            ) : (
+              <div className="profile-orders-list">
+                {orders.map((order) => (
+                  <div key={order._id} className="profile-order-item">
+                    <div className="profile-order-header">
+                      <div>
+                        <p className="profile-order-id">Order #{order._id.slice(-8)}</p>
+                        <p className="profile-order-date">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <span className={`profile-order-status ${order.status === 'completed' ? 'completed' :
+                          order.status === 'paid' ? 'paid' :
+                            order.status === 'pending' ? 'pending' :
+                              'default'
+                        }`}>
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </span>
+                    </div>
+                    <div className="profile-order-footer">
+                      <p className="profile-order-items">
+                        {order.items?.length || 0} item(s)
+                      </p>
+                      <p className="profile-order-amount">
+                        ₹{order.amount?.toLocaleString()}
                       </p>
                     </div>
-                    <span className={`profile-order-status ${
-                      order.status === 'completed' ? 'completed' :
-                      order.status === 'paid' ? 'paid' :
-                      order.status === 'pending' ? 'pending' :
-                      'default'
-                    }`}>
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </span>
+                    <button
+                      onClick={() => handleViewOrderDetails(order)}
+                      className="profile-order-view-btn"
+                    >
+                      View Details
+                    </button>
                   </div>
-                  <div className="profile-order-footer">
-                    <p className="profile-order-items">
-                      {order.items?.length || 0} item(s)
-                    </p>
-                    <p className="profile-order-amount">
-                      ₹{order.amount?.toLocaleString()}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => handleViewOrderDetails(order)}
-                    className="profile-order-view-btn"
-                  >
-                    View Details
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         {/* Addresses Tab */}
         {activeTab === 'addresses' && (
-        <div className="profile-addresses-card">
-          <div className="profile-addresses-header">
-            <h2>My Addresses</h2>
-            <button onClick={handleAddAddress} className="profile-add-address-btn">
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Add New Address
-            </button>
-          {error && <div className="profile-alert error">{error}</div>}
-          {success && <div className="profile-alert success">{success}</div>}
-
-          {addresses.length === 0 ? (
-            <div className="profile-empty-state">
-              <svg className="profile-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <p>No addresses saved</p>
-              <button onClick={handleAddAddress} className="profile-shop-btn">
-                Add Your First Address
+          <div className="profile-addresses-card">
+            <div className="profile-addresses-header">
+              <h2>My Addresses</h2>
+              <button onClick={handleAddAddress} className="profile-add-address-btn">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add New Address
               </button>
-            </div>
-          ) : (
-            <div className="profile-addresses-list">
-              {addresses.map((address: any) => (
-                <div key={address._id} className={`profile-address-item ${address.isDefault ? 'default' : ''}`}>
-                  {address.isDefault && (
-                    <span className="profile-address-default-badge">Default</span>
-                  )}
-                  <div className="profile-address-content">
-                    <h3>{address.fullName}</h3>
-                    <p>{address.addressLine1}</p>
-                    {address.addressLine2 && <p>{address.addressLine2}</p>}
-                    <p>{address.city}, {address.state} {address.zipCode}</p>
-                    <p>{address.country}</p>
-                    <p className="profile-address-phone">Phone: {address.phone}</p>
-                  </div>
-                  <div className="profile-address-actions">
-                    <button onClick={() => handleEditAddress(address)} className="profile-address-edit-btn">
-                      Edit
-                    </button>
-                    {!address.isDefault && (
-                      <button onClick={() => handleSetDefault(address._id)} className="profile-address-default-btn">
-                        Set as Default
-                      </button>
-                    )}
-                    <button onClick={() => handleDeleteAddress(address._id)} className="profile-address-delete-btn">
-                      Delete
-                    </button>
-                  </div>
+              {error && <div className="profile-alert error">{error}</div>}
+              {success && <div className="profile-alert success">{success}</div>}
+
+              {addresses.length === 0 ? (
+                <div className="profile-empty-state">
+                  <svg className="profile-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <p>No addresses saved</p>
+                  <button onClick={handleAddAddress} className="profile-shop-btn">
+                    Add Your First Address
+                  </button>
                 </div>
-              ))}
+              ) : (
+                <div className="profile-addresses-list">
+                  {addresses.map((address: any) => (
+                    <div key={address._id} className={`profile-address-item ${address.isDefault ? 'default' : ''}`}>
+                      {address.isDefault && (
+                        <span className="profile-address-default-badge">Default</span>
+                      )}
+                      <div className="profile-address-content">
+                        <h3>{address.fullName}</h3>
+                        <p>{address.addressLine1}</p>
+                        {address.addressLine2 && <p>{address.addressLine2}</p>}
+                        <p>{address.city}, {address.state} {address.zipCode}</p>
+                        <p>{address.country}</p>
+                        <p className="profile-address-phone">Phone: {address.phone}</p>
+                      </div>
+                      <div className="profile-address-actions">
+                        <button onClick={() => handleEditAddress(address)} className="profile-address-edit-btn">
+                          Edit
+                        </button>
+                        {!address.isDefault && (
+                          <button onClick={() => handleSetDefault(address._id)} className="profile-address-default-btn">
+                            Set as Default
+                          </button>
+                        )}
+                        <button onClick={() => handleDeleteAddress(address._id)} className="profile-address-delete-btn">
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-            </div>
-        </div>
+          </div>
         )}
 
         {/* Address Form Modal */}
@@ -709,12 +719,11 @@ function ProfileContent() {
                     </div>
                     <div>
                       <label>Status</label>
-                      <span className={`profile-order-status ${
-                        selectedOrder.status === 'completed' ? 'completed' :
-                        selectedOrder.status === 'paid' ? 'paid' :
-                        selectedOrder.status === 'pending' ? 'pending' :
-                        'default'
-                      }`}>
+                      <span className={`profile-order-status ${selectedOrder.status === 'completed' ? 'completed' :
+                          selectedOrder.status === 'paid' ? 'paid' :
+                            selectedOrder.status === 'pending' ? 'pending' :
+                              'default'
+                        }`}>
                         {selectedOrder.status.charAt(0).toUpperCase() + selectedOrder.status.slice(1)}
                       </span>
                     </div>

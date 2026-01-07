@@ -12,15 +12,22 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.6",
+    "@mui/material": "^7.3.6",
+    "@mui/x-data-grid": "^8.23.0",
     "@ory/client-fetch": "^1.22.2",
     "@types/node": "^24.5.2",
     "@types/react": "^19.1.13",
+    "date-fns": "^4.1.0",
     "multer": "^2.0.2",
     "next": "^16.0.7",
     "next-connect": "^1.0.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.1",
+    "recharts": "^3.6.0",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
