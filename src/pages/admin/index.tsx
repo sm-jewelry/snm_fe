@@ -238,7 +238,6 @@ const AdminDashboard = () => {
   // Generate top products data
   const generateTopProductsData = (orders: any[], products: any[]) => {
     const productSales: any = {};
-
     orders.forEach((order: any) => {
       const items = order.items || [];
       items.forEach((item: any) => {
@@ -248,8 +247,8 @@ const AdminDashboard = () => {
             productSales[productId] = {
               salesCount: 0,
               revenue: 0,
-              title: item.productName || item.product?.title || 'Unknown Product',
-              image: item.image || item.product?.image || '',
+              title: item.title || item.product?.title || 'Unknown Product',
+              image: item.URL || item.product?.URL || '',
             };
           }
           productSales[productId].salesCount += item.quantity || 1;
