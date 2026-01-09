@@ -4,6 +4,7 @@
  */
 
 import { auth } from './auth';
+import { createApiError, NetworkError } from './errors';
 
 // All requests now go through the API Gateway
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
@@ -62,7 +63,7 @@ class ApiClient {
     if (requiresAuth) {
       const accessToken = auth.getAccessToken();
       if (!accessToken) {
-        throw new Error('Please login to continue');
+        throw createApiError(401, 'Please login to continue');
       }
     }
 
@@ -70,19 +71,42 @@ class ApiClient {
       ? await this.getAuthHeaders()
       : { 'Content-Type': 'application/json', ...headers };
 
-    const response = await fetch(url, {
-      ...restOptions,
-      headers: { ...requestHeaders, ...headers },
-      credentials: 'include', // Important: send cookies through gateway
-    });
+    try {
+      const response = await fetch(url, {
+        ...restOptions,
+        headers: { ...requestHeaders, ...headers },
+        credentials: 'include', // Important: send cookies through gateway
+      });
 
-    const data = await response.json();
+      // Handle different content types
+      const contentType = response.headers.get('content-type');
+      let data: any;
 
-    if (!response.ok) {
-      throw new Error(data.message || 'Request failed');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        data = { message: await response.text() };
+      }
+
+      if (!response.ok) {
+        // Create appropriate error based on status code
+        throw createApiError(
+          response.status,
+          data.message || data.error || `Request failed with status ${response.status}`,
+          data
+        );
+      }
+
+      return data;
+    } catch (error) {
+      // Handle network errors (no response from server)
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new NetworkError('Unable to connect to server. Please check your internet connection.');
+      }
+
+      // Re-throw API errors
+      throw error;
     }
-
-    return data;
   }
 
   // ==================== CART SERVICE (via Gateway) ====================

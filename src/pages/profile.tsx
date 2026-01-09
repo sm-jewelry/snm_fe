@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { apiClient } from '../lib/apiClient';
+import { useErrorNotification } from '../components/common/ErrorNotification';
 
 export default function ProfilePage() {
   return (
@@ -17,6 +18,7 @@ export default function ProfilePage() {
 function ProfileContent() {
   const { user, logout, updateProfile, addAddress, updateAddress, deleteAddress, setDefaultAddress } = useAuth();
   const router = useRouter();
+  const { showError } = useErrorNotification(); // ✅ Add error notification hook
 
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses'>('profile');
 
@@ -29,6 +31,7 @@ function ProfileContent() {
       }
     }
   }, [router.query.tab]);
+
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
@@ -87,7 +90,8 @@ function ProfileContent() {
       const response = await apiClient.getMyOrders();
       setOrders(response.data || []);
     } catch (error) {
-      console.error('Failed to fetch orders:', error);
+      // ✅ Show user-friendly error notification with retry button
+      showError(error, fetchOrders);
     } finally {
       setLoadingOrders(false);
     }
@@ -111,6 +115,8 @@ function ProfileContent() {
       setSuccess('Profile updated successfully!');
       setIsEditing(false);
     } catch (err: any) {
+      // ✅ Use error notification for profile updates too
+      showError(err);
       setError(err.message || 'Failed to update profile');
     } finally {
       setLoading(false);
@@ -188,6 +194,8 @@ function ProfileContent() {
       }
       setShowAddressForm(false);
     } catch (err: any) {
+      // ✅ Use error notification for address operations
+      showError(err);
       setError(err.message || 'Failed to save address');
     } finally {
       setLoading(false);
@@ -205,6 +213,8 @@ function ProfileContent() {
       await deleteAddress(addressId);
       setSuccess('Address deleted successfully!');
     } catch (err: any) {
+      // ✅ Use error notification
+      showError(err);
       setError(err.message || 'Failed to delete address');
     } finally {
       setLoading(false);
@@ -220,6 +230,8 @@ function ProfileContent() {
       await setDefaultAddress(addressId);
       setSuccess('Default address updated!');
     } catch (err: any) {
+      // ✅ Use error notification
+      showError(err);
       setError(err.message || 'Failed to set default address');
     } finally {
       setLoading(false);
@@ -248,7 +260,7 @@ function ProfileContent() {
                   }`}
                 onClick={() => {
                   if (user.role === 'admin') {
-                    router.push('/admin');   // your admin dashboard route
+                    router.push('/admin');
                   }
                 }}
                 style={{

@@ -34,32 +34,38 @@ import AdminLayout from "../components/admin/layout/AdminLayout";
 import { AdminThemeProvider } from "../contexts/AdminThemeContext";
 import Script from "next/script";
 import { AuthProvider } from "../contexts/AuthContext";
+import { ErrorBoundary } from "../components/common/ErrorBoundary";
+import { ErrorNotificationProvider } from "../components/common/ErrorNotification";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isAdminRoute = router.pathname.startsWith('/admin');
 
   return (
-    <AuthProvider>
-      {isAdminRoute ? (
-        <AdminThemeProvider>
-          <AdminLayout>
-            <Component {...pageProps} />
-          </AdminLayout>
-        </AdminThemeProvider>
-      ) : (
-        <Layout>
-          <Script
-            src="https://checkout.razorpay.com/v1/checkout.js"
-            strategy="beforeInteractive"
-          />
-          <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-          />
-          <Component {...pageProps} />
-        </Layout>
-      )}
-    </AuthProvider>
+    <ErrorBoundary>
+      <ErrorNotificationProvider>
+        <AuthProvider>
+          {isAdminRoute ? (
+            <AdminThemeProvider>
+              <AdminLayout>
+                <Component {...pageProps} />
+              </AdminLayout>
+            </AdminThemeProvider>
+          ) : (
+            <Layout>
+              <Script
+                src="https://checkout.razorpay.com/v1/checkout.js"
+                strategy="beforeInteractive"
+              />
+              <link
+                rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+              />
+              <Component {...pageProps} />
+            </Layout>
+          )}
+        </AuthProvider>
+      </ErrorNotificationProvider>
+    </ErrorBoundary>
   );
 }
