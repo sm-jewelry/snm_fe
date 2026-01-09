@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Seo from "../../components/common/Seo";
 import ProductReviews from "../../components/reviews/ProductReviews";
+import Swal from "sweetalert2";
 
 interface Product {
   _id: string;
@@ -51,7 +52,7 @@ const ProductDetail: React.FC = () => {
       router.push("/profile");
     }
   }, [router]);
- useEffect(() => {
+  useEffect(() => {
     if (!id) return;
     setLoading(true);
 
@@ -149,7 +150,13 @@ const ProductDetail: React.FC = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert("✅ Product added to cart successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Added to cart",
+          text: "Product added to cart successfully!",
+          timer: 2000,
+          showConfirmButton: false
+        });
         window.dispatchEvent(new CustomEvent("cartUpdated"));
       } else {
         alert(data?.message || "❌ Failed to add to cart");
@@ -222,9 +229,8 @@ const ProductDetail: React.FC = () => {
     <>
       <Seo
         title={`${product.title} - Buy Online | NQD Fashion Store`}
-        description={`Buy ${product.title} at just ₹${product.price}. ${
-          product.stock > 0 ? "In stock now!" : "Currently out of stock."
-        }`}
+        description={`Buy ${product.title} at just ₹${product.price}. ${product.stock > 0 ? "In stock now!" : "Currently out of stock."
+          }`}
         ogTitle={product.title}
         ogDescription={`Shop ${product.title} — available at NQD Fashion Store.`}
         ogType="product"

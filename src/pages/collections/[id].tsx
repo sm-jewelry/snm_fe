@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
+import Swal from "sweetalert2";
 
 interface Product {
   _id: string;
@@ -17,8 +18,8 @@ interface Product {
   sizes?: string[];
 }
 
-// ✅ Use API Gateway URL
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8000";
 
 const CollectionProductsPage: React.FC = () => {
   const router = useRouter();
@@ -35,22 +36,26 @@ const CollectionProductsPage: React.FC = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        // Fetch collection details
-        const colRes = await fetch(`${API_GATEWAY_URL}/api/collections/${id}`, {
-          credentials: 'include', // Important for API Gateway
-        });
+        const colRes = await fetch(
+          `${API_GATEWAY_URL}/api/collections/${id}`,
+          { credentials: "include" }
+        );
         const colData = await colRes.json();
         setCollectionName(colData.name || "Collection");
-        
-        // Fetch products in collection
-        const res = await fetch(`${API_GATEWAY_URL}/api/catalogs/collection/${id}`, {
-          credentials: 'include', // Important for API Gateway
-        });
+
+        const res = await fetch(
+          `${API_GATEWAY_URL}/api/catalogs/collection/${id}`,
+          { credentials: "include" }
+        );
         const data = await res.json();
         setProducts(data || []);
       } catch (err) {
         console.error("Error fetching collection products:", err);
-        alert("Failed to fetch collection products.");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to fetch collection products",
+        });
       } finally {
         setLoading(false);
       }
@@ -59,11 +64,22 @@ const CollectionProductsPage: React.FC = () => {
     fetchProducts();
   }, [id]);
 
+  // ================= ADD TO CART =================
   const handleAddToCart = async (product: Product) => {
     const token = localStorage.getItem("access_token");
+
     if (!token) {
-      alert("Please login to continue");
-      router.push("/profile");
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please login to continue",
+        confirmButtonText: "Login",
+        confirmButtonColor: "#f59e0b",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/profile");
+        }
+      });
       return;
     }
 
@@ -74,7 +90,7 @@ const CollectionProductsPage: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Important for API Gateway
+        credentials: "include",
         body: JSON.stringify({
           productId: product._id,
           url: product.URL,
@@ -85,23 +101,49 @@ const CollectionProductsPage: React.FC = () => {
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        alert("✅ Product added to cart successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Added to Cart",
+          text: "Product added to cart successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
         window.dispatchEvent(new CustomEvent("cartUpdated"));
       } else {
-        alert(data.message || "❌ Failed to add to cart");
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: data.message || "Failed to add to cart",
+        });
       }
     } catch (err) {
       console.error("Cart Add Error:", err);
-      alert("Something went wrong while adding to cart.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while adding to cart",
+      });
     }
   };
 
+  // ================= ADD TO WISHLIST =================
   const handleAddToWishlist = async (product: Product) => {
     const token = localStorage.getItem("access_token");
+
     if (!token) {
-      alert("Please login to continue");
-      router.push("/profile");
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please login to continue",
+        confirmButtonText: "Login",
+        confirmButtonColor: "#f59e0b",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/profile");
+        }
+      });
       return;
     }
 
@@ -112,20 +154,34 @@ const CollectionProductsPage: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Important for API Gateway
+        credentials: "include",
         body: JSON.stringify({ productId: product._id }),
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        alert("✅ Added to wishlist!");
+        Swal.fire({
+          icon: "success",
+          title: "Added to Wishlist",
+          timer: 1500,
+          showConfirmButton: false,
+        });
         window.dispatchEvent(new CustomEvent("wishlistUpdated"));
       } else {
-        alert(data.message || "❌ Failed to add to wishlist");
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: data.message || "Failed to add to wishlist",
+        });
       }
     } catch (err) {
       console.error("Wishlist Error:", err);
-      alert("Something went wrong adding to wishlist.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong adding to wishlist",
+      });
     }
   };
 
@@ -142,53 +198,56 @@ const CollectionProductsPage: React.FC = () => {
   return (
     <section style={{ padding: "40px" }}>
       <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
-        {collectionName || "Collection"} Products
+        {collectionName} Products
       </h1>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className="product-grid">
-          {products.map((product) => (
-            <div key={product._id} className="product-card">
-              <div className="image-wrapper">
-                <Link href={`/products/${product._id}`}>
-                  <img src={product.URL} alt={product.title} className="product-img" />
-                </Link>
-
-                <div className="overlay-icons">
-                  <button
-                    className="icon-btn"
-                    title="Add to Wishlist"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleAddToWishlist(product);
-                    }}
-                  >
-                    ❤️
-                  </button>
-                  <button
-                    className="icon-btn"
-                    title="Add to Cart"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleAddToCart(product);
-                    }}
-                  >
-                    🛒
-                  </button>
-                </div>
-              </div>
-
-              <Link href={`collectionproducts/${product._id}`} className="product-info">
-                <h3>{product.title}</h3>
-                <p>₹{product.price}</p>
-                <p className="sku">SKU: {product.SKU}</p>
+      <div className="product-grid">
+        {products.map((product) => (
+          <div key={product._id} className="product-card">
+            <div className="image-wrapper">
+              <Link href={`/products/${product._id}`}>
+                <img
+                  src={product.URL}
+                  alt={product.title}
+                  className="product-img"
+                />
               </Link>
+
+              <div className="overlay-icons">
+                <button
+                  className="icon-btn"
+                  title="Add to Wishlist"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleAddToWishlist(product);
+                  }}
+                >
+                  ❤️
+                </button>
+                <button
+                  className="icon-btn"
+                  title="Add to Cart"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleAddToCart(product);
+                  }}
+                >
+                  🛒
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
-      )}
+
+            <Link
+              href={`/collectionproducts/${product._id}`}
+              className="product-info"
+            >
+              <h3>{product.title}</h3>
+              <p>₹{product.price}</p>
+              <p className="sku">SKU: {product.SKU}</p>
+            </Link>
+          </div>
+        ))}
+      </div>
     </section>
   );
 };

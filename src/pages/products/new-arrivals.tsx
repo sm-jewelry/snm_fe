@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Seo from "../../components/common/Seo";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 interface Product {
   _id: string;
@@ -69,7 +70,14 @@ const NewArrivals: React.FC = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert("✅ Product added to cart successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Added to cart",
+          text: "Product added to cart successfully!",
+          timer: 2000,
+          showConfirmButton: false
+        });
+
         window.dispatchEvent(new CustomEvent("cartUpdated"));
       } else {
         alert(data.message || "❌ Failed to add to cart");
