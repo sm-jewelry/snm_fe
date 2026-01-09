@@ -25,6 +25,7 @@ import { fetcher } from "../../../lib/api";
 import DataTable from "../../../components/admin/common/DataTable";
 import ConfirmDialog from "../../../components/admin/common/ConfirmDialog";
 import LoadingState from "../../../components/admin/common/LoadingState";
+import { useAdminAuth } from "../../../hooks/useAdminAuth";
 
 interface CategoryParent {
   _id: string;
@@ -41,6 +42,9 @@ interface Category {
 }
 
 export default function CategoriesPage() {
+  // Protected route - only admins can access
+  const { loading: authLoading, user } = useAdminAuth();
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -95,9 +99,11 @@ export default function CategoriesPage() {
   };
 
   useEffect(() => {
-    loadCategories();
-    loadParentLists();
-  }, []);
+    if (!authLoading && user) {
+      loadCategories();
+      loadParentLists();
+    }
+  }, [authLoading, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -258,6 +264,10 @@ export default function CategoriesPage() {
     level: cat.level,
     parents: cat.parents || [],
   }));
+
+  if (authLoading) {
+    return <LoadingState message="Verifying admin access..." />;
+  }
 
   if (loading) {
     return <LoadingState message="Loading categories..." />;

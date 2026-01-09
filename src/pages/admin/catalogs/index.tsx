@@ -7,6 +7,7 @@ import DataTable from "../../../components/admin/common/DataTable";
 import ImageUploadField from "../../../components/admin/common/ImageUploadField";
 import ConfirmDialog from "../../../components/admin/common/ConfirmDialog";
 import LoadingState from "../../../components/admin/common/LoadingState";
+import { useAdminAuth } from "../../../hooks/useAdminAuth";
 
 interface Category {
   _id: string;
@@ -33,6 +34,9 @@ interface Catalog {
 }
 
 export default function CatalogsPage() {
+  // Protected route - only admins can access
+  const { loading: authLoading, user } = useAdminAuth();
+
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,9 +68,11 @@ export default function CatalogsPage() {
   };
 
   useEffect(() => {
-    loadCatalogs();
-    loadCategories();
-  }, []);
+    if (!authLoading && user) {
+      loadCatalogs();
+      loadCategories();
+    }
+  }, [authLoading, user]);
 
   const handleImageUpload = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -207,6 +213,8 @@ export default function CatalogsPage() {
   ];
 
   const rows = catalogs.map((c) => ({ id: c._id, _id: c._id, title: c.title, price: c.price, SKU: c.SKU, stock: c.stock, categoryPath: getCategoryPath(c), brand: c.brand || "", isFeatured: c.isFeatured || false, rating: c.rating || 0, URL: c.URL, c1: c.c1, c2: c.c2, c3: c.c3 }));
+
+  if (authLoading) return <LoadingState message="Verifying admin access..." />;
 
   if (loading) return <LoadingState message="Loading catalogs..." />;
 

@@ -25,6 +25,7 @@ import DataTable from "../../../components/admin/common/DataTable";
 import ImageUploadField from "../../../components/admin/common/ImageUploadField";
 import ConfirmDialog from "../../../components/admin/common/ConfirmDialog";
 import LoadingState from "../../../components/admin/common/LoadingState";
+import { useAdminAuth } from "../../../hooks/useAdminAuth";
 
 interface Collection {
   _id: string;
@@ -34,6 +35,9 @@ interface Collection {
 }
 
 export default function AdminCollectionsPage() {
+  // Protected route - only admins can access
+  const { loading: authLoading, user } = useAdminAuth();
+
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -75,8 +79,10 @@ export default function AdminCollectionsPage() {
   };
 
   useEffect(() => {
-    loadCollections();
-  }, []);
+    if (!authLoading && user) {
+      loadCollections();
+    }
+  }, [authLoading, user]);
 
   // Handle image upload
   const handleImageUpload = async (file: File): Promise<string> => {
@@ -230,6 +236,10 @@ export default function AdminCollectionsPage() {
     description: col.description,
     imageUrl: col.imageUrl,
   }));
+
+  if (authLoading) {
+    return <LoadingState message="Verifying admin access..." />;
+  }
 
   if (loading) {
     return <LoadingState message="Loading collections..." />;

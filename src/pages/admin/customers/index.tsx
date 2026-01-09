@@ -16,6 +16,7 @@ import CustomerDetailsDrawer from '../../../components/admin/customers/CustomerD
 import ConfirmDialog from '../../../components/admin/common/ConfirmDialog';
 import LoadingState from '../../../components/admin/common/LoadingState';
 import { exportCustomersToCSV } from '../../../utils/csvExport';
+import { useAdminAuth } from '../../../hooks/useAdminAuth';
 
 interface Customer {
   _id: string;
@@ -30,6 +31,9 @@ interface Customer {
 }
 
 export default function AdminCustomersPage() {
+  // Protected route - only admins can access
+  const { loading: authLoading, user } = useAdminAuth();
+
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -56,8 +60,10 @@ export default function AdminCustomersPage() {
   });
 
   useEffect(() => {
-    loadCustomers();
-  }, [statusFilter]);
+    if (!authLoading && user) {
+      loadCustomers();
+    }
+  }, [statusFilter, authLoading, user]);
 
   const loadCustomers = async () => {
     try {
@@ -168,6 +174,10 @@ export default function AdminCustomersPage() {
   const handleExport = () => {
     exportCustomersToCSV(customers);
   };
+
+  if (authLoading) {
+    return <LoadingState message="Verifying admin access..." />;
+  }
 
   if (loading && customers.length === 0) {
     return <LoadingState message="Loading customers..." />;

@@ -17,6 +17,7 @@ import OrdersTable from '../../../components/admin/orders/OrdersTable';
 import OrderDetailsDrawer from '../../../components/admin/orders/OrderDetailsDrawer';
 import LoadingState from '../../../components/admin/common/LoadingState';
 import { exportOrdersToCSV } from '../../../utils/csvExport';
+import { useAdminAuth } from '../../../hooks/useAdminAuth';
 
 interface Order {
   _id: string;
@@ -31,6 +32,9 @@ interface Order {
 }
 
 export default function AdminOrdersPage() {
+  // Protected route - only admins can access
+  const { loading: authLoading, user } = useAdminAuth();
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -40,8 +44,10 @@ export default function AdminOrdersPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
-    loadOrders();
-  }, [statusFilter, paymentFilter]);
+    if (!authLoading && user) {
+      loadOrders();
+    }
+  }, [statusFilter, paymentFilter, authLoading, user]);
 
   const loadOrders = async () => {
     try {
@@ -106,6 +112,10 @@ export default function AdminOrdersPage() {
   const handleExport = () => {
     exportOrdersToCSV(orders);
   };
+
+  if (authLoading) {
+    return <LoadingState message="Verifying admin access..." />;
+  }
 
   if (loading && orders.length === 0) {
     return <LoadingState message="Loading orders..." />;

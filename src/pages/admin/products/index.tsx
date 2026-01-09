@@ -27,6 +27,7 @@ import DataTable from "../../../components/admin/common/DataTable";
 import ImageUploadField from "../../../components/admin/common/ImageUploadField";
 import ConfirmDialog from "../../../components/admin/common/ConfirmDialog";
 import LoadingState from "../../../components/admin/common/LoadingState";
+import { useAdminAuth } from "../../../hooks/useAdminAuth";
 
 interface Product {
   _id: string;
@@ -51,6 +52,9 @@ interface Collection {
 }
 
 export default function AdminProductsPage() {
+  // Protected route - only admins can access
+  const { loading: authLoading, user } = useAdminAuth();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,9 +113,11 @@ export default function AdminProductsPage() {
   };
 
   useEffect(() => {
-    loadProducts();
-    loadCollections();
-  }, []);
+    if (!authLoading && user) {
+      loadProducts();
+      loadCollections();
+    }
+  }, [authLoading, user]);
 
   const handleImageUpload = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -350,6 +356,10 @@ export default function AdminProductsPage() {
     rating: p.rating || 0,
     URL: p.URL,
   }));
+
+  if (authLoading) {
+    return <LoadingState message="Verifying admin access..." />;
+  }
 
   if (loading) {
     return <LoadingState message="Loading products..." />;

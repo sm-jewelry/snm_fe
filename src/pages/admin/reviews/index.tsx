@@ -8,6 +8,7 @@ import DataTable from "../../../components/admin/common/DataTable";
 import StatusChip from "../../../components/admin/common/StatusChip";
 import ConfirmDialog from "../../../components/admin/common/ConfirmDialog";
 import LoadingState from "../../../components/admin/common/LoadingState";
+import { useAdminAuth } from "../../../hooks/useAdminAuth";
 
 interface Review {
   _id: string;
@@ -26,6 +27,9 @@ interface Review {
 }
 
 export default function AdminReviewsPage() {
+  // Protected route - only admins can access
+  const { loading: authLoading, user } = useAdminAuth();
+
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -72,8 +76,10 @@ export default function AdminReviewsPage() {
   };
 
   useEffect(() => {
-    loadReviews();
-  }, [statusFilter, ratingFilter]);
+    if (!authLoading && user) {
+      loadReviews();
+    }
+  }, [statusFilter, ratingFilter, authLoading, user]);
 
   const handleModerate = async () => {
     if (!moderateDialog.reviewId || !moderateDialog.action) return;
@@ -251,19 +257,21 @@ export default function AdminReviewsPage() {
     },
   ];
 
-  const rows = reviews.map((r) => ({ 
-    id: r._id, 
-    _id: r._id, 
+  const rows = reviews.map((r) => ({
+    id: r._id,
+    _id: r._id,
     productTitle: r.productTitle,
     userName: r.userName,
-    rating: r.rating, 
+    rating: r.rating,
     title: r.title,
-    comment: r.comment, 
-    status: r.status, 
-    rawStatus: r.status, 
+    comment: r.comment,
+    status: r.status,
+    rawStatus: r.status,
     createdAt: r.createdAt,
     fullReview: r
   }));
+
+  if (authLoading) return <LoadingState message="Verifying admin access..." />;
 
   if (loading) return <LoadingState message="Loading reviews..." />;
 
