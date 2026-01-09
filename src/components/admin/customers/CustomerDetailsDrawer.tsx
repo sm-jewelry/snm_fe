@@ -29,7 +29,8 @@ interface Address {
   addressLine2?: string;
   city: string;
   state: string;
-  pinCode: string;
+  zipCode?: string;
+  pinCode?: string;
   phone: string;
   isDefault?: boolean;
 }
@@ -96,9 +97,25 @@ const CustomerDetailsDrawer: React.FC<CustomerDetailsDrawerProps> = ({
     if (!customerId) return;
     try {
       setLoading(true);
-      const data = await fetcher(`/api/customers/${customerId}`);
-      setCustomer(data);
+      const response = await fetcher(`/api/customers/${customerId}`);
+      
+      // Handle nested response structure
+      let customerData = null;
+      
+      if (response.success && response.data) {
+        // If API returns {success: true, data: {user: {...}}}
+        customerData = response.data.user || response.data;
+      } else if (response.data) {
+        // If API returns {data: {...}}
+        customerData = response.data;
+      } else {
+        // If API returns customer object directly
+        customerData = response;
+      }
+      
+      setCustomer(customerData);
     } catch (error) {
+      console.error('Failed to load customer details:', error);
       setSnackbar({
         open: true,
         message: error instanceof Error ? error.message : 'Failed to load customer details',
@@ -315,7 +332,7 @@ const CustomerDetailsDrawer: React.FC<CustomerDetailsDrawerProps> = ({
                                       </Typography>
                                     )}
                                     <Typography variant="body2" component="div">
-                                      {address.city}, {address.state} - {address.pinCode}
+                                      {address.city}, {address.state} - {address.zipCode || address.pinCode}
                                     </Typography>
                                     <Typography variant="body2" component="div">
                                       Phone: {address.phone}
@@ -332,7 +349,11 @@ const CustomerDetailsDrawer: React.FC<CustomerDetailsDrawerProps> = ({
                 </>
               )}
             </>
-          ) : null}
+          ) : (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <Typography color="text.secondary">No customer data available</Typography>
+            </Box>
+          )}
         </Box>
       </Drawer>
 
