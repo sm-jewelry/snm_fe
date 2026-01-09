@@ -17,7 +17,17 @@ import SalesChart from "../../components/admin/dashboard/SalesChart";
 import OrderStatusChart from "../../components/admin/dashboard/OrderStatusChart";
 import TopProductsTable from "../../components/admin/dashboard/TopProductsTable";
 import RecentActivity from "../../components/admin/dashboard/RecentActivity";
+import AdvancedMetrics from "../../components/admin/dashboard/AdvancedMetrics";
+import TimePeriodSelector, { TimePeriod } from "../../components/admin/dashboard/TimePeriodSelector";
+import ComparisonView from "../../components/admin/dashboard/ComparisonView";
 import { fetcher } from "../../lib/api";
+import {
+  getDateRangeForPeriod,
+  getPreviousPeriodRange,
+  filterOrdersByDateRange,
+  getPeriodLabel,
+  getPreviousPeriodLabel,
+} from "../../utils/dateFilters";
 
 interface UserInfo {
   sub: string;
@@ -49,6 +59,11 @@ const AdminDashboard = () => {
   const [orderStatusData, setOrderStatusData] = useState<any[]>([]);
   const [topProductsData, setTopProductsData] = useState<any[]>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('month');
+  const [allOrders, setAllOrders] = useState<any[]>([]);
+  const [allCustomers, setAllCustomers] = useState<any[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
+  const [previousPeriodOrders, setPreviousPeriodOrders] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -93,6 +108,20 @@ const AdminDashboard = () => {
     checkAdminAccess();
   }, [router]);
 
+  // Filter orders based on selected time period
+  useEffect(() => {
+    if (allOrders.length === 0) return;
+
+    const currentRange = getDateRangeForPeriod(timePeriod);
+    const previousRange = getPreviousPeriodRange(timePeriod);
+
+    const currentPeriodOrders = filterOrdersByDateRange(allOrders, currentRange);
+    const prevPeriodOrders = filterOrdersByDateRange(allOrders, previousRange);
+
+    setFilteredOrders(currentPeriodOrders);
+    setPreviousPeriodOrders(prevPeriodOrders);
+  }, [timePeriod, allOrders]);
+
   const loadDashboardStats = async () => {
     try {
       // Load statistics from various endpoints
@@ -122,6 +151,9 @@ const AdminDashboard = () => {
         const dataObj = ordersData.data || ordersData;
         orders = dataObj.orders || ordersData.orders || ordersData || [];
 
+        // Store all orders for filtering
+        setAllOrders(orders);
+
         if (Array.isArray(orders)) {
           totalOrders = orders.length;
           totalRevenue = orders.reduce((sum: number, order: any) => {
@@ -141,6 +173,9 @@ const AdminDashboard = () => {
         const customerDataObj = customersData.data || customersData;
         customers = customerDataObj.customers || customerDataObj.users || customersData.customers || customersData || [];
         totalCustomers = Array.isArray(customers) ? customers.length : 0;
+
+        // Store all customers
+        setAllCustomers(customers);
       }
 
       // Calculate sales growth (current month vs previous month)
@@ -448,11 +483,69 @@ const AdminDashboard = () => {
       {/* Analytics Section Header */}
       <Box sx={{ mb: 3, mt: 2 }}>
         <Typography variant="h5" fontWeight={700} gutterBottom>
-          Analytics Overview
+          Advanced Analytics Overview
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Track your sales performance and order trends
+          Track your sales performance and order trends with detailed insights
         </Typography>
+      </Box>
+
+      {/* Time Period Selector */}
+      <TimePeriodSelector value={timePeriod} onChange={setTimePeriod} />
+
+      {/* Advanced Metrics Cards */}
+      <Box sx={{ mb: 4 }}>
+        <AdvancedMetrics
+          orders={filteredOrders}
+          customers={allCustomers}
+          previousPeriodOrders={previousPeriodOrders}
+        />
+      </Box>
+
+      {/* Comparison View */}
+      <Box sx={{ mb: 4 }}>
+        <ComparisonView
+          currentPeriodLabel={getPeriodLabel(timePeriod)}
+          previousPeriodLabel={getPreviousPeriodLabel(timePeriod)}
+          metrics={[
+            {
+              label: 'Total Revenue',
+              currentValue: filteredOrders.reduce((sum, o) => sum + (o.amount || o.total || 0), 0),
+              previousValue: previousPeriodOrders.reduce((sum, o) => sum + (o.amount || o.total || 0), 0),
+              format: 'currency',
+            },
+            {
+              label: 'Total Orders',
+              currentValue: filteredOrders.length,
+              previousValue: previousPeriodOrders.length,
+              format: 'number',
+            },
+            {
+              label: 'Average Order Value',
+              currentValue: filteredOrders.length > 0 ? filteredOrders.reduce((sum, o) => sum + (o.amount || o.total || 0), 0) / filteredOrders.length : 0,
+              previousValue: previousPeriodOrders.length > 0 ? previousPeriodOrders.reduce((sum, o) => sum + (o.amount || o.total || 0), 0) / previousPeriodOrders.length : 0,
+              format: 'currency',
+            },
+            {
+              label: 'Delivered Orders',
+              currentValue: filteredOrders.filter(o => o.status === 'delivered').length,
+              previousValue: previousPeriodOrders.filter(o => o.status === 'delivered').length,
+              format: 'number',
+            },
+            {
+              label: 'Cancelled Orders',
+              currentValue: filteredOrders.filter(o => o.status === 'cancelled').length,
+              previousValue: previousPeriodOrders.filter(o => o.status === 'cancelled').length,
+              format: 'number',
+            },
+            {
+              label: 'Pending Orders',
+              currentValue: filteredOrders.filter(o => o.status === 'pending').length,
+              previousValue: previousPeriodOrders.filter(o => o.status === 'pending').length,
+              format: 'number',
+            },
+          ]}
+        />
       </Box>
 
       {/* Analytics Charts */}
