@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
   LinearProgress,
   Chip,
 } from '@mui/material';
@@ -181,9 +180,9 @@ const AdvancedMetrics: React.FC<AdvancedMetricsProps> = ({
 
   return (
     <Box>
-      <Grid container spacing={3}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
         {/* Revenue */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Box sx={{ flex: '1 1 calc(50% - 12px)', minWidth: 250, '@media (min-width: 900px)': { flex: '1 1 calc(25% - 18px)' } }}>
           <MetricCard
             title="Total Revenue"
             value={`₹${totalRevenue.toLocaleString('en-IN')}`}
@@ -192,10 +191,10 @@ const AdvancedMetrics: React.FC<AdvancedMetricsProps> = ({
             icon={<AccountBalanceWallet />}
             color={theme.palette.success.main}
           />
-        </Grid>
+        </Box>
 
         {/* Average Order Value */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Box sx={{ flex: '1 1 calc(50% - 12px)', minWidth: 250, '@media (min-width: 900px)': { flex: '1 1 calc(25% - 18px)' } }}>
           <MetricCard
             title="Average Order Value"
             value={`₹${Math.round(averageOrderValue).toLocaleString('en-IN')}`}
@@ -205,10 +204,10 @@ const AdvancedMetrics: React.FC<AdvancedMetricsProps> = ({
             color={theme.palette.primary.main}
             subtitle={`From ${totalOrders} orders`}
           />
-        </Grid>
+        </Box>
 
         {/* Conversion Rate */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Box sx={{ flex: '1 1 calc(50% - 12px)', minWidth: 250, '@media (min-width: 900px)': { flex: '1 1 calc(25% - 18px)' } }}>
           <MetricCard
             title="Conversion Rate"
             value={`${conversionRate.toFixed(1)}%`}
@@ -217,10 +216,10 @@ const AdvancedMetrics: React.FC<AdvancedMetricsProps> = ({
             progress={conversionRate}
             subtitle={`${totalOrders} orders / ${totalCustomers} customers`}
           />
-        </Grid>
+        </Box>
 
         {/* Customer Retention */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Box sx={{ flex: '1 1 calc(50% - 12px)', minWidth: 250, '@media (min-width: 900px)': { flex: '1 1 calc(25% - 18px)' } }}>
           <MetricCard
             title="Customer Retention"
             value={`${customerRetentionRate.toFixed(1)}%`}
@@ -229,10 +228,10 @@ const AdvancedMetrics: React.FC<AdvancedMetricsProps> = ({
             progress={customerRetentionRate}
             subtitle={`${returningCustomers} returning customers`}
           />
-        </Grid>
+        </Box>
 
         {/* Total Orders */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Box sx={{ flex: '1 1 calc(50% - 12px)', minWidth: 250, '@media (min-width: 900px)': { flex: '1 1 calc(25% - 18px)' } }}>
           <MetricCard
             title="Total Orders"
             value={totalOrders.toLocaleString('en-IN')}
@@ -241,10 +240,10 @@ const AdvancedMetrics: React.FC<AdvancedMetricsProps> = ({
             icon={<ShoppingCart />}
             color={theme.palette.warning.main}
           />
-        </Grid>
+        </Box>
 
         {/* Total Customers */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Box sx={{ flex: '1 1 calc(50% - 12px)', minWidth: 250, '@media (min-width: 900px)': { flex: '1 1 calc(25% - 18px)' } }}>
           <MetricCard
             title="Total Customers"
             value={totalCustomers.toLocaleString('en-IN')}
@@ -252,10 +251,10 @@ const AdvancedMetrics: React.FC<AdvancedMetricsProps> = ({
             color={theme.palette.info.main}
             subtitle={`${customers.filter((c) => c.isActive).length} active`}
           />
-        </Grid>
+        </Box>
 
         {/* Order Fulfillment */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Box sx={{ flex: '1 1 calc(50% - 12px)', minWidth: 250, '@media (min-width: 900px)': { flex: '1 1 calc(25% - 18px)' } }}>
           <MetricCard
             title="Order Fulfillment"
             value={`${fulfillmentRate.toFixed(1)}%`}
@@ -264,10 +263,10 @@ const AdvancedMetrics: React.FC<AdvancedMetricsProps> = ({
             progress={fulfillmentRate}
             subtitle={`${deliveredOrders} delivered orders`}
           />
-        </Grid>
+        </Box>
 
         {/* Success Rate */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Box sx={{ flex: '1 1 calc(50% - 12px)', minWidth: 250, '@media (min-width: 900px)': { flex: '1 1 calc(25% - 18px)' } }}>
           <MetricCard
             title="Success Rate"
             value={`${(100 - orders.filter((o) => o.status === 'cancelled').length / totalOrders * 100).toFixed(1)}%`}
@@ -276,8 +275,8 @@ const AdvancedMetrics: React.FC<AdvancedMetricsProps> = ({
             progress={100 - (orders.filter((o) => o.status === 'cancelled').length / totalOrders) * 100}
             subtitle={`${orders.filter((o) => o.status === 'cancelled').length} cancelled`}
           />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 };

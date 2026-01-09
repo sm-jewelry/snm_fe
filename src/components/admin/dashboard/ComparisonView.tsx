@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
   Divider,
   Chip,
 } from '@mui/material';
@@ -76,14 +75,23 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
           Compare {currentPeriodLabel} vs {previousPeriodLabel}
         </Typography>
 
-        <Grid container spacing={3}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
           {metrics.map((metric, index) => {
             const change = calculateChange(metric.currentValue, metric.previousValue);
             const trendColor = getTrendColor(change);
             const trendIcon = getTrendIcon(change);
 
             return (
-              <Grid item xs={12} sm={6} md={4} key={index}>
+              <Box 
+                key={index}
+                sx={{ 
+                  flex: '1 1 calc(50% - 12px)', 
+                  minWidth: 250, 
+                  '@media (min-width: 900px)': { 
+                    flex: '1 1 calc(33.333% - 16px)' 
+                  } 
+                }}
+              >
                 <Box
                   sx={{
                     p: 2,
@@ -91,6 +99,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                     backgroundColor: alpha(theme.palette.background.paper, 0.8),
                     border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                     transition: 'all 0.3s ease',
+                    height: '100%',
                     '&:hover': {
                       transform: 'translateY(-2px)',
                       boxShadow: `0 8px 16px ${alpha(theme.palette.primary.main, 0.1)}`,
@@ -132,10 +141,10 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                     </Typography>
                   </Box>
                 </Box>
-              </Grid>
+              </Box>
             );
           })}
-        </Grid>
+        </Box>
       </CardContent>
     </Card>
   );
