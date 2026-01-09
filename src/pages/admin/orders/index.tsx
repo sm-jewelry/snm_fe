@@ -16,6 +16,7 @@ import { fetcher } from '../../../lib/api';
 import OrdersTable from '../../../components/admin/orders/OrdersTable';
 import OrderDetailsDrawer from '../../../components/admin/orders/OrderDetailsDrawer';
 import LoadingState from '../../../components/admin/common/LoadingState';
+import { exportOrdersToCSV } from '../../../utils/csvExport';
 
 interface Order {
   _id: string;
@@ -103,7 +104,7 @@ export default function AdminOrdersPage() {
   };
 
   const handleExport = () => {
-    alert('CSV export will be implemented');
+    exportOrdersToCSV(orders);
   };
 
   if (loading && orders.length === 0) {
@@ -189,7 +190,7 @@ export default function AdminOrdersPage() {
 
           <TextField
             label="Search"
-            placeholder="Order ID, customer name, email..."
+            placeholder="Order ID, Payment ID, Transaction ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

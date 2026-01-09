@@ -15,6 +15,7 @@ import CustomersTable from '../../../components/admin/customers/CustomersTable';
 import CustomerDetailsDrawer from '../../../components/admin/customers/CustomerDetailsDrawer';
 import ConfirmDialog from '../../../components/admin/common/ConfirmDialog';
 import LoadingState from '../../../components/admin/common/LoadingState';
+import { exportCustomersToCSV } from '../../../utils/csvExport';
 
 interface Customer {
   _id: string;
@@ -165,8 +166,7 @@ export default function AdminCustomersPage() {
   };
 
   const handleExport = () => {
-    // TODO: Implement CSV export
-    alert('CSV export functionality will be implemented');
+    exportCustomersToCSV(customers);
   };
 
   if (loading && customers.length === 0) {

@@ -31,6 +31,7 @@ interface DashboardStats {
   totalCustomers: number;
   pendingReviews: number;
   lowStockProducts: number;
+  salesGrowth: number;
 }
 
 const AdminDashboard = () => {
@@ -42,6 +43,7 @@ const AdminDashboard = () => {
     totalCustomers: 0,
     pendingReviews: 0,
     lowStockProducts: 0,
+    salesGrowth: 0,
   });
   const [salesData, setSalesData] = useState<any[]>([]);
   const [orderStatusData, setOrderStatusData] = useState<any[]>([]);
@@ -141,6 +143,9 @@ const AdminDashboard = () => {
         totalCustomers = Array.isArray(customers) ? customers.length : 0;
       }
 
+      // Calculate sales growth (current month vs previous month)
+      const salesGrowth = calculateSalesGrowth(orders);
+
       // Update basic stats
       setStats({
         totalOrders,
@@ -148,6 +153,7 @@ const AdminDashboard = () => {
         totalCustomers,
         pendingReviews: pendingReviews.length,
         lowStockProducts: lowStock,
+        salesGrowth,
       });
 
       // Process analytics data
@@ -174,6 +180,42 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error("Failed to load dashboard stats:", error);
     }
+  };
+
+  // Calculate sales growth (current month vs previous month)
+  const calculateSalesGrowth = (orders: any[]) => {
+    if (!Array.isArray(orders) || orders.length === 0) return 0;
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Calculate current month revenue
+    const currentMonthRevenue = orders
+      .filter((order: any) => {
+        const orderDate = new Date(order.createdAt || order.orderDate);
+        return orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear;
+      })
+      .reduce((sum: number, order: any) => sum + (order.total || order.amount || 0), 0);
+
+    // Calculate previous month revenue
+    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+    const prevMonthRevenue = orders
+      .filter((order: any) => {
+        const orderDate = new Date(order.createdAt || order.orderDate);
+        return orderDate.getMonth() === prevMonth && orderDate.getFullYear() === prevYear;
+      })
+      .reduce((sum: number, order: any) => sum + (order.total || order.amount || 0), 0);
+
+    // Calculate growth percentage
+    if (prevMonthRevenue === 0) {
+      return currentMonthRevenue > 0 ? 100 : 0;
+    }
+
+    const growth = ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100;
+    return Math.round(growth * 10) / 10; // Round to 1 decimal place
   };
 
   // Generate sales chart data from orders
@@ -353,7 +395,6 @@ const AdminDashboard = () => {
             value={stats.totalOrders}
             icon={<OrdersIcon />}
             color="primary"
-            trend={{ value: 12, isPositive: true }}
             onClick={() => router.push("/admin/orders")}
           />
         </Grid>
@@ -363,7 +404,7 @@ const AdminDashboard = () => {
             value={`₹${stats.totalRevenue.toLocaleString()}`}
             icon={<RevenueIcon />}
             color="success"
-            trend={{ value: 8, isPositive: true }}
+            trend={{ value: Math.abs(stats.salesGrowth), isPositive: stats.salesGrowth >= 0 }}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -396,9 +437,10 @@ const AdminDashboard = () => {
         <Grid item xs={12} sm={6} md={4}>
           <StatsCard
             title="Sales Growth"
-            value="+24%"
+            value={`${stats.salesGrowth > 0 ? '+' : ''}${stats.salesGrowth}%`}
             icon={<TrendingUpIcon />}
             color="secondary"
+            trend={{ value: Math.abs(stats.salesGrowth), isPositive: stats.salesGrowth >= 0 }}
           />
         </Grid>
       </Grid>
