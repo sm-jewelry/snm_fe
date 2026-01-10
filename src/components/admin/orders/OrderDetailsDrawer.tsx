@@ -15,12 +15,13 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { Close as CloseIcon, Download as DownloadIcon, Print as PrintIcon } from '@mui/icons-material';
 import { GridColDef } from '@mui/x-data-grid';
 import { fetcher } from '../../../lib/api';
 import DataTable from '../common/DataTable';
 import OrderStatusStepper from './OrderStatusStepper';
 import RefundDialog from './RefundDialog';
+import { downloadInvoice, printInvoice } from '../../../utils/invoiceGenerator';
 
 interface OrderItem {
   productId: { _id: string; title: string; URL?: string };
@@ -293,6 +294,31 @@ const OrderDetailsDrawer: React.FC<OrderDetailsDrawerProps> = ({
               <Card>
                 <CardContent>
                   <Typography variant="h6" fontWeight={600} gutterBottom>Actions</Typography>
+
+                  {/* Invoice Download - Only for Delivered Orders */}
+                  {order.status === 'delivered' && (
+                    <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        startIcon={<DownloadIcon />}
+                        onClick={() => downloadInvoice(order as any)}
+                        fullWidth
+                      >
+                        Download Invoice
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        startIcon={<PrintIcon />}
+                        onClick={() => printInvoice(order as any)}
+                        fullWidth
+                      >
+                        Print Invoice
+                      </Button>
+                    </Box>
+                  )}
+
                   <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                     <TextField
                       select
