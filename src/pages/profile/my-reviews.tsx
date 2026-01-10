@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Seo from '../../components/common/Seo';
+import Swal from 'sweetalert2';
 
 interface Review {
   _id: string;
@@ -17,7 +18,8 @@ interface Review {
   updatedAt: string;
 }
 
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
 export default function MyReviewsPage() {
   const router = useRouter();
@@ -29,8 +31,17 @@ export default function MyReviewsPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
+
     if (!token) {
-      router.push('/profile?login=true');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Login Required',
+        text: 'Please login to continue',
+        confirmButtonText: 'Login',
+        confirmButtonColor: '#f59e0b',
+      }).then(() => {
+        router.push('/profile?login=true');
+      });
       return;
     }
 
@@ -57,41 +68,59 @@ export default function MyReviewsPage() {
         setReviews(data.reviews || []);
         setTotalPages(data.pagination?.pages || 1);
       } else {
-        console.error('Failed to load reviews');
+        Swal.fire('Error', 'Failed to load reviews', 'error');
       }
     } catch (error) {
-      console.error('Error loading reviews:', error);
+      console.error(error);
+      Swal.fire('Error', 'Something went wrong', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (reviewId: string) => {
-    if (!confirm('Are you sure you want to delete this review?')) {
-      return;
-    }
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: 'Delete Review?',
+      text: 'Are you sure you want to delete this review?',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#ef4444',
+    });
+
+    if (!result.isConfirmed) return;
 
     const token = localStorage.getItem('access_token');
 
     try {
-      const response = await fetch(`${API_GATEWAY_URL}/api/reviews/${reviewId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `${API_GATEWAY_URL}/api/reviews/${reviewId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: 'include',
+        }
+      );
 
       if (response.ok) {
-        alert('Review deleted successfully');
+        Swal.fire({
+          icon: 'success',
+          title: 'Deleted',
+          text: 'Review deleted successfully',
+          timer: 2000,
+          showConfirmButton: false,
+        });
         loadReviews();
       } else {
         const data = await response.json();
-        alert(data.message || 'Failed to delete review');
+        Swal.fire('Error', data.message || 'Failed to delete review', 'error');
       }
     } catch (error) {
-      console.error('Error deleting review:', error);
-      alert('Failed to delete review');
+      console.error(error);
+      Swal.fire('Error', 'Failed to delete review', 'error');
     }
   };
 
@@ -125,27 +154,31 @@ export default function MyReviewsPage() {
       );
 
       if (response.ok) {
-        alert('Review updated successfully! It will be re-approved by admin.');
+        Swal.fire({
+          icon: 'success',
+          title: 'Updated',
+          text: 'Review updated successfully! It will be re-approved by admin.',
+          timer: 2500,
+          showConfirmButton: false,
+        });
         setEditingReview(null);
         loadReviews();
       } else {
         const data = await response.json();
-        alert(data.message || 'Failed to update review');
+        Swal.fire('Error', data.message || 'Failed to update review', 'error');
       }
     } catch (error) {
-      console.error('Error updating review:', error);
-      alert('Failed to update review');
+      console.error(error);
+      Swal.fire('Error', 'Failed to update review', 'error');
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
-  };
 
   const getStatusBadge = (status: string) => {
     const badges = {

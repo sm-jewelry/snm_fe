@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 interface Product {
   _id: string;
@@ -13,13 +14,14 @@ interface Product {
 }
 
 interface WishlistItem {
-  _id: string; // wishlist item ID
+  _id: string;
   productId: Product;
   addedAt: string;
 }
 
-// ✅ Use API Gateway URL
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8000";
+
 const WISHLIST_API = `${API_GATEWAY_URL}/api/wishlist`;
 const PRODUCT_API = `${API_GATEWAY_URL}/api/catalogs`;
 const FALLBACK_PRODUCT_API = `${API_GATEWAY_URL}/api/catalogs`;
@@ -29,51 +31,63 @@ const WishlistPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const showLoginAlert = () => {
+    Swal.fire({
+      icon: "warning",
+      title: "Login Required",
+      text: "Please login to view your wishlist",
+      confirmButtonText: "Login",
+    }).then(() => {
+      router.push("/profile?login=true");
+    });
+  };
+
   const fetchWishlist = async () => {
     const token = localStorage.getItem("access_token");
+
     if (!token) {
-      router.push("/profile");
+      showLoginAlert();
       return;
     }
 
     try {
       const res = await fetch(WISHLIST_API, {
         headers: { Authorization: `Bearer ${token}` },
-        credentials: 'include', // Important for API Gateway
+        credentials: "include",
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to fetch wishlist");
 
-      // Fetch product details for each wishlist item
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
       const detailedProducts: WishlistItem[] = await Promise.all(
         data.data.products.map(async (item: any) => {
-          let prodData = null;
+          let prodData;
+
           try {
-            // Try first endpoint
             const prodRes = await fetch(`${PRODUCT_API}/${item.productId}`, {
-              credentials: 'include', // Important for API Gateway
+              credentials: "include",
             });
             prodData = await prodRes.json();
-            if (!prodRes.ok || !prodData._id) throw new Error("Not found");
+            if (!prodRes.ok) throw new Error();
           } catch {
-            // Try fallback endpoint
-            const prodRes2 = await fetch(`${FALLBACK_PRODUCT_API}/${item.productId}`, {
-              credentials: 'include', // Important for API Gateway
-            });
+            const prodRes2 = await fetch(
+              `${FALLBACK_PRODUCT_API}/${item.productId}`,
+              { credentials: "include" }
+            );
             prodData = await prodRes2.json();
           }
 
-          return {
-            ...item,
-            productId: prodData,
-          };
+          return { ...item, productId: prodData };
         })
       );
 
       setWishlist(detailedProducts);
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong while fetching wishlist.");
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Failed to fetch wishlist",
+      });
     } finally {
       setLoading(false);
     }
@@ -81,26 +95,44 @@ const WishlistPage: React.FC = () => {
 
   const handleRemove = async (productId: string) => {
     const token = localStorage.getItem("access_token");
-    if (!token) return;
+
+    if (!token) {
+      showLoginAlert();
+      return;
+    }
 
     try {
       const res = await fetch(`${WISHLIST_API}/${productId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
-        credentials: 'include', // Important for API Gateway
+        credentials: "include",
       });
+
       const data = await res.json();
 
       if (res.ok) {
-        // Remove item locally
-        setWishlist((prev) => prev.filter((item) => item.productId._id !== productId));
+        setWishlist((prev) =>
+          prev.filter((item) => item.productId._id !== productId)
+        );
+
         window.dispatchEvent(new CustomEvent("wishlistUpdated"));
+
+        Swal.fire({
+          icon: "success",
+          title: "Removed",
+          text: "Product removed from wishlist",
+          timer: 1500,
+          showConfirmButton: false,
+        });
       } else {
-        alert(data.message || "Failed to remove from wishlist");
+        throw new Error(data.message);
       }
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong while removing item.");
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: error.message || "Unable to remove item",
+      });
     }
   };
 
@@ -127,15 +159,20 @@ const WishlistPage: React.FC = () => {
                 alt={item.productId.title}
                 className="wishlist-img"
               />
-              <h2 className="wishlist-title">{item.productId.title}</h2>
-              <p className="wishlist-price">₹{item.productId.price}</p>
-              <p className="wishlist-sku">SKU: {item.productId.SKU}</p>
+              <h2 className="wishlist-title">
+                {item.productId.title}
+              </h2>
+              <p className="wishlist-price">
+                ₹{item.productId.price}
+              </p>
+              <p className="wishlist-sku">
+                SKU: {item.productId.SKU}
+              </p>
             </Link>
 
             <button
               className="wishlist-remove"
               onClick={() => handleRemove(item.productId._id)}
-              title="Remove from Wishlist"
             >
               ❌
             </button>

@@ -19,8 +19,8 @@ interface Product {
   sizes?: string[];
 }
 
-// ✅ Use API Gateway URL
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8000";
 
 const NewArrivals: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -29,27 +29,42 @@ const NewArrivals: React.FC = () => {
 
   useEffect(() => {
     fetch(`${API_GATEWAY_URL}/api/new-arrivals`, {
-      credentials: 'include', // Important for API Gateway
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
-        setProducts(data);
+        setProducts(data || []);
         setLoading(false);
       })
       .catch((err) => {
         console.error("Failed to fetch products:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to load new arrivals",
+        });
         setLoading(false);
       });
   }, []);
 
-  // ✅ Add to Cart
+  // 🔐 Common login popup
+  const requireLogin = () =>
+    Swal.fire({
+      icon: "warning",
+      title: "Login Required",
+      text: "Please login to continue",
+      confirmButtonText: "Login",
+      confirmButtonColor: "#f59e0b",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        router.push("/profile");
+      }
+    });
+
+  // 🛒 Add to Cart
   const handleAddToCart = async (product: Product) => {
     const token = localStorage.getItem("access_token");
-    if (!token) {
-      alert("Please login to continue");
-      router.push("/profile");
-      return;
-    }
+    if (!token) return requireLogin();
 
     try {
       const res = await fetch(`${API_GATEWAY_URL}/api/cart/add`, {
@@ -58,7 +73,7 @@ const NewArrivals: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Important for API Gateway
+        credentials: "include",
         body: JSON.stringify({
           productId: product._id,
           url: product.URL,
@@ -69,33 +84,37 @@ const NewArrivals: React.FC = () => {
       });
 
       const data = await res.json();
+
       if (res.ok) {
         Swal.fire({
           icon: "success",
-          title: "Added to cart",
+          title: "Added to Cart",
           text: "Product added to cart successfully!",
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
-
         window.dispatchEvent(new CustomEvent("cartUpdated"));
       } else {
-        alert(data.message || "❌ Failed to add to cart");
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: data.message || "Failed to add to cart",
+        });
       }
     } catch (err) {
       console.error("Cart Add Error:", err);
-      alert("Something went wrong while adding to cart.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while adding to cart",
+      });
     }
   };
 
-  // ✅ Add to Wishlist
+  // ❤️ Add to Wishlist
   const handleAddToWishlist = async (product: Product) => {
     const token = localStorage.getItem("access_token");
-    if (!token) {
-      alert("Please login to continue");
-      router.push("/profile");
-      return;
-    }
+    if (!token) return requireLogin();
 
     try {
       const res = await fetch(`${API_GATEWAY_URL}/api/wishlist/add`, {
@@ -104,20 +123,34 @@ const NewArrivals: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Important for API Gateway
+        credentials: "include",
         body: JSON.stringify({ productId: product._id }),
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        alert("✅ Added to wishlist!");
+        Swal.fire({
+          icon: "success",
+          title: "Added to Wishlist",
+          timer: 1500,
+          showConfirmButton: false,
+        });
         window.dispatchEvent(new CustomEvent("wishlistUpdated"));
       } else {
-        alert(data.message || "❌ Failed to add to wishlist");
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: data.message || "Failed to add to wishlist",
+        });
       }
     } catch (err) {
       console.error("Wishlist Add Error:", err);
-      alert("Something went wrong.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while adding to wishlist",
+      });
     }
   };
 
@@ -156,7 +189,6 @@ const NewArrivals: React.FC = () => {
           <p>Shop through our latest selection of Fashion</p>
         </div>
 
-        {/* Sort/Filter Controls */}
         <div className="controls">
           <button className="filter-btn">⚙ FILTER</button>
           <div className="sort">
@@ -168,7 +200,6 @@ const NewArrivals: React.FC = () => {
           </div>
         </div>
 
-        {/* Products Grid */}
         {loading ? (
           <p>Loading...</p>
         ) : (
@@ -177,7 +208,11 @@ const NewArrivals: React.FC = () => {
               <div key={product._id} className="product-card">
                 <div className="image-wrapper">
                   <Link href={`/products/${product._id}`}>
-                    <img src={product.URL} alt={product.title} className="product-img" />
+                    <img
+                      src={product.URL}
+                      alt={product.title}
+                      className="product-img"
+                    />
                   </Link>
 
                   <div className="overlay-icons">
@@ -205,7 +240,10 @@ const NewArrivals: React.FC = () => {
                   </div>
                 </div>
 
-                <Link href={`/products/${product._id}`} className="product-info">
+                <Link
+                  href={`/products/${product._id}`}
+                  className="product-info"
+                >
                   <h3>{product.title}</h3>
                   <p>₹{product.price}</p>
                   <p className="sku">SKU: {product.SKU}</p>

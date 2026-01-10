@@ -30,8 +30,8 @@ interface Product {
   };
 }
 
-// ✅ Use API Gateway URL
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8000";
 
 const ProductDetail: React.FC = () => {
   const router = useRouter();
@@ -46,31 +46,42 @@ const ProductDetail: React.FC = () => {
   const [wishlisting, setWishlisting] = useState(false);
   const [userHasOrdered, setUserHasOrdered] = useState(false);
 
-  // Check authentication on page load and redirect to login if not authenticated
+  /* 🔐 Auth check */
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      alert("Please login to view product details");
-      router.push("/profile");
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please login to view product details",
+        confirmButtonText: "Login",
+        confirmButtonColor: "#f59e0b",
+      }).then(() => {
+        router.push("/profile");
+      });
     }
   }, [router]);
+
+  /* 📦 Fetch product */
   useEffect(() => {
     if (!id) return;
+
     const fetchProduct = async () => {
       setLoading(true);
       try {
         const res = await fetch(`${API_GATEWAY_URL}/api/catalogs/${id}`, {
-          credentials: 'include', // Important for API Gateway
+          credentials: "include",
         });
         const data = await res.json();
 
-        if (!res.ok) throw new Error(data.message || "Failed to fetch product");
+        if (!res.ok) throw new Error(data.message);
 
         setProduct(data);
         setSelectedImage(data?.URL || null);
         setQty(1);
       } catch (err) {
-        console.error("Failed to fetch product:", err);
+        console.error(err);
+        Swal.fire("Error", "Failed to load product", "error");
       } finally {
         setLoading(false);
       }
@@ -79,30 +90,28 @@ const ProductDetail: React.FC = () => {
     fetchProduct();
   }, [id]);
 
-  // Check if user has ordered this product
+  /* ✅ Can review check */
   useEffect(() => {
     if (!id) return;
+
     const checkUserOrder = async () => {
       const token = localStorage.getItem("access_token");
-      if (!token) {
-        setUserHasOrdered(false);
-        return;
-      }
+      if (!token) return;
 
       try {
-        const res = await fetch(`${API_GATEWAY_URL}/api/reviews/user/can-review/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: 'include',
-        });
+        const res = await fetch(
+          `${API_GATEWAY_URL}/api/reviews/user/can-review/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            credentials: "include",
+          }
+        );
 
         if (res.ok) {
           const data = await res.json();
           setUserHasOrdered(data.canReview || false);
         }
-      } catch (err) {
-        console.error("Failed to check user order:", err);
+      } catch {
         setUserHasOrdered(false);
       }
     };
@@ -113,19 +122,24 @@ const ProductDetail: React.FC = () => {
   if (loading) return <p className="text-center p-6">Loading...</p>;
   if (!product) return <p className="text-center p-6">Product not found</p>;
 
-  const productUrl = `${process.env.NEXT_LOGIN_FRONTEND_URL}/products/${product._id}`;
   const imageList = [product.URL, ...(product.images || [])];
   const mainImage = selectedImage || imageList[0];
+  const productUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}${typeof window !== 'undefined' ? window.location.pathname : ''}`;
 
   const incQty = () =>
-    setQty((prev) => (product.stock ? Math.min(prev + 1, product.stock) : prev + 1));
-  const decQty = () => setQty((prev) => Math.max(1, prev - 1));
+    setQty((p) => (product.stock ? Math.min(p + 1, product.stock) : p + 1));
+  const decQty = () => setQty((p) => Math.max(1, p - 1));
 
+  /* 🛒 Add to cart */
   const handleAddToCart = async () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      alert("Please login to continue");
-      router.push("/profile");
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please login to continue",
+        confirmButtonText: "Login",
+      }).then(() => router.push("/profile"));
       return;
     }
 
@@ -137,7 +151,7 @@ const ProductDetail: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Important for API Gateway
+        credentials: "include",
         body: JSON.stringify({
           productId: product._id,
           url: product.URL,
@@ -148,31 +162,36 @@ const ProductDetail: React.FC = () => {
       });
 
       const data = await res.json();
+
       if (res.ok) {
         Swal.fire({
           icon: "success",
           title: "Added to cart",
           text: "Product added to cart successfully!",
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
         window.dispatchEvent(new CustomEvent("cartUpdated"));
       } else {
-        alert(data.message || "❌ Failed to add to cart");
+        Swal.fire("Error", data.message || "Failed to add to cart", "error");
       }
-    } catch (err) {
-      console.error("Cart Add Error:", err);
-      alert("Something went wrong while adding to cart.");
+    } catch {
+      Swal.fire("Error", "Something went wrong", "error");
     } finally {
       setAdding(false);
     }
   };
 
+  /* ❤️ Wishlist */
   const handleAddToWishlist = async () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      alert("Please login to continue");
-      router.push("/profile");
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please login to continue",
+        confirmButtonText: "Login",
+      }).then(() => router.push("/profile"));
       return;
     }
 
@@ -184,43 +203,56 @@ const ProductDetail: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Important for API Gateway
+        credentials: "include",
         body: JSON.stringify({ productId: product._id }),
       });
 
       const data = await res.json();
+
       if (res.ok) {
-        alert("✅ Added to wishlist!");
+        Swal.fire({
+          icon: "success",
+          title: "Added to Wishlist",
+          timer: 1800,
+          showConfirmButton: false,
+        });
         window.dispatchEvent(new CustomEvent("wishlistUpdated"));
       } else {
-        alert(data.message || "❌ Failed to add to wishlist");
+        Swal.fire("Error", data.message || "Failed to add to wishlist", "error");
       }
-    } catch (err) {
-      console.error("Wishlist Add Error:", err);
-      alert("Something went wrong adding to wishlist.");
+    } catch {
+      Swal.fire("Error", "Something went wrong", "error");
     } finally {
       setWishlisting(false);
     }
   };
 
+  /* ⚡ Buy now */
   const handleBuyNow = () => {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      alert("Please login to continue");
-      router.push("/profile");
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please login to continue",
+        confirmButtonText: "Login",
+      }).then(() => router.push("/profile"));
       return;
     }
 
-    const orderData = {
-      productId: product._id,
-      title: product.title,
-      price: product.price,
-      image: product.URL,
-      quantity: qty,
-      total: product.price * qty,
-      SKU: product.SKU,
-    };
-    localStorage.setItem("checkoutItem", JSON.stringify(orderData));
+    localStorage.setItem(
+      "checkoutItem",
+      JSON.stringify({
+        productId: product._id,
+        title: product.title,
+        price: product.price,
+        image: product.URL,
+        quantity: qty,
+        total: product.price * qty,
+        SKU: product.SKU,
+      })
+    );
+
     router.push("/checkout");
   };
 
@@ -234,7 +266,7 @@ const ProductDetail: React.FC = () => {
         ogDescription={`Shop ${product.title} — available at NQD Fashion Store.`}
         ogType="product"
         ogImage={mainImage}
-        canonical={productUrl}
+        canonical={productUrl || ''}
         articleTags={[product.title, "NQD Fashion", "latest fashion"]}
         structuredData={{
           "@context": "https://schema.org/",

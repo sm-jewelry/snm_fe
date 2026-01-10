@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import Seo from '../../../components/common/Seo';
+"use client";
 
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+import React, { useState } from "react";
+import { useRouter } from "next/router";
+import Seo from "../../../components/common/Seo";
+import Swal from "sweetalert2";
+
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8000";
 
 export default function ImportExportPage() {
   const router = useRouter();
@@ -10,34 +14,48 @@ export default function ImportExportPage() {
   const [exporting, setExporting] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importResults, setImportResults] = useState<any>(null);
-  const [exportStatus, setExportStatus] = useState('');
+  const [exportStatus, setExportStatus] = useState("");
   const [exportFilters, setExportFilters] = useState({
-    status: '',
-    productId: '',
+    status: "",
+    productId: "",
   });
 
+  /* 📂 File validation */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+      if (file.type === "text/csv" || file.name.endsWith(".csv")) {
         setImportFile(file);
         setImportResults(null);
       } else {
-        alert('Please select a CSV file');
-        e.target.value = '';
+        Swal.fire("Invalid File", "Please select a CSV file", "warning");
+        e.target.value = "";
       }
     }
   };
 
+  /* 🔐 Auth guard */
+  const requireLogin = () => {
+    Swal.fire({
+      icon: "warning",
+      title: "Login Required",
+      text: "Please login to continue",
+      confirmButtonText: "Login",
+    }).then(() => {
+      router.push("/profile?login=true");
+    });
+  };
+
+  /* 📥 Import */
   const handleImport = async () => {
     if (!importFile) {
-      alert('Please select a CSV file to import');
+      Swal.fire("Missing File", "Please select a CSV file to import", "info");
       return;
     }
 
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem("access_token");
     if (!token) {
-      router.push('/profile?login=true');
+      requireLogin();
       return;
     }
 
@@ -46,47 +64,60 @@ export default function ImportExportPage() {
 
     try {
       const formData = new FormData();
-      formData.append('file', importFile);
+      formData.append("file", importFile);
 
-      const response = await fetch(`${API_GATEWAY_URL}/api/reviews/admin/import`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: 'include',
-        body: formData,
-      });
+      const response = await fetch(
+        `${API_GATEWAY_URL}/api/reviews/admin/import`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
         setImportResults(data.results);
-        alert(data.message);
+        Swal.fire({
+          icon: "success",
+          title: "Import Completed",
+          text: data.message,
+        });
       } else {
-        alert(data.message || 'Import failed');
+        Swal.fire("Import Failed", data.message || "Import failed", "error");
       }
     } catch (error) {
-      console.error('Import error:', error);
-      alert('Failed to import reviews. Please try again.');
+      console.error("Import error:", error);
+      Swal.fire(
+        "Error",
+        "Failed to import reviews. Please try again.",
+        "error"
+      );
     } finally {
       setImporting(false);
     }
   };
 
+  /* 📤 Export */
   const handleExport = async () => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem("access_token");
     if (!token) {
-      router.push('/profile?login=true');
+      requireLogin();
       return;
     }
 
     setExporting(true);
-    setExportStatus('');
+    setExportStatus("");
 
     try {
       const params = new URLSearchParams();
-      if (exportFilters.status) params.append('status', exportFilters.status);
-      if (exportFilters.productId) params.append('productId', exportFilters.productId);
+      if (exportFilters.status) params.append("status", exportFilters.status);
+      if (exportFilters.productId)
+        params.append("productId", exportFilters.productId);
 
       const response = await fetch(
         `${API_GATEWAY_URL}/api/reviews/admin/export?${params}`,
@@ -94,14 +125,14 @@ export default function ImportExportPage() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          credentials: 'include',
+          credentials: "include",
         }
       );
 
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = `reviews-${Date.now()}.csv`;
         document.body.appendChild(a);
@@ -109,29 +140,40 @@ export default function ImportExportPage() {
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
 
-        setExportStatus('Export successful! File downloaded.');
+        setExportStatus("Export successful! File downloaded.");
+        Swal.fire({
+          icon: "success",
+          title: "Export Successful",
+          text: "CSV file downloaded successfully",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
         const data = await response.json();
-        alert(data.message || 'Export failed');
+        Swal.fire("Export Failed", data.message || "Export failed", "error");
       }
     } catch (error) {
-      console.error('Export error:', error);
-      alert('Failed to export reviews. Please try again.');
+      console.error("Export error:", error);
+      Swal.fire(
+        "Error",
+        "Failed to export reviews. Please try again.",
+        "error"
+      );
     } finally {
       setExporting(false);
     }
   };
 
+  /* 📄 Sample CSV */
   const downloadSampleCSV = () => {
     const sampleData = `userId,userName,userEmail,productId,productTitle,orderId,rating,title,comment,images,isVerifiedPurchase,status
-694b6a0b0d061f44ab3d6e11,John Doe,john@example.com,69525ceda173ca03dde70bad,Bridal Necklace Set,ORD123,5,Amazing quality!,This necklace is absolutely stunning. The craftsmanship is excellent.,image1.jpg|image2.jpg,true,approved
-694b6a0b0d061f44ab3d6e12,Jane Smith,jane@example.com,69525ceda173ca03dde70baf,Wedding Diamond Ring,ORD124,4,Very good,Beautiful ring but slightly smaller than expected.,image3.jpg,true,approved`;
+694b6a0b0d061f44ab3d6e11,John Doe,john@example.com,69525ceda173ca03dde70bad,Bridal Necklace Set,ORD123,5,Amazing quality!,Excellent craftsmanship,image1.jpg|image2.jpg,true,approved`;
 
-    const blob = new Blob([sampleData], { type: 'text/csv' });
+    const blob = new Blob([sampleData], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'sample-reviews-import.csv';
+    a.download = "sample-reviews-import.csv";
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);

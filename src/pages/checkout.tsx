@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
+import Swal from "sweetalert2";
 
 interface CheckoutItem {
   productId: string;
@@ -102,7 +103,7 @@ const CheckoutPage: React.FC = () => {
         const data = await res.json();
         setCart(data.data);
       } catch (err) {
-        console.error("Error fetching cart:", err);
+        Swal.fire("Error", "Failed to fetch cart", "error");
       } finally {
         setLoading(false);
       }
@@ -130,7 +131,7 @@ const CheckoutPage: React.FC = () => {
       const params = new URLSearchParams(window.location.search);
       const cartId = params.get("cartId");
       if (!token || !cartId) {
-        alert("Cart not found!");
+        Swal.fire("Cart not found", "Please add products again", "warning");
         setLoading(false);
         return;
       }
@@ -235,9 +236,10 @@ const CheckoutPage: React.FC = () => {
 
     try {
       await deleteAddress(addressId);
+      Swal.fire("Deleted", "Address removed successfully", "success");
       if (selectedAddressId === addressId) setSelectedAddressId(null);
     } catch (err: any) {
-      alert(err.message || "Failed to delete address");
+      Swal.fire("Error", err.message || "Failed to delete address", "error");
     }
   };
 
@@ -258,7 +260,7 @@ const CheckoutPage: React.FC = () => {
 
   const handleCreateOrder = async () => {
     if (!email || !address || !city || !state || !pinCode)
-      return alert("Please fill all required fields");
+      return Swal.fire("Missing Info", "Please fill all required fields", "warning");
 
     const shippingAddress = {
       email,
@@ -292,7 +294,11 @@ const CheckoutPage: React.FC = () => {
       if (selectedPayment === "cod") {
         // For COD, order is directly in data.data (not nested)
         const orderId = data.data._id || data.data.order?._id;
-        alert("Order created successfully (Cash on Delivery)");
+        Swal.fire({
+          icon: "success",
+          title: "Order Placed",
+          text: "Cash on Delivery order created successfully",
+        })
         router.push(`/order-success?orderId=${orderId}`);
       } else if (selectedPayment === "online") {
         // For Razorpay, response has { order, rzpOrder }
@@ -370,7 +376,7 @@ const CheckoutPage: React.FC = () => {
         }
       }
     } catch (err: any) {
-      alert(err.message || "Something went wrong");
+      Swal.fire("Order Failed", err.message || "Something went wrong", "error");
     }
   };
 

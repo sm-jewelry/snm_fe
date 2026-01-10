@@ -30,105 +30,96 @@ interface Product {
   };
 }
 
-// ✅ Use API Gateway URL
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8000";
 
 const ProductDetail: React.FC = () => {
   const router = useRouter();
   const { id } = router.query as { id?: string };
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [qty, setQty] = useState<number>(1);
+  const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
   const [wishlisting, setWishlisting] = useState(false);
   const [userHasOrdered, setUserHasOrdered] = useState(false);
 
-  // Check authentication on page load and redirect to login if not authenticated
+  // 🔐 Auth check
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      alert("Please login to view product details");
-      router.push("/profile");
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please login to view product details",
+        confirmButtonText: "Login",
+        confirmButtonColor: "#f59e0b",
+      }).then((r) => {
+        if (r.isConfirmed) router.push("/profile");
+      });
     }
   }, [router]);
+
+  // 📦 Fetch product
   useEffect(() => {
     if (!id) return;
-    setLoading(true);
 
-    // Try to fetch from products API first (has more details)
-    fetch(`${API_GATEWAY_URL}/api/catalogs/${id}`, {
-      credentials: 'include',
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-        // If not found in products, try catalogs
-        return fetch(`${API_GATEWAY_URL}/api/catalogs/${id}`, {
-          credentials: 'include',
-        }).then(r => r.json());
-      })
+    setLoading(true);
+    fetch(`${API_GATEWAY_URL}/api/catalogs/${id}`, { credentials: "include" })
+      .then((res) => res.json())
       .then((data) => {
         setProduct(data);
         setSelectedImage(data?.URL || null);
-        setLoading(false);
         setQty(1);
       })
-      .catch((err) => {
-        console.error("Failed to fetch product:", err);
-        setLoading(false);
-      });
+      .catch(() => {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to fetch product details",
+        });
+      })
+      .finally(() => setLoading(false));
   }, [id]);
 
-  // Check if user has ordered this product
+  // 🧾 Check order
   useEffect(() => {
     if (!id) return;
-    const checkUserOrder = async () => {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        setUserHasOrdered(false);
-        return;
-      }
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
 
-      try {
-        const res = await fetch(`${API_GATEWAY_URL}/api/reviews/user/can-review/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          credentials: 'include',
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setUserHasOrdered(data.canReview || false);
-        }
-      } catch (err) {
-        console.error("Failed to check user order:", err);
-        setUserHasOrdered(false);
-      }
-    };
-
-    checkUserOrder();
+    fetch(`${API_GATEWAY_URL}/api/reviews/user/can-review/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => setUserHasOrdered(data.canReview || false))
+      .catch(() => setUserHasOrdered(false));
   }, [id]);
 
   if (loading) return <p>Loading...</p>;
   if (!product) return <p>Product not found</p>;
 
-  const productUrl = `https://nqdstore.com/products/${product._id}`;
   const imageList = [product.URL, ...(product.images || [])];
   const mainImage = selectedImage || imageList[0];
+  const productUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}${router.asPath}`;
 
-  const incQty = () => {
-    setQty((prev) => (product?.stock ? Math.min(prev + 1, product.stock) : prev + 1));
-  };
-  const decQty = () => setQty((prev) => Math.max(1, prev - 1));
+  const requireLogin = () =>
+    Swal.fire({
+      icon: "warning",
+      title: "Login Required",
+      text: "Please login to continue",
+      confirmButtonText: "Login",
+      confirmButtonColor: "#f59e0b",
+    }).then((r) => {
+      if (r.isConfirmed) router.push("/profile");
+    });
 
+  // 🛒 Add to cart
   const handleAddToCart = async () => {
     const token = localStorage.getItem("access_token");
-    if (!token) {
-      alert("Please login to continue");
-      router.push("/profile");
-      return;
-    }
+    if (!token) return requireLogin();
 
     setAdding(true);
     try {
@@ -138,7 +129,7 @@ const ProductDetail: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Important for API Gateway
+        credentials: "include",
         body: JSON.stringify({
           productId: product._id,
           url: product.URL,
@@ -152,30 +143,34 @@ const ProductDetail: React.FC = () => {
       if (res.ok) {
         Swal.fire({
           icon: "success",
-          title: "Added to cart",
+          title: "Added to Cart",
           text: "Product added to cart successfully!",
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
         window.dispatchEvent(new CustomEvent("cartUpdated"));
       } else {
-        alert(data?.message || "❌ Failed to add to cart");
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: data?.message || "Failed to add to cart",
+        });
       }
-    } catch (err) {
-      console.error("Cart Add Error:", err);
-      alert("Something went wrong while adding to cart.");
+    } catch {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while adding to cart",
+      });
     } finally {
       setAdding(false);
     }
   };
 
+  // ❤️ Wishlist
   const handleAddToWishlist = async () => {
     const token = localStorage.getItem("access_token");
-    if (!token) {
-      alert("Please login to continue");
-      router.push("/profile");
-      return;
-    }
+    if (!token) return requireLogin();
 
     setWishlisting(true);
     try {
@@ -185,44 +180,69 @@ const ProductDetail: React.FC = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include', // Important for API Gateway
+        credentials: "include",
         body: JSON.stringify({ productId: product._id }),
       });
 
       const data = await res.json();
       if (res.ok) {
-        alert("✅ Added to wishlist!");
+        Swal.fire({
+          icon: "success",
+          title: "Added to Wishlist",
+          timer: 1500,
+          showConfirmButton: false,
+        });
         window.dispatchEvent(new CustomEvent("wishlistUpdated"));
       } else {
-        alert(data?.message || "❌ Failed to add to wishlist");
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: data?.message || "Failed to add to wishlist",
+        });
       }
-    } catch (err) {
-      console.error("Wishlist Add Error:", err);
-      alert("Something went wrong adding to wishlist.");
+    } catch {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong adding to wishlist",
+      });
     } finally {
       setWishlisting(false);
     }
   };
 
+  // ⚡ Buy now
   const handleBuyNow = () => {
     const token = localStorage.getItem("access_token");
-    if (!token) {
-      alert("Please login to continue");
-      router.push("/profile");
-      return;
-    }
+    if (!token) return requireLogin();
 
-    const orderData = {
-      productId: product._id,
-      title: product.title,
-      price: product.price,
-      image: product.URL,
-      quantity: qty,
-      total: product.price * qty,
-      SKU: product.SKU,
-    };
-    localStorage.setItem("checkoutItem", JSON.stringify(orderData));
+    localStorage.setItem(
+      "checkoutItem",
+      JSON.stringify({
+        productId: product._id,
+        title: product.title,
+        price: product.price,
+        image: product.URL,
+        quantity: qty,
+        total: product.price * qty,
+        SKU: product.SKU,
+      })
+    );
+
     router.push("/checkout");
+  };
+
+  // 📊 Quantity handlers
+  const incQty = () => {
+    if (product.stock && qty < product.stock) {
+      setQty(qty + 1);
+    }
+  };
+
+  const decQty = () => {
+    if (qty > 1) {
+      setQty(qty - 1);
+    }
   };
 
   return (
