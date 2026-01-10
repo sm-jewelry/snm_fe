@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import ReviewCard from './ReviewCard';
-import WriteReviewForm from './WriteReviewForm';
+import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import ReviewCard from "./ReviewCard";
+import WriteReviewForm from "./WriteReviewForm";
 
 interface Review {
   _id: string;
@@ -31,10 +32,11 @@ interface ReviewStats {
 interface ProductReviewsProps {
   productId: string;
   productTitle: string;
-  userHasOrdered?: boolean; // Whether user has a delivered order with this product
+  userHasOrdered?: boolean;
 }
 
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8000";
 
 const ProductReviews: React.FC<ProductReviewsProps> = ({
   productId,
@@ -47,7 +49,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filterRating, setFilterRating] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortBy, setSortBy] = useState("createdAt");
   const [showWriteReview, setShowWriteReview] = useState(false);
 
   useEffect(() => {
@@ -55,52 +57,46 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
     loadStats();
   }, [productId, page, filterRating, sortBy]);
 
+  /* ---------------- LOAD REVIEWS ---------------- */
   const loadReviews = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '10',
+        limit: "10",
         sortBy,
-        sortOrder: 'desc',
-        status: 'approved',
+        sortOrder: "desc",
+        status: "approved",
       });
-
-      if (filterRating) {
-        // Filter by rating would require backend support
-      }
 
       const response = await fetch(
         `${API_GATEWAY_URL}/api/reviews/product/${productId}?${params}`,
-        {
-          credentials: 'include',
-        }
+        { credentials: "include" }
       );
 
       const data = await response.json();
       setReviews(data.reviews || []);
       setTotalPages(data.pagination?.pages || 1);
     } catch (error) {
-      console.error('Error loading reviews:', error);
+      console.error("Error loading reviews:", error);
       setReviews([]);
     } finally {
       setLoading(false);
     }
   };
 
+  /* ---------------- LOAD STATS ---------------- */
   const loadStats = async () => {
     try {
       const response = await fetch(
         `${API_GATEWAY_URL}/api/reviews/product/${productId}/stats`,
-        {
-          credentials: 'include',
-        }
+        { credentials: "include" }
       );
 
       const data = await response.json();
       setStats(data);
     } catch (error) {
-      console.error('Error loading stats:', error);
+      console.error("Error loading stats:", error);
     }
   };
 
@@ -110,10 +106,19 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
     loadStats();
   };
 
-  const handleVote = async (reviewId: string, voteType: 'helpful' | 'notHelpful') => {
-    const token = localStorage.getItem('access_token');
+  /* ---------------- VOTING ---------------- */
+  const handleVote = async (
+    reviewId: string,
+    voteType: "helpful" | "notHelpful"
+  ) => {
+    const token = localStorage.getItem("access_token");
+
     if (!token) {
-      alert('Please login to vote');
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please login to vote on reviews",
+      });
       return;
     }
 
@@ -121,25 +126,33 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
       const response = await fetch(
         `${API_GATEWAY_URL}/api/reviews/${reviewId}/vote`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          credentials: 'include',
+          credentials: "include",
           body: JSON.stringify({ voteType }),
         }
       );
 
       if (response.ok) {
-        loadReviews(); // Refresh to show updated counts
+        loadReviews();
       } else {
         const data = await response.json();
-        alert(data.message || 'Failed to vote');
+        Swal.fire(
+          "Vote Failed",
+          data.message || "Failed to submit vote",
+          "error"
+        );
       }
     } catch (error) {
-      console.error('Error voting:', error);
-      alert('Failed to vote on review');
+      console.error("Error voting:", error);
+      Swal.fire(
+        "Error",
+        "Failed to vote on review. Please try again.",
+        "error"
+      );
     }
   };
 
@@ -157,19 +170,26 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
         {stats && stats.totalReviews > 0 ? (
           <div className="reviews-overview">
             <div className="average-rating-section">
-              <div className="average-rating-number">{stats.averageRating.toFixed(1)}</div>
+              <div className="average-rating-number">
+                {stats.averageRating.toFixed(1)}
+              </div>
               <div className="average-rating-stars">
                 {[...Array(5)].map((_, i) => (
                   <span
                     key={i}
-                    className={i < Math.floor(stats.averageRating) ? 'star filled' : 'star'}
+                    className={
+                      i < Math.floor(stats.averageRating)
+                        ? "star filled"
+                        : "star"
+                    }
                   >
                     ★
                   </span>
                 ))}
               </div>
               <div className="total-reviews-count">
-                Based on {stats.totalReviews} {stats.totalReviews === 1 ? 'review' : 'reviews'}
+                Based on {stats.totalReviews}{" "}
+                {stats.totalReviews === 1 ? "review" : "reviews"}
               </div>
             </div>
 
@@ -180,29 +200,43 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                   <div className="rating-bar-container">
                     <div
                       className="rating-bar-fill"
-                      style={{ width: `${getPercentage(stats.ratingDistribution[rating as keyof typeof stats.ratingDistribution])}%` }}
-                    ></div>
+                      style={{
+                        width: `${getPercentage(
+                          stats.ratingDistribution[
+                            rating as keyof typeof stats.ratingDistribution
+                          ]
+                        )}%`,
+                      }}
+                    />
                   </div>
                   <span className="rating-count">
-                    {stats.ratingDistribution[rating as keyof typeof stats.ratingDistribution]}
+                    {
+                      stats.ratingDistribution[
+                        rating as keyof typeof stats.ratingDistribution
+                      ]
+                    }
                   </span>
                 </div>
               ))}
             </div>
           </div>
         ) : (
-          <p className="no-reviews-yet">No reviews yet. Be the first to review this product!</p>
+          <p className="no-reviews-yet">
+            No reviews yet. Be the first to review this product!
+          </p>
         )}
 
-        {/* Write Review Button */}
         {userHasOrdered && (
-          <button className="btn-write-review" onClick={() => setShowWriteReview(true)}>
+          <button
+            className="btn-write-review"
+            onClick={() => setShowWriteReview(true)}
+          >
             ✍️ Write a Review
           </button>
         )}
       </div>
 
-      {/* Write Review Form Modal */}
+      {/* Write Review Modal */}
       {showWriteReview && (
         <WriteReviewForm
           productId={productId}
@@ -218,17 +252,15 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
           <div className="reviews-list-header">
             <h3>All Reviews ({stats?.totalReviews || 0})</h3>
 
-            <div className="reviews-controls">
-              <select
-                className="sort-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="createdAt">Most Recent</option>
-                <option value="helpfulCount">Most Helpful</option>
-                <option value="rating">Highest Rated</option>
-              </select>
-            </div>
+            <select
+              className="sort-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="createdAt">Most Recent</option>
+              <option value="helpfulCount">Most Helpful</option>
+              <option value="rating">Highest Rated</option>
+            </select>
           </div>
 
           {loading ? (
@@ -245,23 +277,20 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                 ))}
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="reviews-pagination">
                   <button
-                    className="pagination-btn"
                     disabled={page === 1}
                     onClick={() => setPage(page - 1)}
                   >
                     ← Previous
                   </button>
 
-                  <span className="pagination-info">
+                  <span>
                     Page {page} of {totalPages}
                   </span>
 
                   <button
-                    className="pagination-btn"
                     disabled={page === totalPages}
                     onClick={() => setPage(page + 1)}
                   >

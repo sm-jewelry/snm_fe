@@ -28,6 +28,7 @@ import {
   getPeriodLabel,
   getPreviousPeriodLabel,
 } from "../../utils/dateFilters";
+import Swal from "sweetalert2";
 
 interface UserInfo {
   sub: string;
@@ -90,7 +91,13 @@ const AdminDashboard = () => {
         const user = response.data;
 
         if (user.role !== "admin") {
-          alert("Access denied: Admins only");
+          Swal.fire({
+            icon: "error",
+            title: "Access Denied",
+            text: "Admins only",
+            timer: 2000,
+            showConfirmButton: false,
+          });
           router.push("/");
           return;
         }

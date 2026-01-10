@@ -3,6 +3,8 @@
  * Provides functions to export data as CSV files
  */
 
+import Swal from "sweetalert2";
+
 /**
  * Convert an array of objects to CSV format
  */
@@ -63,7 +65,13 @@ function downloadCSV(csv: string, filename: string): void {
  */
 export function exportOrdersToCSV(orders: any[], filename?: string): void {
   if (!orders || orders.length === 0) {
-    alert('No orders to export');
+    Swal.fire({
+      icon: "info",
+      title: "No Orders",
+      text: "No orders to export",
+      timer: 2000,
+      showConfirmButton: false,
+    });
     return;
   }
 
@@ -103,7 +111,13 @@ export function exportOrdersToCSV(orders: any[], filename?: string): void {
  */
 export function exportCustomersToCSV(customers: any[], filename?: string): void {
   if (!customers || customers.length === 0) {
-    alert('No customers to export');
+    Swal.fire({
+      icon: "info",
+      title: "No Customers",
+      text: "No customers to export",
+      timer: 2000,
+      showConfirmButton: false,
+    });
     return;
   }
 

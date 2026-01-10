@@ -4,6 +4,7 @@ import CircleMenu from '../components/headers/CircleMenu'
 import Collections from '../components/collections/Collections'
 import TrendingProducts from '../components/products/TrendingProducts'
 import Seo from "../components/common/Seo";
+import Swal from 'sweetalert2'
 
 const Home: React.FC = () => {
   const router = useRouter();
@@ -133,7 +134,15 @@ const Home: React.FC = () => {
               Subscribe to get special offers, free giveaways, and exclusive deals
             </p>
           </div>
-          <form className="newsletter-form" onSubmit={(e) => { e.preventDefault(); alert('Thank you for subscribing!'); }}>
+          <form className="newsletter-form" onSubmit={(e) => {
+            e.preventDefault(); Swal.fire({
+              icon: "success",
+              title: "Subscribed!",
+              text: "Thank you for subscribing!",
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          }}>
             <input
               type="email"
               className="newsletter-input"

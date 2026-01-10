@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import Swal from 'sweetalert2';
 
 const Footer: React.FC = () => {
   const router = useRouter();
@@ -76,7 +77,14 @@ const Footer: React.FC = () => {
             <p className="footer-description">
               Subscribe to get special offers and updates
             </p>
-            <form className="newsletter-form-footer" onSubmit={(e) => { e.preventDefault(); alert('Subscribed!'); }}>
+            <form className="newsletter-form-footer" onSubmit={(e) => {
+              e.preventDefault(); Swal.fire({
+                icon: "success",
+                title: "Subscribed!",
+                timer: 1500,
+                showConfirmButton: false,
+              });
+            }}>
               <input
                 type="email"
                 placeholder="Your email address"

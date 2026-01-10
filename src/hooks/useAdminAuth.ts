@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import Swal from 'sweetalert2';
 
 interface UserInfo {
   sub: string;
@@ -46,7 +47,13 @@ export const useAdminAuth = () => {
         // Check if user has admin role
         if (userData.role !== 'admin') {
           console.warn('Access denied: Admin role required');
-          alert('Access denied: This page is only accessible to administrators');
+          Swal.fire({
+            icon: "error",
+            title: "Access Denied",
+            text: "This page is only accessible to administrators",
+            timer: 2000,
+            showConfirmButton: false,
+          });
           router.push('/');
           return;
         }

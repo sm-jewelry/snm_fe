@@ -227,7 +227,12 @@ const CheckoutPage: React.FC = () => {
       }
       setShowAddressModal(false);
     } catch (error: any) {
-      alert(error.message || "Failed to save address");
+      Swal.fire({
+        icon: "error",
+        title: "Save Failed",
+        text: error.message || "Failed to save address",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -248,7 +253,12 @@ const CheckoutPage: React.FC = () => {
       await setDefaultAddress(addressId);
       setSelectedAddressId(addressId);
     } catch (err: any) {
-      alert(err.message || "Failed to set default address");
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: err.message || "Failed to set default address",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -354,7 +364,7 @@ const CheckoutPage: React.FC = () => {
             }
           },
           modal: {
-            ondismiss: function() {
+            ondismiss: function () {
               // User closed the payment modal without completing payment
               router.push(`/order-failure?orderId=${orderId}&reason=${encodeURIComponent("Payment cancelled by user")}`);
             }
@@ -380,402 +390,402 @@ const CheckoutPage: React.FC = () => {
     }
   };
 
-    return (
-        <div className="checkout-page">
-            <div className="checkout-container">
-                {/* LEFT SECTION - FORM */}
-                <div className="checkout-left">
-                    <h2 className="checkout-section-title">Contact</h2>
-                    <input
-                        type="email"
-                        placeholder="Email or mobile phone number"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="checkout-input"
-                    />
+  return (
+    <div className="checkout-page">
+      <div className="checkout-container">
+        {/* LEFT SECTION - FORM */}
+        <div className="checkout-left">
+          <h2 className="checkout-section-title">Contact</h2>
+          <input
+            type="email"
+            placeholder="Email or mobile phone number"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="checkout-input"
+          />
 
-                    <h3 className="checkout-section-title">Delivery Address</h3>
+          <h3 className="checkout-section-title">Delivery Address</h3>
 
-                    {/* Saved Addresses Section */}
-                    {user?.addresses && user.addresses.length > 0 && (
-                        <div className="checkout-saved-addresses">
-                            <div className="checkout-addresses-header">
-                                <span className="checkout-addresses-label">Select a saved address</span>
-                                <button
-                                    type="button"
-                                    onClick={handleAddAddress}
-                                    className="checkout-add-new-btn"
-                                >
-                                    + Add New Address
-                                </button>
-                            </div>
+          {/* Saved Addresses Section */}
+          {user?.addresses && user.addresses.length > 0 && (
+            <div className="checkout-saved-addresses">
+              <div className="checkout-addresses-header">
+                <span className="checkout-addresses-label">Select a saved address</span>
+                <button
+                  type="button"
+                  onClick={handleAddAddress}
+                  className="checkout-add-new-btn"
+                >
+                  + Add New Address
+                </button>
+              </div>
 
-                            <div className="checkout-addresses-grid">
-                                {user.addresses.map((addr: Address) => (
-                                    <div
-                                        key={addr._id}
-                                        className={`checkout-address-card ${selectedAddressId === addr._id ? 'selected' : ''} ${addr.isDefault ? 'default' : ''}`}
-                                        onClick={() => setSelectedAddressId(addr._id)}
-                                    >
-                                        {addr.isDefault && (
-                                            <span className="checkout-default-badge">Default</span>
-                                        )}
-                                        <div className="checkout-address-content">
-                                            <p className="checkout-address-name">{addr.fullName}</p>
-                                            <p>{addr.addressLine1}</p>
-                                            {addr.addressLine2 && <p>{addr.addressLine2}</p>}
-                                            <p>{addr.city}, {addr.state} {addr.zipCode}</p>
-                                            <p>{addr.country}</p>
-                                            <p className="checkout-address-phone">📞 {addr.phone}</p>
-                                        </div>
-                                        <div className="checkout-address-actions">
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleEditAddress(addr);
-                                                }}
-                                                className="checkout-edit-btn"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteAddress(addr._id);
-                                                }}
-                                                className="checkout-delete-btn"
-                                            >
-                                                Delete
-                                            </button>
-                                            {!addr.isDefault && (
-                                                <button
-                                                    type="button"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleSetDefault(addr._id);
-                                                    }}
-                                                    className="checkout-set-default-btn"
-                                                >
-                                                    Set Default
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+              <div className="checkout-addresses-grid">
+                {user.addresses.map((addr: Address) => (
+                  <div
+                    key={addr._id}
+                    className={`checkout-address-card ${selectedAddressId === addr._id ? 'selected' : ''} ${addr.isDefault ? 'default' : ''}`}
+                    onClick={() => setSelectedAddressId(addr._id)}
+                  >
+                    {addr.isDefault && (
+                      <span className="checkout-default-badge">Default</span>
                     )}
-
-                    {/* Manual Address Entry (shown if no saved addresses or user wants to enter manually) */}
-                    {(!user?.addresses || user.addresses.length === 0) && (
+                    <div className="checkout-address-content">
+                      <p className="checkout-address-name">{addr.fullName}</p>
+                      <p>{addr.addressLine1}</p>
+                      {addr.addressLine2 && <p>{addr.addressLine2}</p>}
+                      <p>{addr.city}, {addr.state} {addr.zipCode}</p>
+                      <p>{addr.country}</p>
+                      <p className="checkout-address-phone">📞 {addr.phone}</p>
+                    </div>
+                    <div className="checkout-address-actions">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditAddress(addr);
+                        }}
+                        className="checkout-edit-btn"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteAddress(addr._id);
+                        }}
+                        className="checkout-delete-btn"
+                      >
+                        Delete
+                      </button>
+                      {!addr.isDefault && (
                         <button
-                            type="button"
-                            onClick={handleAddAddress}
-                            className="checkout-add-first-address-btn"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSetDefault(addr._id);
+                          }}
+                          className="checkout-set-default-btn"
                         >
-                            + Add Delivery Address
+                          Set Default
                         </button>
-                    )}
-
-                    <div className="checkout-delivery-form">
-                        <select
-                            value={country}
-                            onChange={(e) => setCountry(e.target.value)}
-                            className="checkout-select"
-                        >
-                            <option>India</option>
-                            <option>United States</option>
-                            <option>United Kingdom</option>
-                        </select>
-
-                        <div className="checkout-form-row">
-                            <input
-                                type="text"
-                                placeholder="First name"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                className="checkout-input"
-                            />
-                            <input
-                                type="text"
-                                placeholder="Last name"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                                className="checkout-input"
-                            />
-                        </div>
-
-                        <input
-                            type="text"
-                            placeholder="Address"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            className="checkout-input"
-                        />
-                        <input
-                            type="text"
-                            placeholder="Apartment, suite, etc. (optional)"
-                            value={apartment}
-                            onChange={(e) => setApartment(e.target.value)}
-                            className="checkout-input"
-                        />
-
-                        <div className="checkout-form-row">
-                            <input
-                                type="text"
-                                placeholder="City"
-                                value={city}
-                                onChange={(e) => setCity(e.target.value)}
-                                className="checkout-input"
-                            />
-                            <input
-                                type="text"
-                                placeholder="State"
-                                value={state}
-                                onChange={(e) => setState(e.target.value)}
-                                className="checkout-input"
-                            />
-                        </div>
-
-                        <div className="checkout-form-row">
-                            <input
-                                type="text"
-                                placeholder="PIN Code"
-                                value={pinCode}
-                                onChange={(e) => setPinCode(e.target.value)}
-                                className="checkout-input"
-                            />
-                            <input
-                                type="text"
-                                placeholder="Phone"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                className="checkout-input"
-                            />
-                        </div>
+                      )}
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-                    {/* Payment Method */}
-                    <div className="checkout-payment-section">
-                        <h3 className="checkout-section-title">Payment Method</h3>
-                        <div className="checkout-payment-options">
-                            <label className="checkout-payment-option">
-                                <input
-                                    type="radio"
-                                    name="payment"
-                                    value="cod"
-                                    checked={selectedPayment === "cod"}
-                                    onChange={() => setSelectedPayment("cod")}
-                                />
-                                <div className="checkout-payment-label">
-                                    <span className="checkout-payment-icon">💵</span>
-                                    <span>Cash on Delivery</span>
-                                </div>
-                            </label>
-                            <label className="checkout-payment-option">
-                                <input
-                                    type="radio"
-                                    name="payment"
-                                    value="online"
-                                    checked={selectedPayment === "online"}
-                                    onChange={() => setSelectedPayment("online")}
-                                />
-                                <div className="checkout-payment-label">
-                                    <span className="checkout-payment-icon">💳</span>
-                                    <span>Online Payment</span>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
+          {/* Manual Address Entry (shown if no saved addresses or user wants to enter manually) */}
+          {(!user?.addresses || user.addresses.length === 0) && (
+            <button
+              type="button"
+              onClick={handleAddAddress}
+              className="checkout-add-first-address-btn"
+            >
+              + Add Delivery Address
+            </button>
+          )}
 
-                    <button className="checkout-place-order-btn" onClick={handleCreateOrder}>
-                        Place Order - ₹{total}
-                    </button>
-                </div>
+          <div className="checkout-delivery-form">
+            <select
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              className="checkout-select"
+            >
+              <option>India</option>
+              <option>United States</option>
+              <option>United Kingdom</option>
+            </select>
 
-                {/* RIGHT SECTION - SUMMARY */}
-                <div className="checkout-right">
-                    <h3 className="checkout-summary-title">Order Summary</h3>
-                    <div className="checkout-items">
-                        {items.map((item) => (
-                            <div key={item.productId} className="checkout-item">
-                                <div className="checkout-item-img">
-                                    <img src={item.url} alt={item.title} />
-                                    <span className="checkout-qty-badge">{item.quantity}</span>
-                                </div>
-                                <div className="checkout-item-info">
-                                    <p className="checkout-item-title">{item.title}</p>
-                                    <p className="checkout-item-price">₹{item.price.toLocaleString()}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="checkout-summary-divider"></div>
-
-                    <div className="checkout-summary-row">
-                        <span>Subtotal</span>
-                        <span>₹{total.toLocaleString()}</span>
-                    </div>
-                    <div className="checkout-summary-row">
-                        <span>Shipping</span>
-                        <span>Free</span>
-                    </div>
-                    <div className="checkout-summary-total">
-                        <span>Total</span>
-                        <span className="checkout-total-amount">₹{total.toLocaleString()}</span>
-                    </div>
-                </div>
+            <div className="checkout-form-row">
+              <input
+                type="text"
+                placeholder="First name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="checkout-input"
+              />
+              <input
+                type="text"
+                placeholder="Last name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="checkout-input"
+              />
             </div>
 
-            {/* Address Modal */}
-            {showAddressModal && (
-                <div className="checkout-modal-overlay" onClick={() => setShowAddressModal(false)}>
-                    <div className="checkout-modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="checkout-modal-header">
-                            <h2>{isEditingAddress ? 'Edit Address' : 'Add New Address'}</h2>
-                            <button
-                                className="checkout-modal-close"
-                                onClick={() => setShowAddressModal(false)}
-                            >
-                                ✕
-                            </button>
-                        </div>
+            <input
+              type="text"
+              placeholder="Address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="checkout-input"
+            />
+            <input
+              type="text"
+              placeholder="Apartment, suite, etc. (optional)"
+              value={apartment}
+              onChange={(e) => setApartment(e.target.value)}
+              className="checkout-input"
+            />
 
-                        <form onSubmit={handleAddressSubmit} className="checkout-address-form">
-                            <div className="checkout-modal-body">
-                                <div className="checkout-form-group">
-                                    <label>Full Name *</label>
-                                    <input
-                                        type="text"
-                                        name="fullName"
-                                        value={addressFormData.fullName}
-                                        onChange={handleAddressFormChange}
-                                        required
-                                        className="checkout-input"
-                                    />
-                                </div>
+            <div className="checkout-form-row">
+              <input
+                type="text"
+                placeholder="City"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="checkout-input"
+              />
+              <input
+                type="text"
+                placeholder="State"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                className="checkout-input"
+              />
+            </div>
 
-                                <div className="checkout-form-group">
-                                    <label>Phone Number *</label>
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        value={addressFormData.phone}
-                                        onChange={handleAddressFormChange}
-                                        required
-                                        className="checkout-input"
-                                    />
-                                </div>
+            <div className="checkout-form-row">
+              <input
+                type="text"
+                placeholder="PIN Code"
+                value={pinCode}
+                onChange={(e) => setPinCode(e.target.value)}
+                className="checkout-input"
+              />
+              <input
+                type="text"
+                placeholder="Phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="checkout-input"
+              />
+            </div>
+          </div>
 
-                                <div className="checkout-form-group">
-                                    <label>Address Line 1 *</label>
-                                    <input
-                                        type="text"
-                                        name="addressLine1"
-                                        value={addressFormData.addressLine1}
-                                        onChange={handleAddressFormChange}
-                                        required
-                                        className="checkout-input"
-                                    />
-                                </div>
-
-                                <div className="checkout-form-group">
-                                    <label>Address Line 2</label>
-                                    <input
-                                        type="text"
-                                        name="addressLine2"
-                                        value={addressFormData.addressLine2}
-                                        onChange={handleAddressFormChange}
-                                        className="checkout-input"
-                                    />
-                                </div>
-
-                                <div className="checkout-form-row">
-                                    <div className="checkout-form-group">
-                                        <label>City *</label>
-                                        <input
-                                            type="text"
-                                            name="city"
-                                            value={addressFormData.city}
-                                            onChange={handleAddressFormChange}
-                                            required
-                                            className="checkout-input"
-                                        />
-                                    </div>
-
-                                    <div className="checkout-form-group">
-                                        <label>State *</label>
-                                        <input
-                                            type="text"
-                                            name="state"
-                                            value={addressFormData.state}
-                                            onChange={handleAddressFormChange}
-                                            required
-                                            className="checkout-input"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="checkout-form-row">
-                                    <div className="checkout-form-group">
-                                        <label>ZIP Code *</label>
-                                        <input
-                                            type="text"
-                                            name="zipCode"
-                                            value={addressFormData.zipCode}
-                                            onChange={handleAddressFormChange}
-                                            required
-                                            className="checkout-input"
-                                        />
-                                    </div>
-
-                                    <div className="checkout-form-group">
-                                        <label>Country *</label>
-                                        <input
-                                            type="text"
-                                            name="country"
-                                            value={addressFormData.country}
-                                            onChange={handleAddressFormChange}
-                                            required
-                                            className="checkout-input"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="checkout-checkbox-wrapper">
-                                    <label className="checkout-checkbox-label">
-                                        <input
-                                            type="checkbox"
-                                            name="isDefault"
-                                            checked={addressFormData.isDefault}
-                                            onChange={handleAddressFormChange}
-                                        />
-                                        <span>Set as default address</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div className="checkout-modal-footer">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAddressModal(false)}
-                                    className="checkout-cancel-btn"
-                                >
-                                    Cancel
-                                </button>
-                                <button type="submit" className="checkout-save-btn">
-                                    {isEditingAddress ? 'Update Address' : 'Save Address'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+          {/* Payment Method */}
+          <div className="checkout-payment-section">
+            <h3 className="checkout-section-title">Payment Method</h3>
+            <div className="checkout-payment-options">
+              <label className="checkout-payment-option">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cod"
+                  checked={selectedPayment === "cod"}
+                  onChange={() => setSelectedPayment("cod")}
+                />
+                <div className="checkout-payment-label">
+                  <span className="checkout-payment-icon">💵</span>
+                  <span>Cash on Delivery</span>
                 </div>
-            )}
+              </label>
+              <label className="checkout-payment-option">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="online"
+                  checked={selectedPayment === "online"}
+                  onChange={() => setSelectedPayment("online")}
+                />
+                <div className="checkout-payment-label">
+                  <span className="checkout-payment-icon">💳</span>
+                  <span>Online Payment</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <button className="checkout-place-order-btn" onClick={handleCreateOrder}>
+            Place Order - ₹{total}
+          </button>
         </div>
-    );
+
+        {/* RIGHT SECTION - SUMMARY */}
+        <div className="checkout-right">
+          <h3 className="checkout-summary-title">Order Summary</h3>
+          <div className="checkout-items">
+            {items.map((item) => (
+              <div key={item.productId} className="checkout-item">
+                <div className="checkout-item-img">
+                  <img src={item.url} alt={item.title} />
+                  <span className="checkout-qty-badge">{item.quantity}</span>
+                </div>
+                <div className="checkout-item-info">
+                  <p className="checkout-item-title">{item.title}</p>
+                  <p className="checkout-item-price">₹{item.price.toLocaleString()}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="checkout-summary-divider"></div>
+
+          <div className="checkout-summary-row">
+            <span>Subtotal</span>
+            <span>₹{total.toLocaleString()}</span>
+          </div>
+          <div className="checkout-summary-row">
+            <span>Shipping</span>
+            <span>Free</span>
+          </div>
+          <div className="checkout-summary-total">
+            <span>Total</span>
+            <span className="checkout-total-amount">₹{total.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Address Modal */}
+      {showAddressModal && (
+        <div className="checkout-modal-overlay" onClick={() => setShowAddressModal(false)}>
+          <div className="checkout-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="checkout-modal-header">
+              <h2>{isEditingAddress ? 'Edit Address' : 'Add New Address'}</h2>
+              <button
+                className="checkout-modal-close"
+                onClick={() => setShowAddressModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAddressSubmit} className="checkout-address-form">
+              <div className="checkout-modal-body">
+                <div className="checkout-form-group">
+                  <label>Full Name *</label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={addressFormData.fullName}
+                    onChange={handleAddressFormChange}
+                    required
+                    className="checkout-input"
+                  />
+                </div>
+
+                <div className="checkout-form-group">
+                  <label>Phone Number *</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={addressFormData.phone}
+                    onChange={handleAddressFormChange}
+                    required
+                    className="checkout-input"
+                  />
+                </div>
+
+                <div className="checkout-form-group">
+                  <label>Address Line 1 *</label>
+                  <input
+                    type="text"
+                    name="addressLine1"
+                    value={addressFormData.addressLine1}
+                    onChange={handleAddressFormChange}
+                    required
+                    className="checkout-input"
+                  />
+                </div>
+
+                <div className="checkout-form-group">
+                  <label>Address Line 2</label>
+                  <input
+                    type="text"
+                    name="addressLine2"
+                    value={addressFormData.addressLine2}
+                    onChange={handleAddressFormChange}
+                    className="checkout-input"
+                  />
+                </div>
+
+                <div className="checkout-form-row">
+                  <div className="checkout-form-group">
+                    <label>City *</label>
+                    <input
+                      type="text"
+                      name="city"
+                      value={addressFormData.city}
+                      onChange={handleAddressFormChange}
+                      required
+                      className="checkout-input"
+                    />
+                  </div>
+
+                  <div className="checkout-form-group">
+                    <label>State *</label>
+                    <input
+                      type="text"
+                      name="state"
+                      value={addressFormData.state}
+                      onChange={handleAddressFormChange}
+                      required
+                      className="checkout-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="checkout-form-row">
+                  <div className="checkout-form-group">
+                    <label>ZIP Code *</label>
+                    <input
+                      type="text"
+                      name="zipCode"
+                      value={addressFormData.zipCode}
+                      onChange={handleAddressFormChange}
+                      required
+                      className="checkout-input"
+                    />
+                  </div>
+
+                  <div className="checkout-form-group">
+                    <label>Country *</label>
+                    <input
+                      type="text"
+                      name="country"
+                      value={addressFormData.country}
+                      onChange={handleAddressFormChange}
+                      required
+                      className="checkout-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="checkout-checkbox-wrapper">
+                  <label className="checkout-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="isDefault"
+                      checked={addressFormData.isDefault}
+                      onChange={handleAddressFormChange}
+                    />
+                    <span>Set as default address</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="checkout-modal-footer">
+                <button
+                  type="button"
+                  onClick={() => setShowAddressModal(false)}
+                  className="checkout-cancel-btn"
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="checkout-save-btn">
+                  {isEditingAddress ? 'Update Address' : 'Save Address'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default CheckoutPage;

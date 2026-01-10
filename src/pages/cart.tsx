@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 // ✅ Use API Gateway URL
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
@@ -29,7 +30,13 @@ const CartPage = () => {
 
   const handleCheckout = () => {
     if (!cart || !cart.items || cart.items.length === 0) {
-      alert("Your cart is empty!");
+      Swal.fire({
+        icon: "info",
+        title: "Cart Empty",
+        text: "Your cart is empty!",
+        confirmButtonText: "OK",
+      });
+
       return;
     }
     router.push(`/checkout?cartId=${cart._id}`);

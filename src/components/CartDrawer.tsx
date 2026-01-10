@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -73,7 +74,12 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   // ✅ Checkout
   const handleCheckout = () => {
     if (!cart || !cart.items || cart.items.length === 0) {
-      alert("Your cart is empty!");
+      Swal.fire({
+        icon: "info",
+        title: "Cart Empty",
+        text: "Your cart is empty!",
+        confirmButtonText: "OK",
+      });
       return;
     }
     router.push(`/checkout?cartId=${cart._id}`);

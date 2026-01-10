@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import Swal from "sweetalert2";
 
 interface WriteReviewFormProps {
   productId: string;
   productTitle: string;
-  orderId?: string; // Optional: if we know the specific order
+  orderId?: string;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
+const API_GATEWAY_URL =
+  process.env.NEXT_PUBLIC_API_GATEWAY_URL || "http://localhost:8000";
 
 const WriteReviewForm: React.FC<WriteReviewFormProps> = ({
   productId,
@@ -19,41 +21,49 @@ const WriteReviewForm: React.FC<WriteReviewFormProps> = ({
 }) => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [title, setTitle] = useState('');
-  const [comment, setComment] = useState('');
+  const [title, setTitle] = useState("");
+  const [comment, setComment] = useState("");
   const [images, setImages] = useState<string[]>([]);
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
 
+  /* -------------------- SUBMIT REVIEW -------------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
-    // Validation
+    /* Validation */
     if (rating === 0) {
-      setError('Please select a rating');
+      Swal.fire("Rating Required", "Please select a rating", "warning");
       return;
     }
 
     if (!title.trim()) {
-      setError('Please enter a review title');
+      Swal.fire("Missing Title", "Please enter a review title", "warning");
       return;
     }
 
     if (!comment.trim()) {
-      setError('Please enter your review');
+      Swal.fire("Missing Review", "Please enter your review", "warning");
       return;
     }
 
     if (comment.length > 2000) {
-      setError('Review must be less than 2000 characters');
+      Swal.fire(
+        "Too Long",
+        "Review must be less than 2000 characters",
+        "warning"
+      );
       return;
     }
 
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem("access_token");
     if (!token) {
-      setError('Please login to submit a review');
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please login to submit a review",
+        confirmButtonText: "Login",
+      });
       return;
     }
 
@@ -61,16 +71,16 @@ const WriteReviewForm: React.FC<WriteReviewFormProps> = ({
 
     try {
       const response = await fetch(`${API_GATEWAY_URL}/api/reviews`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
           productId,
           productTitle,
-          orderId: orderId || 'ORD-DEFAULT', // In production, should be actual order ID
+          orderId: orderId || "ORD-DEFAULT",
           rating,
           title: title.trim(),
           comment: comment.trim(),
@@ -81,24 +91,43 @@ const WriteReviewForm: React.FC<WriteReviewFormProps> = ({
       const data = await response.json();
 
       if (response.ok) {
-        alert('Review submitted successfully! It will be visible after admin approval.');
-        onSuccess();
+        Swal.fire({
+          icon: "success",
+          title: "Review Submitted",
+          text: "Your review will be visible after admin approval",
+        }).then(() => {
+          onSuccess();
+        });
       } else {
-        setError(data.message || 'Failed to submit review');
+        Swal.fire(
+          "Submission Failed",
+          data.message || "Failed to submit review",
+          "error"
+        );
       }
     } catch (err) {
-      setError('Failed to submit review. Please try again.');
-      console.error('Review submission error:', err);
+      console.error("Review submission error:", err);
+      Swal.fire(
+        "Error",
+        "Failed to submit review. Please try again.",
+        "error"
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
+  /* -------------------- IMAGE HANDLERS -------------------- */
   const addImage = () => {
-    if (imageUrl.trim() && images.length < 5) {
-      setImages([...images, imageUrl.trim()]);
-      setImageUrl('');
+    if (!imageUrl.trim()) return;
+
+    if (images.length >= 5) {
+      Swal.fire("Limit Reached", "You can add up to 5 images", "info");
+      return;
     }
+
+    setImages([...images, imageUrl.trim()]);
+    setImageUrl("");
   };
 
   const removeImage = (index: number) => {
@@ -131,8 +160,8 @@ const WriteReviewForm: React.FC<WriteReviewFormProps> = ({
                   key={star}
                   className={
                     star <= (hoverRating || rating)
-                      ? 'star-input filled'
-                      : 'star-input'
+                      ? "star-input filled"
+                      : "star-input"
                   }
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHoverRating(star)}
@@ -143,61 +172,51 @@ const WriteReviewForm: React.FC<WriteReviewFormProps> = ({
               ))}
               <span className="rating-text">
                 {rating === 0
-                  ? 'Select rating'
+                  ? "Select rating"
                   : rating === 1
-                  ? 'Poor'
+                  ? "Poor"
                   : rating === 2
-                  ? 'Fair'
+                  ? "Fair"
                   : rating === 3
-                  ? 'Good'
+                  ? "Good"
                   : rating === 4
-                  ? 'Very Good'
-                  : 'Excellent'}
+                  ? "Very Good"
+                  : "Excellent"}
               </span>
             </div>
           </div>
 
           {/* Title */}
           <div className="form-group">
-            <label className="form-label" htmlFor="review-title">
-              Review Title <span className="required">*</span>
-            </label>
+            <label className="form-label">Review Title *</label>
             <input
               type="text"
-              id="review-title"
               className="form-input"
-              placeholder="Sum up your experience in a few words"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={200}
               required
             />
-            <small className="form-hint">{title.length}/200 characters</small>
+            <small>{title.length}/200 characters</small>
           </div>
 
           {/* Comment */}
           <div className="form-group">
-            <label className="form-label" htmlFor="review-comment">
-              Your Review <span className="required">*</span>
-            </label>
+            <label className="form-label">Your Review *</label>
             <textarea
-              id="review-comment"
               className="form-textarea"
-              placeholder="Share your experience with this product..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={6}
               maxLength={2000}
               required
-            ></textarea>
-            <small className="form-hint">{comment.length}/2000 characters</small>
+            />
+            <small>{comment.length}/2000 characters</small>
           </div>
 
           {/* Images */}
           <div className="form-group">
-            <label className="form-label">
-              Add Images (Optional)
-            </label>
+            <label className="form-label">Add Images (Optional)</label>
             <div className="image-input-group">
               <input
                 type="url"
@@ -206,16 +225,10 @@ const WriteReviewForm: React.FC<WriteReviewFormProps> = ({
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
               />
-              <button
-                type="button"
-                className="btn-add-image"
-                onClick={addImage}
-                disabled={images.length >= 5}
-              >
+              <button type="button" onClick={addImage}>
                 Add
               </button>
             </div>
-            <small className="form-hint">You can add up to 5 images</small>
 
             {images.length > 0 && (
               <div className="review-images-preview">
@@ -224,7 +237,6 @@ const WriteReviewForm: React.FC<WriteReviewFormProps> = ({
                     <img src={img} alt={`Preview ${index + 1}`} />
                     <button
                       type="button"
-                      className="btn-remove-image"
                       onClick={() => removeImage(index)}
                     >
                       ✕
@@ -235,25 +247,13 @@ const WriteReviewForm: React.FC<WriteReviewFormProps> = ({
             )}
           </div>
 
-          {/* Error Message */}
-          {error && <div className="form-error">{error}</div>}
-
-          {/* Submit Button */}
+          {/* Actions */}
           <div className="form-actions">
-            <button
-              type="button"
-              className="btn-cancel"
-              onClick={onClose}
-              disabled={submitting}
-            >
+            <button type="button" onClick={onClose} disabled={submitting}>
               Cancel
             </button>
-            <button
-              type="submit"
-              className="btn-submit-review"
-              disabled={submitting}
-            >
-              {submitting ? 'Submitting...' : 'Submit Review'}
+            <button type="submit" disabled={submitting}>
+              {submitting ? "Submitting..." : "Submit Review"}
             </button>
           </div>
         </form>
