@@ -22,6 +22,7 @@ import {
   RateReview as ReviewsIcon,
   ShoppingCart as OrdersIcon,
   People as CustomersIcon,
+  Monitor as MonitorIcon,
 } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 260;
@@ -34,6 +35,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', path: '/admin', icon: <DashboardIcon /> },
+  { label: 'Monitoring', path: '/admin/monitoring', icon: <MonitorIcon /> },
   { label: 'Categories', path: '/admin/categories', icon: <CategoryIcon /> },
   { label: 'Catalogs', path: '/admin/catalogs', icon: <InventoryIcon /> },
   { label: 'Collections', path: '/admin/collections', icon: <CollectionsIcon /> },
