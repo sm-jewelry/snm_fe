@@ -17,11 +17,23 @@ const SystemMetricsCards: React.FC<SystemMetricsCardsProps> = ({
   healthData,
   metricsData,
 }) => {
-  // Parse metrics data
+  // Parse metrics data with more flexible matching
   const parseMetric = (metricName: string): number => {
-    const regex = new RegExp(`${metricName}\\s+(\\d+\\.?\\d*)`);
-    const match = metricsData.match(regex);
-    return match ? parseFloat(match[1]) : 0;
+    if (!metricsData) return 0;
+    
+    // Try different patterns to match the metric
+    const patterns = [
+      new RegExp(`${metricName}\\s+(\\d+\\.?\\d*)`, 'i'),
+      new RegExp(`${metricName}\\{[^}]*\\}\\s+(\\d+\\.?\\d*)`, 'i'),
+      new RegExp(`${metricName}[\\s{].*?\\s+(\\d+\\.?\\d*)`, 'i'),
+    ];
+    
+    for (const pattern of patterns) {
+      const match = metricsData.match(pattern);
+      if (match) return parseFloat(match[1]);
+    }
+    
+    return 0;
   };
 
   // Calculate average response time
@@ -40,8 +52,11 @@ const SystemMetricsCards: React.FC<SystemMetricsCardsProps> = ({
   const uptimeHours = Math.floor(uptime / 3600);
   const uptimeMinutes = Math.floor((uptime % 3600) / 60);
 
-  // Get total requests (approximate from metrics)
-  const totalRequests = parseMetric('snm_gateway_http_requests_total');
+  // Get total active requests (since there's no http_requests_total in your metrics)
+  const totalRequests = 
+    parseMetric('snm_gateway_nodejs_active_requests_total') ||
+    parseMetric('snm_gateway_nodejs_active_resources_total') ||
+    0;
 
   return (
     <Box sx={{ mb: 4 }}>
@@ -60,7 +75,7 @@ const SystemMetricsCards: React.FC<SystemMetricsCardsProps> = ({
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatsCard
             title="Memory Usage"
-            value={`${memoryMB}MB`}
+            value={memoryMB > 0 ? `${memoryMB}MB` : 'N/A'}
             icon={<MemoryIcon />}
             color="info"
           />

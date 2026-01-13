@@ -104,6 +104,7 @@ const RecentErrorsLog: React.FC = () => {
             >
               <Box sx={{ mr: 2 }}>{getIcon(error.level)}</Box>
               <ListItemText
+                disableTypography
                 primary={
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                     <Typography variant="body2" fontWeight={600}>
@@ -118,11 +119,11 @@ const RecentErrorsLog: React.FC = () => {
                   </Box>
                 }
                 secondary={
-                  <Box sx={{ display: 'flex', gap: 2, mt: 0.5 }}>
-                    <Typography variant="caption" color="text.secondary">
+                  <Box component="span" sx={{ display: 'flex', gap: 2, mt: 0.5 }}>
+                    <Typography variant="caption" color="text.secondary" component="span">
                       Service: {error.service}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" color="text.secondary" component="span">
                       {error.timestamp}
                     </Typography>
                   </Box>
