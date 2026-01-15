@@ -17,7 +17,7 @@ const Home: React.FC = () => {
         ogTitle="Home - SNM Jewelry"
         ogDescription="Discover exquisite jewelry collections at SNM. Shop our latest trending pieces, premium diamonds, and handcrafted gold ornaments."
         ogType="website"
-        ogImage='assets/GreeneyeLandscape.png'
+        ogImage='/snm_brand.png'
       />
 
       {/* Hero Section */}

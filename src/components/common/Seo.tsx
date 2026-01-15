@@ -39,7 +39,7 @@ export default function Seo({
   ogTitle,
   ogDescription,
   ogType = "website",
-  ogImage = "/assets/GreenLandscape.png",
+  ogImage = "/snm_brand.png",
   ogImageWidth,
   ogImageHeight,
   ogImageAlt,
@@ -130,7 +130,6 @@ export default function Seo({
       {structuredData && (
         <script
           type="application/ld+json"
-          // array या single object—दोनों handle
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(structuredData, null, 2),
           }}

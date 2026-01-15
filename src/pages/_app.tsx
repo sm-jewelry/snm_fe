@@ -1,4 +1,5 @@
 import type { AppProps } from "next/app";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import "../styles/globals.css";
 import "../styles/collections.css";
@@ -42,30 +43,35 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const isAdminRoute = router.pathname.startsWith('/admin');
 
   return (
-    <ErrorBoundary>
-      <ErrorNotificationProvider>
-        <AuthProvider>
-          {isAdminRoute ? (
-            <AdminThemeProvider>
-              <AdminLayout>
+    <>
+      <Head>
+        <link rel="icon" href="/snm.ico" />
+      </Head>
+      <ErrorBoundary>
+        <ErrorNotificationProvider>
+          <AuthProvider>
+            {isAdminRoute ? (
+              <AdminThemeProvider>
+                <AdminLayout>
+                  <Component {...pageProps} />
+                </AdminLayout>
+              </AdminThemeProvider>
+            ) : (
+              <Layout>
+                <Script
+                  src="https://checkout.razorpay.com/v1/checkout.js"
+                  strategy="beforeInteractive"
+                />
+                <link
+                  rel="stylesheet"
+                  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+                />
                 <Component {...pageProps} />
-              </AdminLayout>
-            </AdminThemeProvider>
-          ) : (
-            <Layout>
-              <Script
-                src="https://checkout.razorpay.com/v1/checkout.js"
-                strategy="beforeInteractive"
-              />
-              <link
-                rel="stylesheet"
-                href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-              />
-              <Component {...pageProps} />
-            </Layout>
-          )}
-        </AuthProvider>
-      </ErrorNotificationProvider>
-    </ErrorBoundary>
+              </Layout>
+            )}
+          </AuthProvider>
+        </ErrorNotificationProvider>
+      </ErrorBoundary>
+    </>
   );
 }
