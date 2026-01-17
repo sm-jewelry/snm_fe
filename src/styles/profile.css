@@ -1372,3 +1372,99 @@
     display: none;
   }
 }
+
+/* ============================================
+   Email Verification Banner Styles
+   ============================================ */
+
+.profile-verification-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #f59e0b;
+  border-left: 4px solid #d97706;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-verification-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+}
+
+.profile-verification-content svg {
+  flex-shrink: 0;
+  color: #d97706;
+  margin-top: 2px;
+}
+
+.profile-verification-content strong {
+  display: block;
+  color: #92400e;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.profile-verification-content p {
+  color: #b45309;
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.profile-verification-btn {
+  flex-shrink: 0;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+}
+
+.profile-verification-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.4);
+}
+
+.profile-verification-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .profile-verification-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .profile-verification-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profile-verification-btn {
+    width: 100%;
+  }
+}

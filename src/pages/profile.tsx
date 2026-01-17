@@ -7,6 +7,7 @@ import { ProtectedRoute } from '../components/ProtectedRoute';
 import { apiClient } from '../lib/apiClient';
 import { useErrorNotification } from '../components/common/ErrorNotification';
 import { downloadInvoice, printInvoice } from '../utils/invoiceGenerator';
+import EmailVerificationModal from '../components/auth/EmailVerificationModal';
 
 export default function ProfilePage() {
   return (
@@ -46,6 +47,9 @@ function ProfileContent() {
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [showOrderDetails, setShowOrderDetails] = useState(false);
+
+  // Email verification state
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   // Address management state
   const [showAddressForm, setShowAddressForm] = useState(false);
@@ -279,6 +283,27 @@ function ProfileContent() {
             </button>
           </div>
         </div>
+
+        {/* Email Verification Banner */}
+        {user && !(user as any).isEmailVerified && (
+          <div className="profile-verification-banner">
+            <div className="profile-verification-content">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <strong>Verify your email address</strong>
+                <p>Please verify your email to access all features and receive important updates.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowVerificationModal(true)}
+              className="profile-verification-btn"
+            >
+              Verify Now
+            </button>
+          </div>
+        )}
 
         {/* Tabs Navigation */}
         <div className="profile-tabs">
@@ -831,6 +856,16 @@ function ProfileContent() {
             </div>
           </div>
         )}
+
+        {/* Email Verification Modal */}
+        <EmailVerificationModal
+          isOpen={showVerificationModal}
+          onClose={() => setShowVerificationModal(false)}
+          onSuccess={() => {
+            setSuccess('Email verified successfully!');
+            setShowVerificationModal(false);
+          }}
+        />
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ interface AuthContextType {
   register: (data: any) => Promise<void>;
   logout: () => Promise<void>;
   refreshUserData: () => Promise<void>;
+  refreshUserProfile: () => Promise<void>; // Alias for refreshUserData
   updateProfile: (data: Partial<User>) => Promise<void>;
   addAddress: (addressData: any) => Promise<void>;
   updateAddress: (addressId: string, addressData: any) => Promise<void>;
@@ -274,6 +275,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     refreshUserData,
+    refreshUserProfile: refreshUserData, // Alias for refreshUserData
     updateProfile,
     addAddress,
     updateAddress,

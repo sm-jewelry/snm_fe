@@ -13,8 +13,24 @@ export interface User {
   role: string;
   phone?: string;
   isActive: boolean;
+  isEmailVerified: boolean;
+  profilePicture?: string;
+  addresses?: Address[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Address {
+  _id: string;
+  fullName: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  phone: string;
+  isDefault: boolean;
 }
 
 export interface LoginData {
@@ -377,5 +393,118 @@ export const auth = {
     }
 
     return response.json();
+  },
+
+  // ============================================
+  // PASSWORD RESET METHODS
+  // ============================================
+
+  /**
+   * Request password reset OTP
+   */
+  async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
+    const response = await fetch(`${API_GATEWAY_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to send reset OTP');
+    }
+
+    return data;
+  },
+
+  /**
+   * Verify password reset OTP
+   */
+  async verifyResetOtp(email: string, otp: string): Promise<{ success: boolean; data: { resetToken: string }; message: string }> {
+    const response = await fetch(`${API_GATEWAY_URL}/api/auth/verify-reset-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, otp }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Invalid or expired OTP');
+    }
+
+    return data;
+  },
+
+  /**
+   * Reset password with token
+   */
+  async resetPassword(email: string, resetToken: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    const response = await fetch(`${API_GATEWAY_URL}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ email, resetToken, newPassword }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to reset password');
+    }
+
+    return data;
+  },
+
+  // ============================================
+  // EMAIL VERIFICATION METHODS
+  // ============================================
+
+  /**
+   * Send email verification OTP
+   */
+  async sendEmailVerification(accessToken: string): Promise<{ success: boolean; message: string }> {
+    const response = await fetch(`${API_GATEWAY_URL}/api/auth/send-verification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      credentials: 'include',
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to send verification email');
+    }
+
+    return data;
+  },
+
+  /**
+   * Verify email with OTP
+   */
+  async verifyEmail(accessToken: string, otp: string): Promise<{ success: boolean; message: string }> {
+    const response = await fetch(`${API_GATEWAY_URL}/api/auth/verify-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      credentials: 'include',
+      body: JSON.stringify({ otp }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to verify email');
+    }
+
+    return data;
   },
 };

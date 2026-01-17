@@ -11,6 +11,8 @@ import "../styles/adminCollection.css";
 import "../styles/adminCollectionProduct.css";
 import "../styles/login.css";
 import "../styles/register.css";
+import "../styles/forgot-password.css";
+import "../styles/email-verification.css";
 import "../styles/profile.css";
 import "../styles/checkout.css";
 import "../styles/ProductCard.css";
