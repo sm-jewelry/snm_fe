@@ -11,14 +11,18 @@ interface Category {
   level?: string;
 }
 
-// ✅ Use API Gateway URL
+interface MainHeaderProps {
+  onMenuClick?: () => void;
+  isMenuOpen?: boolean;
+}
+
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 
 const WISHLIST_API = `${API_GATEWAY_URL}/api/wishlist`;
 const CART_API = `${API_GATEWAY_URL}/api/cart`;
 const CATEGORY_API = `${API_GATEWAY_URL}/api/categories/level`;
 
-const MainHeader: React.FC = () => {
+const MainHeader: React.FC<MainHeaderProps> = ({ onMenuClick, isMenuOpen = false }) => {
   const [c1, setC1] = useState<Category[]>([]);
   const [c2, setC2] = useState<Category[]>([]);
   const [cartCount, setCartCount] = useState<number>(0);
@@ -26,14 +30,14 @@ const MainHeader: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [wishlistCount, setWishlistCount] = useState<number>(0);
 
-  // 🔹 Fetch wishlist count
+  // Fetch wishlist count
   const fetchWishlistCount = () => {
     const token = localStorage.getItem("access_token");
     if (!token) return setWishlistCount(0);
 
     fetch(WISHLIST_API, {
       headers: { Authorization: `Bearer ${token}` },
-      credentials: 'include', // Important for API Gateway
+      credentials: 'include',
     })
       .then((res) => res.json())
       .then((data) => {
@@ -46,7 +50,6 @@ const MainHeader: React.FC = () => {
     setIsClient(true);
     fetchWishlistCount();
 
-    // Listen for wishlist updates
     const handleWishlistUpdate = () => fetchWishlistCount();
     window.addEventListener("wishlistUpdated", handleWishlistUpdate);
 
@@ -55,14 +58,14 @@ const MainHeader: React.FC = () => {
     };
   }, []);
 
-  // 🔹 Fetch cart count
+  // Fetch cart count
   const fetchCartCount = () => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
 
     fetch(CART_API, {
       headers: { Authorization: `Bearer ${token}` },
-      credentials: 'include', // Important for API Gateway
+      credentials: 'include',
     })
       .then((res) => res.json())
       .then((data) => {
@@ -104,7 +107,6 @@ const MainHeader: React.FC = () => {
     const handleCartUpdate = () => fetchCartCount();
     window.addEventListener("cartUpdated", handleCartUpdate);
 
-    // Cleanup
     return () => {
       window.removeEventListener("cartUpdated", handleCartUpdate);
     };
@@ -114,11 +116,27 @@ const MainHeader: React.FC = () => {
   const getChildren = (parentId: string, categories: Category[]) =>
     categories.filter((cat) => cat.parents?.includes(parentId));
 
-  if (!isClient) return null; // prevents hydration mismatch
+  // Toggle menu handler
+  const handleMenuToggle = () => {
+    onMenuClick?.();
+  };
+
+  if (!isClient) return null;
 
   return (
     <header className="main-header flex justify-between items-center px-6 py-3 border-b relative">
-      {/* Left nav (C1 categories with C2 dropdowns) */}
+      {/* Mobile Menu Button - UPDATED */}
+      <button
+        className={`mobile-menu-btn ${isMenuOpen ? 'active' : ''}`}
+        onClick={handleMenuToggle}
+        aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      {/* Left nav (C1 categories with C2 dropdowns) - Desktop Only */}
       <nav className="flex gap-4 main-header-nav">
         {c1.map((category) => (
           <div key={category._id} className="dropdown">
@@ -152,22 +170,33 @@ const MainHeader: React.FC = () => {
       </nav>
 
       {/* Logo */}
-      <Link href="/" className="text-2xl font-bold">
+      <Link href="/" className="text-2xl font-bold main-header-logo">
         SNM
       </Link>
 
       {/* Right icons */}
       <div className="flex items-center gap-4 main-header-icons">
-        <Link href="/search" aria-label="Search" className="cart-icon">
-          🔍
+        {/* Search - Desktop Only (hidden on mobile) */}
+        <Link href="/search" aria-label="Search" className="cart-icon desktop-only">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
         </Link>
 
-        <Link href="/profile" aria-label="Profile" className="cart-icon">
-          👤
+        {/* Profile - Desktop Only (hidden on mobile, in bottom nav) */}
+        <Link href="/profile" aria-label="Profile" className="cart-icon desktop-only">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
         </Link>
 
+        {/* Wishlist */}
         <Link href="/wishlist" aria-label="Wishlist" className="cart-icon relative">
-          ❤️
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
           {wishlistCount > 0 && <span className="cart-badge">{wishlistCount}</span>}
         </Link>
 
@@ -177,7 +206,11 @@ const MainHeader: React.FC = () => {
           className="cart-icon relative"
           onClick={() => setIsCartOpen(true)}
         >
-          🛒
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
           {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
         </button>
       </div>

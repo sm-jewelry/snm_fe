@@ -482,45 +482,180 @@
 }
 
 /* Responsive design */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .register-container {
-    padding: 2rem 1rem;
+    padding: 1rem;
+    padding-top: calc(80px + 1rem);
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
+    min-height: 100vh;
+    align-items: flex-start;
   }
 
   .register-card {
-    padding: 2.5rem 1.75rem;
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+    margin-top: 0.5rem;
   }
 
   .register-title {
-    font-size: 2.25rem;
+    font-size: 1.75rem;
   }
 
   .register-title::before,
   .register-title::after {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    top: -2px;
   }
 
   .register-title::before {
-    left: -30px;
+    left: -25px;
   }
 
   .register-title::after {
-    right: -30px;
+    right: -25px;
+  }
+
+  .register-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .register-header {
+    margin-bottom: 2rem;
+  }
+
+  .register-form {
+    gap: 1rem;
   }
 
   .register-form-row {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .register-input {
+    padding: 0.875rem 1rem;
+    font-size: 16px; /* Prevents zoom on iOS */
+    border-radius: 10px;
+  }
+
+  .register-label {
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .register-label-optional {
+    font-size: 0.8rem;
+  }
+
+  .register-input-helper {
+    font-size: 0.75rem;
+    margin-top: 0.35rem;
   }
 
   .register-button {
-    padding: 1rem;
+    padding: 0.95rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    margin-top: 0.5rem;
+  }
+
+  .register-divider {
+    margin: 1.25rem 0;
+  }
+
+  .register-divider-text {
+    font-size: 0.85rem;
+    padding: 0 0.75rem;
+  }
+
+  .register-google-button {
+    padding: 0.8rem 1.25rem;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .register-google-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .register-login {
+    margin-top: 1rem;
+  }
+
+  .register-login-link {
+    font-size: 0.95rem;
+  }
+
+  .register-back {
+    margin-top: 1.5rem;
+  }
+
+  .register-back-link {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.875rem;
+  }
+
+  .register-error {
+    padding: 0.875rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .register-error-icon {
+    width: 18px;
+    height: 18px;
   }
 }
 
 @media (max-width: 480px) {
+  .register-container {
+    padding: 0.75rem;
+    padding-top: calc(70px + 0.75rem);
+  }
+
+  .register-card {
+    padding: 1.5rem 1.25rem;
+    border-radius: 16px;
+  }
+
+  .register-title {
+    font-size: 1.5rem;
+  }
+
   .register-title::before,
   .register-title::after {
     display: none;
+  }
+
+  .register-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .register-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .register-input {
+    padding: 0.8rem 0.9rem;
+  }
+
+  .register-button {
+    padding: 0.875rem 1.25rem;
+  }
+
+  .register-google-button {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Safe area for notch devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .register-container {
+    padding-top: calc(80px + env(safe-area-inset-top, 0px) + 1rem);
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
   }
 }
 

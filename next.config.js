@@ -13,7 +13,7 @@ const withPWA = require('next-pwa')({
         cacheName: 'google-fonts-webfonts',
         expiration: {
           maxEntries: 4,
-          maxAgeSeconds: 365 * 24 * 60 * 60, // 365 days
+          maxAgeSeconds: 365 * 24 * 60 * 60,
         },
       },
     },
@@ -24,7 +24,7 @@ const withPWA = require('next-pwa')({
         cacheName: 'google-fonts-stylesheets',
         expiration: {
           maxEntries: 4,
-          maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+          maxAgeSeconds: 7 * 24 * 60 * 60,
         },
       },
     },
@@ -35,18 +35,18 @@ const withPWA = require('next-pwa')({
         cacheName: 'static-font-assets',
         expiration: {
           maxEntries: 4,
-          maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+          maxAgeSeconds: 7 * 24 * 60 * 60,
         },
       },
     },
     {
-      urlPattern: /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,
+      urlPattern: /\.(?:jpg|jpeg|gif|png|svg|ico|webp|avif)$/i,
       handler: 'StaleWhileRevalidate',
       options: {
         cacheName: 'static-image-assets',
         expiration: {
-          maxEntries: 64,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          maxEntries: 100,
+          maxAgeSeconds: 24 * 60 * 60,
         },
       },
     },
@@ -56,8 +56,8 @@ const withPWA = require('next-pwa')({
       options: {
         cacheName: 'next-image',
         expiration: {
-          maxEntries: 64,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          maxEntries: 100,
+          maxAgeSeconds: 24 * 60 * 60,
         },
       },
     },
@@ -67,8 +67,8 @@ const withPWA = require('next-pwa')({
       options: {
         cacheName: 'static-js-assets',
         expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60,
         },
       },
     },
@@ -78,8 +78,8 @@ const withPWA = require('next-pwa')({
       options: {
         cacheName: 'static-style-assets',
         expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60,
         },
       },
     },
@@ -89,8 +89,8 @@ const withPWA = require('next-pwa')({
       options: {
         cacheName: 'next-data',
         expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60,
         },
       },
     },
@@ -100,8 +100,8 @@ const withPWA = require('next-pwa')({
       options: {
         cacheName: 'static-data-assets',
         expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60,
         },
       },
     },
@@ -118,8 +118,8 @@ const withPWA = require('next-pwa')({
       options: {
         cacheName: 'others',
         expiration: {
-          maxEntries: 32,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60,
         },
         networkTimeoutSeconds: 10,
       },
@@ -129,6 +129,11 @@ const withPWA = require('next-pwa')({
 
 const nextConfig = {
   reactStrictMode: true,
+
+  // Force webpack mode for next-pwa compatibility
+  webpack: (config) => {
+    return config;
+  },
 
   // Transpile MUI packages for proper CSS handling
   transpilePackages: [
@@ -148,23 +153,29 @@ const nextConfig = {
     },
   },
 
-  // Turbopack-specific configuration
-  experimental: {
-    turbo: {
-      rules: {
-        '*.css': {
-          loaders: ['css-loader'],
-          as: '*.css',
-        },
-      },
-    },
-  },
-
   // Image optimization settings
   images: {
-    domains: ['localhost'],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
     unoptimized: process.env.NODE_ENV === 'development',
   },
+
+  // Compression
+  compress: true,
+
+  // PoweredBy header removal
+  poweredByHeader: false,
+
+  // Trailing slash
+  trailingSlash: false,
 };
 
 module.exports = withPWA(nextConfig);

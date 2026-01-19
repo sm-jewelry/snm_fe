@@ -483,6 +483,7 @@
 @media (max-width: 480px) {
   .order-success-page {
     padding: 20px 12px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
   }
 
   .order-success-container {
@@ -521,5 +522,14 @@
   .btn-secondary {
     padding: 16px 32px;
     font-size: 14px;
+  }
+}
+
+/* Safe area for notch devices */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .order-success-page {
+      padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
+    }
   }
 }

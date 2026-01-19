@@ -453,6 +453,7 @@
 @media (max-width: 480px) {
   .order-failure-page {
     padding: 1rem 0.5rem;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
   }
 
   .order-failure-container {
@@ -469,5 +470,14 @@
   .failure-btn-tertiary {
     padding: 0.9rem 1.5rem;
     font-size: 1rem;
+  }
+}
+
+/* Safe area for notch devices */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .order-failure-page {
+      padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
+    }
   }
 }

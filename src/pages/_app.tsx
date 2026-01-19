@@ -32,6 +32,7 @@ import "../styles/Footer.css";
 import "../styles/LegalPages.css";
 import "../styles/OrderSuccess.css";
 import "../styles/OrderFailure.css";
+import "../styles/mobile-responsive.css";
 import Layout from "../components/layout/Layout";
 import AdminLayout from "../components/admin/layout/AdminLayout";
 import { AdminThemeProvider } from "../contexts/AdminThemeContext";
@@ -40,7 +41,7 @@ import { AuthProvider } from "../contexts/AuthContext";
 import { ErrorBoundary } from "../components/common/ErrorBoundary";
 import { ErrorNotificationProvider } from "../components/common/ErrorNotification";
 import InstallPWA from "../components/common/InstallPWA";
-import '../styles/InstallPWA.css';
+import "../styles/InstallPWA.css";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -66,7 +67,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-192x192.png" />
         
         {/* Viewport for mobile */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
       </Head>
       <ErrorBoundary>
         <ErrorNotificationProvider>

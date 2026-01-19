@@ -1580,3 +1580,31 @@ img {
     font-size: 24px;
   }
 }
+
+/* ============================================
+   DESKTOP ONLY ELEMENTS
+   ============================================ */
+
+.desktop-only {
+  display: flex !important;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   MOBILE ONLY ELEMENTS
+   ============================================ */
+
+.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: flex !important;
+  }
+}
