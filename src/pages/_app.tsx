@@ -39,6 +39,8 @@ import Script from "next/script";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ErrorBoundary } from "../components/common/ErrorBoundary";
 import { ErrorNotificationProvider } from "../components/common/ErrorNotification";
+import InstallPWA from "../components/common/InstallPWA";
+import '../styles/InstallPWA.css';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -48,10 +50,29 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <link rel="icon" href="/snm.ico" />
+        
+        {/* PWA Meta Tags */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#D4AF37" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="SNM Jewelry" />
+        
+        {/* Apple Touch Icons */}
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-192x192.png" />
+        
+        {/* Viewport for mobile */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
       </Head>
       <ErrorBoundary>
         <ErrorNotificationProvider>
           <AuthProvider>
+             {/* Add Install PWA Banner */}
+            {!isAdminRoute && <InstallPWA />}
             {isAdminRoute ? (
               <AdminThemeProvider>
                 <AdminLayout>
