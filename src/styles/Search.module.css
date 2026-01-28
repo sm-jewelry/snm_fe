@@ -490,6 +490,112 @@
   }
 }
 
+/* ===== MOBILE FILTER BUTTON ===== */
+.mobileFilterBtn {
+  display: none;
+  position: fixed;
+  bottom: 90px;
+  right: 16px;
+  z-index: 100;
+  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  color: #000;
+  border: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.5);
+  transition: all 0.3s ease;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobileFilterBtn:active {
+  transform: scale(0.95);
+}
+
+.filterBtnIcon {
+  font-size: 20px;
+}
+
+.filterBtnText {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== MOBILE FILTER OVERLAY ===== */
+.filterOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 998;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.filterOverlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ===== STATE CLASSES (must be outside media query for CSS Modules export) ===== */
+.open {
+  transform: translateY(0) !important;
+}
+
+.active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* ===== MOBILE FILTER DRAWER HEADER ===== */
+.mobileFilterHeader {
+  display: none;
+}
+
+/* ===== ACTIVE FILTERS PILLS (Mobile) ===== */
+.activeFilters {
+  display: none;
+}
+
+.filterPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #d4af37;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.filterPill button {
+  background: none;
+  border: none;
+  color: #d4af37;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ===== MOBILE SORT DROPDOWN ===== */
+.mobileSortRow {
+  display: none;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1200px) {
   .searchContainer {
@@ -526,48 +632,583 @@
   }
 }
 
+/* ============================================
+   MOBILE RESPONSIVE - 768px
+   ============================================ */
 @media (max-width: 768px) {
+  .searchPage {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
+  }
+
+  /* Hero Section Mobile */
   .searchHero {
-    padding: 60px 20px 40px;
+    padding: 30px 16px 24px;
+    min-height: auto;
+  }
+
+  .heroContent {
+    max-width: 100%;
+  }
+
+  .heroTitle {
+    margin-bottom: 12px;
   }
 
   .titleLine {
-    font-size: 36px;
+    font-size: 26px;
+    letter-spacing: -0.5px;
   }
 
   .heroSubtitle {
-    font-size: 16px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    padding: 0 10px;
   }
 
-  .searchContainer {
-    padding: 40px 20px;
+  /* Search Form Mobile */
+  .searchForm {
+    flex-direction: row;
+    gap: 10px;
+    padding: 0 4px;
   }
 
-  .resultsTitle {
-    font-size: 24px;
+  .searchInputWrapper {
+    padding: 0 16px;
+    border-radius: 12px;
+    min-height: 52px;
   }
 
-  .filtersSidebar {
-    padding: 20px;
-  }
-
-  .productsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .titleLine {
-    font-size: 28px;
+  .searchIcon {
+    font-size: 18px;
+    margin-right: 10px;
   }
 
   .searchInput {
+    padding: 14px 0;
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+
+  .clearButton {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .searchButton {
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    min-width: auto;
+    white-space: nowrap;
+  }
+
+  /* Main Container Mobile */
+  .searchContainer {
+    padding: 20px 12px;
+    gap: 0;
+    display: block;
+  }
+
+  /* Mobile Filter Button - Show on mobile */
+  .mobileFilterBtn {
+    display: flex;
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Mobile Sort Row - Show on mobile */
+  .mobileSortRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 0 4px;
+  }
+
+  .mobileSortRow label {
+    font-size: 13px;
+    color: #b8b8b8;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .mobileSortSelect {
+    flex: 1;
+    background: rgba(26, 26, 26, 0.9);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* Active Filters Pills - Show on mobile */
+  .activeFilters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 0 4px;
+  }
+
+  /* Filter Overlay - Show on mobile */
+  .filterOverlay {
+    display: block;
+    pointer-events: none;
+  }
+
+  .filterOverlay.active {
+    pointer-events: auto;
+  }
+
+  /* Filters Sidebar - Convert to Bottom Drawer */
+  .filtersSidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    max-height: 85vh;
+    height: auto;
+    z-index: 999;
+    border-radius: 20px 20px 0 0;
+    padding: 0;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #1a1a1a;
+    border: none;
+    border-top: 2px solid rgba(212, 175, 55, 0.3);
+    overflow: hidden;
+  }
+
+  /* Mobile Filter Header */
+  .mobileFilterHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    position: sticky;
+    top: 0;
+    background: #1a1a1a;
+    z-index: 10;
+  }
+
+  .mobileFilterHeader::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+  }
+
+  .mobileFilterTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: #d4af37;
+    margin: 0;
+  }
+
+  .mobileFilterClose {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .mobileFilterClose:active {
+    background: rgba(212, 175, 55, 0.3);
+  }
+
+  /* Filter Content Scrollable */
+  .filterContent {
+    padding: 14px 16px;
+    overflow-y: auto;
+    max-height: calc(85vh - 120px);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Filters Header in Drawer */
+  .filtersHeader {
+    display: none; /* Hide default header on mobile */
+  }
+
+  /* Filter Groups Mobile */
+  .filterGroup {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .filterGroup:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .filterLabel {
+    font-size: 11px;
+    margin-bottom: 5px;
+    color: #d4af37;
+  }
+
+  .sortSelect {
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: 6px;
+    height: 32px;
+  }
+
+  .priceInputs {
+    gap: 6px;
+  }
+
+  .priceInput {
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: 6px;
+    flex: 1;
+    height: 32px;
+  }
+
+  .priceSeparator {
+    font-size: 12px;
+  }
+
+  /* Apply Filters Button - Mobile */
+  .applyFiltersBtn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .applyFiltersBtn:active {
+    transform: scale(0.98);
+  }
+
+  /* Clear Filters in Mobile */
+  .clearFiltersBtn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  /* Results Section Mobile */
+  .resultsSection {
+    min-height: auto;
+  }
+
+  .resultsHeader {
+    margin-bottom: 20px;
+    padding: 0 4px 16px;
+  }
+
+  .resultsTitle {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .resultsCount {
     font-size: 14px;
   }
 
+  /* Products Grid Mobile */
   .productsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 4px;
+  }
+
+  .productWrapper {
+    transition: none;
+  }
+
+  .productWrapper:hover {
+    transform: none;
+  }
+
+  .productWrapper:active {
+    transform: scale(0.98);
+  }
+
+  /* Loading States Mobile */
+  .loadingContainer {
+    padding: 60px 20px;
+  }
+
+  .loadingSpinner {
+    width: 50px;
+    height: 50px;
+  }
+
+  .loadingText {
+    font-size: 16px;
+  }
+
+  /* No Results Mobile */
+  .noResults {
+    padding: 60px 20px;
+    margin: 0 4px;
+    border-radius: 16px;
+  }
+
+  .noResultsIcon {
+    font-size: 60px;
+  }
+
+  .noResultsTitle {
+    font-size: 22px;
+  }
+
+  .noResultsText {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  /* Load More Mobile */
+  .loadMoreContainer {
+    padding: 40px 20px;
+  }
+
+  /* End of Results Mobile */
+  .endOfResults {
+    padding: 40px 20px;
+    margin-top: 20px;
+  }
+
+  .endText {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+  }
+}
+
+/* ============================================
+   SMALL MOBILE - 480px
+   ============================================ */
+@media (max-width: 480px) {
+  .searchHero {
+    padding: 24px 12px 20px;
+  }
+
+  .titleLine {
+    font-size: 22px;
+  }
+
+  .heroSubtitle {
+    font-size: 13px;
+  }
+
+  .searchForm {
+    gap: 8px;
+  }
+
+  .searchInputWrapper {
+    padding: 0 12px;
+    min-height: 48px;
+    border-radius: 10px;
+  }
+
+  .searchIcon {
+    font-size: 16px;
+    margin-right: 8px;
+  }
+
+  .searchInput {
+    padding: 12px 0;
+    font-size: 16px;
+  }
+
+  .searchButton {
+    padding: 12px 16px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .searchContainer {
+    padding: 16px 10px;
+  }
+
+  .mobileFilterBtn {
+    width: 52px;
+    height: 52px;
+    bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+    right: 12px;
+  }
+
+  .filterBtnIcon {
+    font-size: 18px;
+  }
+
+  .filterBtnText {
+    font-size: 8px;
+  }
+
+  .filtersSidebar {
+    max-height: 90vh;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .mobileFilterHeader {
+    padding: 18px 16px 14px;
+  }
+
+  .mobileFilterTitle {
+    font-size: 16px;
+  }
+
+  .filterContent {
+    padding: 16px;
+    max-height: calc(90vh - 150px);
+  }
+
+  .filterGroup {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+  }
+
+  .filterLabel {
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .sortSelect,
+  .priceInput {
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+
+  .applyFiltersBtn {
+    padding: 14px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  .resultsHeader {
+    padding: 0 2px 14px;
+  }
+
+  .resultsTitle {
+    font-size: 18px;
+  }
+
+  .resultsCount {
+    font-size: 13px;
+  }
+
+  .mobileSortRow {
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .mobileSortRow label {
+    font-size: 12px;
+  }
+
+  .mobileSortSelect {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .activeFilters {
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .filterPill {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .productsGrid {
+    gap: 10px;
+  }
+
+  .noResults {
+    padding: 50px 16px;
+    border-radius: 14px;
+  }
+
+  .noResultsIcon {
+    font-size: 50px;
+  }
+
+  .noResultsTitle {
+    font-size: 20px;
+  }
+
+  .noResultsText {
+    font-size: 13px;
+  }
+}
+
+/* ============================================
+   SAFE AREA INSETS FOR NOTCH DEVICES
+   ============================================ */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .searchPage {
+      padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
+    }
+
+    .mobileFilterBtn {
+      bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .filtersSidebar {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+  }
+}
+
+/* ============================================
+   TOUCH DEVICE OPTIMIZATIONS
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+  .productWrapper:hover {
+    transform: none;
+  }
+
+  .productWrapper:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+
+  .searchButton:hover,
+  .clearButton:hover,
+  .clearFiltersBtn:hover {
+    transform: none;
+  }
+
+  .mobileFilterBtn:hover {
+    transform: none;
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.5);
   }
 }
 
@@ -581,5 +1222,254 @@
 
   .productWrapper:hover {
     transform: none;
+  }
+
+  .filtersSidebar {
+    transition: none;
+  }
+
+  .filterOverlay {
+    transition: none;
+  }
+}
+
+
+@media (max-width: 768px) {
+  
+  /* Ensure drawer is positioned correctly */
+  .filtersSidebar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    max-height: 85vh !important;
+    height: auto !important;
+    z-index: 999 !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding: 0 !important;
+    transform: translateY(100%) !important;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    background: #1a1a1a !important;
+    border: none !important;
+    border-top: 2px solid rgba(212, 175, 55, 0.3) !important;
+    overflow: hidden !important;
+    display: block !important;
+  }
+
+  /* When drawer is open - this class is added by React */
+  .filtersSidebar.open {
+    transform: translateY(0) !important;
+  }
+
+  /* Alternative if using different class name */
+  .open {
+    transform: translateY(0) !important;
+  }
+
+  /* Filter overlay styling */
+  .filterOverlay {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    z-index: 998 !important;
+    opacity: 0 !important;
+    transition: opacity 0.3s ease !important;
+    backdrop-filter: blur(4px) !important;
+    pointer-events: none !important;
+  }
+
+  .filterOverlay.active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Mobile filter button - ensure it's visible */
+  .mobileFilterBtn {
+    display: flex !important;
+    position: fixed !important;
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 16px !important;
+    z-index: 100 !important;
+  }
+
+  /* Mobile filter header */
+  .mobileFilterHeader {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 16px 16px 12px !important;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2) !important;
+    position: sticky !important;
+    top: 0 !important;
+    background: #1a1a1a !important;
+    z-index: 10 !important;
+  }
+
+  .mobileFilterHeader::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 6px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 36px !important;
+    height: 4px !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-radius: 2px !important;
+  }
+
+  .mobileFilterTitle {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #d4af37 !important;
+    margin: 0 !important;
+  }
+
+  .mobileFilterClose {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
+    color: #fff !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    font-size: 18px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+  }
+
+  /* Filter content scrollable area */
+  .filterContent {
+    padding: 14px 16px !important;
+    overflow-y: auto !important;
+    max-height: calc(85vh - 120px) !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Hide desktop filters header on mobile */
+  .filtersHeader {
+    display: none !important;
+  }
+
+  /* Compact filter groups for mobile */
+  .filterGroup {
+    margin-bottom: 10px !important;
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .filterLabel {
+    font-size: 11px !important;
+    margin-bottom: 5px !important;
+    color: #d4af37 !important;
+  }
+
+  .sortSelect {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+    border-radius: 6px !important;
+    height: 32px !important;
+  }
+
+  .priceInput {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+    border-radius: 6px !important;
+    height: 32px !important;
+  }
+
+  /* Apply button */
+  .applyFiltersBtn {
+    display: block !important;
+    width: 100% !important;
+    padding: 12px !important;
+    background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%) !important;
+    color: #000 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    margin-top: 14px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  /* Clear filters button */
+  .clearFiltersBtn {
+    width: 100% !important;
+    padding: 10px !important;
+    margin-top: 10px !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+  }
+
+  /* Mobile sort row */
+  .mobileSortRow {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+    padding: 0 4px !important;
+  }
+
+  /* Active filters pills */
+  .activeFilters {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin-bottom: 16px !important;
+    padding: 0 4px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .filtersSidebar {
+    max-height: 90vh !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+
+  .mobileFilterBtn {
+    width: 52px !important;
+    height: 52px !important;
+    bottom: calc(85px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 12px !important;
+  }
+
+  .filterContent {
+    padding: 16px !important;
+    max-height: calc(90vh - 150px) !important;
+  }
+
+  .filterGroup {
+    margin-bottom: 20px !important;
+    padding-bottom: 20px !important;
+  }
+
+  .filterLabel {
+    font-size: 13px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .sortSelect,
+  .priceInput {
+    padding: 12px 14px !important;
+    font-size: 16px !important;
+    border-radius: 10px !important;
+    height: auto !important;
+    min-height: 44px !important;
+  }
+
+  .applyFiltersBtn {
+    padding: 14px !important;
+    font-size: 15px !important;
+    border-radius: 12px !important;
+    min-height: 48px !important;
   }
 }

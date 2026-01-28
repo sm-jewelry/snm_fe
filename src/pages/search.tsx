@@ -49,6 +49,40 @@ export default function SearchPage() {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
+  // Mobile filter drawer state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // Close filter drawer when pressing escape
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFilterOpen(false);
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, []);
+
+  // Prevent body scroll when filter is open
+  useEffect(() => {
+    if (isFilterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isFilterOpen]);
+
+  // Get active filter count for mobile button
+  const getActiveFilterCount = () => {
+    let count = 0;
+    if (selectedCategory !== 'all') count++;
+    if (selectedCollection !== 'all') count++;
+    if (minPrice) count++;
+    if (maxPrice) count++;
+    return count;
+  };
+
   // Fetch all data on mount
   useEffect(() => {
     fetchAllProducts();
@@ -254,8 +288,39 @@ export default function SearchPage() {
     router.push('/search');
   };
 
+  // Get category/collection name for filter pills
+  const getCategoryName = (id: string) => {
+    const cat = categories.find(c => c._id === id);
+    return cat?.name || '';
+  };
+
+  const getCollectionName = (id: string) => {
+    const col = collections.find(c => c._id === id);
+    return col?.name || '';
+  };
+
   return (
     <div className={styles.searchPage}>
+      {/* Mobile Filter Button */}
+      <button
+        className={styles.mobileFilterBtn}
+        onClick={() => setIsFilterOpen(true)}
+        aria-label="Open filters"
+      >
+        <span className={styles.filterBtnIcon}>⚙️</span>
+        <span className={styles.filterBtnText}>
+          {getActiveFilterCount() > 0 ? `Filter (${getActiveFilterCount()})` : 'Filter'}
+        </span>
+      </button>
+
+      {/* Filter Overlay */}
+      {isFilterOpen && (
+        <div
+          className={`${styles.filterOverlay} ${styles.active}`}
+          onClick={() => setIsFilterOpen(false)}
+        />
+      )}
+
       {/* Hero Section */}
       <div className={styles.searchHero}>
         <div className={styles.heroContent}>
@@ -297,78 +362,126 @@ export default function SearchPage() {
 
       {/* Main Content */}
       <div className={styles.searchContainer}>
-        {/* Filters Sidebar */}
-        <aside className={styles.filtersSidebar}>
-          <div className={styles.filtersHeader}>
-            <h2 className={styles.filtersTitle}>Filters</h2>
-            {(searchQuery || selectedCategory !== 'all' || selectedCollection !== 'all' || minPrice || maxPrice) && (
+        {/* Filters Sidebar / Mobile Drawer */}
+        <aside className={`${styles.filtersSidebar} ${isFilterOpen ? styles.open : ''}`}>
+          {/* Mobile Filter Header */}
+          <div className={styles.mobileFilterHeader}>
+            <h2 className={styles.mobileFilterTitle}>Filters & Sort</h2>
+            <button
+              className={styles.mobileFilterClose}
+              onClick={() => setIsFilterOpen(false)}
+              aria-label="Close filters"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Filter Content */}
+          <div className={styles.filterContent}>
+            <div className={styles.filtersHeader}>
+              <h2 className={styles.filtersTitle}>Filters</h2>
+              {(searchQuery || selectedCategory !== 'all' || selectedCollection !== 'all' || minPrice || maxPrice) && (
+                <button className={styles.clearFiltersBtn} onClick={clearFilters}>
+                  Clear All
+                </button>
+              )}
+            </div>
+
+            {/* Sort Filter - Moved to top for mobile */}
+            <div className={styles.filterGroup}>
+              <h3 className={styles.filterLabel}>Sort By</h3>
+              <select
+                className={styles.sortSelect}
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="relevance">Relevance</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+                <option value="popular">Most Popular</option>
+              </select>
+            </div>
+
+            {/* Category Filter */}
+            <div className={styles.filterGroup}>
+              <h3 className={styles.filterLabel}>Category</h3>
+              <select
+                className={styles.sortSelect}
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option value="all">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Collection Filter */}
+            <div className={styles.filterGroup}>
+              <h3 className={styles.filterLabel}>Collection</h3>
+              <select
+                className={styles.sortSelect}
+                value={selectedCollection}
+                onChange={(e) => setSelectedCollection(e.target.value)}
+              >
+                <option value="all">All Collections</option>
+                {collections.map((collection) => (
+                  <option key={collection._id} value={collection._id}>
+                    {collection.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Price Filter */}
+            <div className={styles.filterGroup}>
+              <h3 className={styles.filterLabel}>Price Range</h3>
+              <div className={styles.priceInputs}>
+                <input
+                  type="number"
+                  className={styles.priceInput}
+                  placeholder="Min ₹"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                />
+                <span className={styles.priceSeparator}>-</span>
+                <input
+                  type="number"
+                  className={styles.priceInput}
+                  placeholder="Max ₹"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Apply Filters Button (Mobile) */}
+            <button
+              className={styles.applyFiltersBtn}
+              onClick={() => setIsFilterOpen(false)}
+            >
+              Apply Filters ({filteredProducts.length} products)
+            </button>
+
+            {(selectedCategory !== 'all' || selectedCollection !== 'all' || minPrice || maxPrice) && (
               <button className={styles.clearFiltersBtn} onClick={clearFilters}>
-                Clear All
+                Clear All Filters
               </button>
             )}
           </div>
+        </aside>
 
-          {/* Category Filter */}
-          <div className={styles.filterGroup}>
-            <h3 className={styles.filterLabel}>Category</h3>
+        {/* Results Section */}
+        <main className={styles.resultsSection}>
+          {/* Mobile Sort Row */}
+          <div className={styles.mobileSortRow}>
+            <label>Sort:</label>
             <select
-              className={styles.sortSelect}
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >
-              <option value="all">All Categories</option>
-              {categories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Collection Filter */}
-          <div className={styles.filterGroup}>
-            <h3 className={styles.filterLabel}>Collection</h3>
-            <select
-              className={styles.sortSelect}
-              value={selectedCollection}
-              onChange={(e) => setSelectedCollection(e.target.value)}
-            >
-              <option value="all">All Collections</option>
-              {collections.map((collection) => (
-                <option key={collection._id} value={collection._id}>
-                  {collection.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Price Filter */}
-          <div className={styles.filterGroup}>
-            <h3 className={styles.filterLabel}>Price Range</h3>
-            <div className={styles.priceInputs}>
-              <input
-                type="number"
-                className={styles.priceInput}
-                placeholder="Min"
-                value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
-              />
-              <span className={styles.priceSeparator}>-</span>
-              <input
-                type="number"
-                className={styles.priceInput}
-                placeholder="Max"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Sort Filter */}
-          <div className={styles.filterGroup}>
-            <h3 className={styles.filterLabel}>Sort By</h3>
-            <select
-              className={styles.sortSelect}
+              className={styles.mobileSortSelect}
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
@@ -379,10 +492,36 @@ export default function SearchPage() {
               <option value="popular">Most Popular</option>
             </select>
           </div>
-        </aside>
 
-        {/* Results Section */}
-        <main className={styles.resultsSection}>
+          {/* Active Filters Pills (Mobile) */}
+          {(selectedCategory !== 'all' || selectedCollection !== 'all' || minPrice || maxPrice) && (
+            <div className={styles.activeFilters}>
+              {selectedCategory !== 'all' && (
+                <span className={styles.filterPill}>
+                  {getCategoryName(selectedCategory)}
+                  <button onClick={() => setSelectedCategory('all')}>✕</button>
+                </span>
+              )}
+              {selectedCollection !== 'all' && (
+                <span className={styles.filterPill}>
+                  {getCollectionName(selectedCollection)}
+                  <button onClick={() => setSelectedCollection('all')}>✕</button>
+                </span>
+              )}
+              {minPrice && (
+                <span className={styles.filterPill}>
+                  Min: ₹{minPrice}
+                  <button onClick={() => setMinPrice('')}>✕</button>
+                </span>
+              )}
+              {maxPrice && (
+                <span className={styles.filterPill}>
+                  Max: ₹{maxPrice}
+                  <button onClick={() => setMaxPrice('')}>✕</button>
+                </span>
+              )}
+            </div>
+          )}
           {/* Results Header */}
           <div className={styles.resultsHeader}>
             <h2 className={styles.resultsTitle}>
