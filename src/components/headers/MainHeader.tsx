@@ -192,18 +192,18 @@ const MainHeader: React.FC<MainHeaderProps> = ({ onMenuClick, isMenuOpen = false
           </svg>
         </Link>
 
-        {/* Wishlist */}
-        <Link href="/wishlist" aria-label="Wishlist" className="cart-icon relative">
+        {/* Wishlist - Desktop Only */}
+        <Link href="/wishlist" aria-label="Wishlist" className="cart-icon relative desktop-only">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
           </svg>
           {wishlistCount > 0 && <span className="cart-badge">{wishlistCount}</span>}
         </Link>
 
-        {/* Cart button to open drawer */}
+        {/* Cart button - Desktop Only */}
         <button
           aria-label="Cart"
-          className="cart-icon relative"
+          className="cart-icon relative desktop-only"
           onClick={() => setIsCartOpen(true)}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -213,6 +213,19 @@ const MainHeader: React.FC<MainHeaderProps> = ({ onMenuClick, isMenuOpen = false
           </svg>
           {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
         </button>
+
+        {/* C1 Categories - Mobile Only */}
+        <div className="mobile-c1-categories mobile-only">
+          {c1.slice(0, 3).map((category) => (
+            <Link
+              key={category._id}
+              href={`/shop/category/${category._id}`}
+              className="mobile-c1-link"
+            >
+              {category.name}
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Cart Drawer */}

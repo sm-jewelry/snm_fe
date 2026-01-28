@@ -13,6 +13,7 @@ interface Category {
 // ✅ Use API Gateway URL
 const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000';
 const CATEGORY_API = `${API_GATEWAY_URL}/api/categories/level`;
+console.log(process.env.NEXT_PUBLIC_API_GATEWAY_URL)
 
 const NavHeader: React.FC = () => {
   const [c1, setC1] = useState<Category[]>([]);
