@@ -141,7 +141,8 @@ export default function ShopPage() {
   }, []);
 
   const loadProducts = useCallback(async (pageNum: number, reset = false) => {
-    if (loading) return;
+    // Allow reset to proceed even if loading (for filter changes)
+    if (loading && !reset) return;
 
     setLoading(true);
     try {
