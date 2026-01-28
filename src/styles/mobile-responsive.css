@@ -1016,8 +1016,17 @@
   .product-card,
   .wishlist-card {
     border-radius: 12px !important;
-    overflow: hidden;
+    overflow: visible !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Ensure image container clips overflow, not the whole card */
+  .product-card .product-image,
+  .product-image {
+    overflow: hidden !important;
+    border-radius: 12px 12px 0 0 !important;
   }
 
   .product-img,
@@ -1029,6 +1038,9 @@
   .product-info,
   .wishlist-card > a {
     padding: 12px !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .product-info h3,
@@ -1048,6 +1060,30 @@
     font-size: 15px !important;
     font-weight: 700 !important;
     margin-bottom: 2px !important;
+  }
+
+  /* Product Price Styling - Fix for price cutoff */
+  .product-price {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 2px !important;
+    margin-bottom: 4px !important;
+    margin-top: auto !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+  }
+
+  .product-price .currency {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #1a1a1a !important;
+  }
+
+  .product-price .amount {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #1a1a1a !important;
+    overflow: visible !important;
   }
 
   .product-info .sku,
