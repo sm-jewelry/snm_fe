@@ -48,22 +48,6 @@ const ProductDetail: React.FC = () => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
 
-  // 🔐 Auth check
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      Swal.fire({
-        icon: "warning",
-        title: "Login Required",
-        text: "Please login to view product details",
-        confirmButtonText: "Login",
-        confirmButtonColor: "#f59e0b",
-      }).then((r) => {
-        if (r.isConfirmed) router.push("/profile");
-      });
-    }
-  }, [router]);
-
   // 📦 Fetch product
   useEffect(() => {
     if (!id) return;

@@ -68,9 +68,83 @@
 .shop-controls {
   background: #fff;
   border-radius: 16px;
-  padding: 30px;
+  padding: 0;
   margin-bottom: 40px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Desktop Filter Header */
+.desktop-filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 30px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.desktop-filter-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.desktop-filter-toggle {
+  background: #f5f5f5;
+  border: none;
+  color: #666;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.desktop-filter-toggle:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+/* Desktop Filter Content - Collapsible */
+.shop-controls .filter-content {
+  padding: 0 30px 30px;
+  max-height: 1000px;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+.shop-controls.collapsed .filter-content {
+  max-height: 0;
+  padding: 0 30px;
+  opacity: 0;
+}
+
+.shop-controls.collapsed .desktop-filter-header {
+  border-bottom: none;
+}
+
+/* Hide mobile-only elements on desktop */
+.mobile-filter-header {
+  display: none;
+}
+
+.apply-filters-btn {
+  display: none;
+}
+
+.mobile-sort-row {
+  display: none;
+}
+
+.active-filter-pills {
+  display: none;
 }
 
 .controls-top {
@@ -545,6 +619,18 @@
     padding: 0 12px 20px;
   }
 
+  /* Hide desktop filter header on mobile */
+  .desktop-filter-header {
+    display: none !important;
+  }
+
+  /* Remove desktop collapse on mobile */
+  .shop-controls.collapsed .filter-content {
+    max-height: none !important;
+    padding: 10px 12px !important;
+    opacity: 1 !important;
+  }
+
   /* Mobile Filter Button - Show */
   .mobile-filter-btn {
     display: flex !important;
@@ -618,14 +704,19 @@
     padding: 0 !important;
     margin: 0 !important;
     transform: translateY(100%) !important;
-    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.35s !important;
     background: #fff !important;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2) !important;
     overflow: hidden !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
   }
 
   .shop-controls.open {
     transform: translateY(0) !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0s !important;
   }
 
   /* Mobile Filter Header */
@@ -651,6 +742,7 @@
     height: 4px !important;
     background: #ddd !important;
     border-radius: 2px !important;
+    pointer-events: none !important;
   }
 
   .mobile-filter-title {
@@ -664,15 +756,18 @@
     background: #f5f5f5 !important;
     border: none !important;
     color: #666 !important;
-    width: 30px !important;
-    height: 30px !important;
+    width: 36px !important;
+    height: 36px !important;
     border-radius: 50% !important;
-    font-size: 16px !important;
+    font-size: 18px !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     transition: all 0.2s ease !important;
+    position: relative !important;
+    z-index: 20 !important;
+    -webkit-tap-highlight-color: transparent !important;
   }
 
   .mobile-filter-close:active {

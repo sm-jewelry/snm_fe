@@ -47,24 +47,67 @@ const Collections: React.FC = () => {
     const slider = sliderRef.current;
     if (!slider || collections.length === 0) return;
 
-    let scrollAmount = 0;
-    const speed = 1; // pixels per frame
+    let paused = false;
     let req: number;
 
     const step = () => {
-      scrollAmount += speed;
-      if (scrollAmount >= slider.scrollWidth / 2) {
-        scrollAmount = 0;
+      if (!paused) {
+        slider.scrollLeft += 1;
+        // Reset to start when reached halfway (duplicate content)
+        if (slider.scrollLeft >= slider.scrollWidth / 2) {
+          slider.scrollLeft = 0;
+        }
       }
-      slider.scrollLeft = scrollAmount;
       req = requestAnimationFrame(step);
     };
 
+    // Pause on hover (desktop)
+    const pause = () => { paused = true; };
+    const resume = () => { paused = false; };
+
+    slider.addEventListener("mouseenter", pause);
+    slider.addEventListener("mouseleave", resume);
+
+    // Pause on touch (mobile)
+    slider.addEventListener("touchstart", pause, { passive: true });
+    slider.addEventListener("touchend", resume);
+
     req = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(req);
+
+    return () => {
+      cancelAnimationFrame(req);
+      slider.removeEventListener("mouseenter", pause);
+      slider.removeEventListener("mouseleave", resume);
+      slider.removeEventListener("touchstart", pause);
+      slider.removeEventListener("touchend", resume);
+    };
   }, [collections]);
 
-  const handleClick = (id: string) => {
+  // Mouse drag scroll for desktop
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollStart = useRef(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    startX.current = e.pageX;
+    scrollStart.current = sliderRef.current?.scrollLeft || 0;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !sliderRef.current) return;
+    e.preventDefault();
+    const diff = e.pageX - startX.current;
+    sliderRef.current.scrollLeft = scrollStart.current - diff;
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+  };
+
+  const handleClick = (id: string, e: React.MouseEvent) => {
+    // Prevent navigation if user was dragging
+    if (Math.abs(e.pageX - startX.current) > 5) return;
     router.push(`/collections/${id}`);
   };
 
@@ -110,12 +153,19 @@ const Collections: React.FC = () => {
 
   return (
     <section className="collections-section">
-      <div className="collections-slider" ref={sliderRef}>
+      <div
+        className="collections-slider"
+        ref={sliderRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
         {[...collections, ...collections].map((item, index) => (
           <div
             key={`${item._id}-${index}`}
             className="collection-card"
-            onClick={() => handleClick(item._id)}
+            onClick={(e) => handleClick(item._id, e)}
             style={{ cursor: "pointer" }}
           >
             <img src={item.imageUrl} alt={item.name} />

@@ -61,6 +61,9 @@ export default function ShopPage() {
   // Mobile filter drawer state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+  // Desktop filter collapse state
+  const [isFilterCollapsed, setIsFilterCollapsed] = useState(false);
+
   // Infinite scroll
   const observer = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -368,7 +371,19 @@ export default function ShopPage() {
           )}
 
           {/* Filters & Sorting Bar / Mobile Drawer */}
-          <div className={`shop-controls ${isFilterOpen ? 'open' : ''}`}>
+          <div className={`shop-controls ${isFilterOpen ? 'open' : ''} ${isFilterCollapsed ? 'collapsed' : ''}`}>
+            {/* Desktop Filter Header */}
+            <div className="desktop-filter-header">
+              <h2 className="desktop-filter-title">Filters & Sort</h2>
+              <button
+                className="desktop-filter-toggle"
+                onClick={() => setIsFilterCollapsed(!isFilterCollapsed)}
+                aria-label={isFilterCollapsed ? 'Open filters' : 'Close filters'}
+              >
+                {isFilterCollapsed ? '▼' : '✕'}
+              </button>
+            </div>
+
             {/* Mobile Filter Header */}
             <div className="mobile-filter-header">
               <h2 className="mobile-filter-title">Filters & Sort</h2>
