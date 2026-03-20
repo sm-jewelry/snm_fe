@@ -22,11 +22,24 @@ const Home: React.FC = () => {
 
       {/* Hero Section */}
       <div className="home-hero">
+        <img
+          src="/images/main-banner-2.jpg"
+          alt="SNM Jewelry Banner"
+          className="hero-bg-desktop"
+        />
+        <img
+          src="/images/m.v-main-banner-2.jpg"
+          alt="SNM Jewelry Banner"
+          className="hero-bg-mobile"
+        />
+        <div className="hero-overlay" />
         <div className="hero-content">
           <span className="hero-badge">✨ Premium Jewelry ✨</span>
           <h1 className="hero-title">Timeless Elegance</h1>
           <p className="hero-subtitle">
-            Discover our exquisite collection of handcrafted jewelry that tells your unique story
+            <span>Discover our exquisite collection</span><br />
+            <span>of handcrafted jewelry that</span><br />
+            <span>tells your unique story</span>
           </p>
           <div className="hero-cta">
             <button

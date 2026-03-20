@@ -845,8 +845,8 @@
 @media (max-width: 768px) {
   /* Hero Section */
   .home-hero {
-    min-height: 320px !important;
-    padding: 40px 20px !important;
+    min-height: auto !important;
+    padding: 0 !important;
     margin-bottom: 0 !important;
   }
 
@@ -857,32 +857,36 @@
   .hero-badge {
     font-size: 11px !important;
     padding: 6px 14px !important;
-    margin-bottom: 16px !important;
+    margin-bottom: 8px !important;
+    background: #FFD700;
+    color: #1a1a1a;
   }
 
   .hero-title {
-    font-size: 32px !important;
-    margin-bottom: 12px !important;
+    font-size: 28px !important;
+    margin-bottom: 6px !important;
     line-height: 1.1 !important;
   }
 
   .hero-subtitle {
-    font-size: 14px !important;
-    margin-bottom: 24px !important;
-    line-height: 1.5 !important;
+    display: none !important;
   }
 
   .hero-cta {
     flex-direction: column !important;
-    gap: 12px !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
     width: 100%;
+    margin-top: auto !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
   }
 
   .hero-btn {
-    width: 100% !important;
-    max-width: 280px !important;
-    padding: 14px 24px !important;
-    font-size: 14px !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 8px 16px !important;
+    font-size: 11px !important;
     justify-content: center !important;
   }
 
@@ -2449,7 +2453,7 @@
   }
 
   .home-hero {
-    min-height: 280px !important;
+    min-height: auto !important;
   }
 
   .mobile-bottom-nav {
